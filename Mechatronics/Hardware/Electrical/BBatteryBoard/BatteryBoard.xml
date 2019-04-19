@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/paul/CProjects/Encoder/Mechatronics/Hardware/Electrical/BBatteryBoard/BatteryBoard.sch</source>
+    <date>lun 07 ene 2019 20:31:07 CST</date>
+    <tool>Eeschema 5.0.2+dfsg1-1~bpo9+1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>BatteryBoard.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="U1">
+      <value>03962A</value>
+      <footprint>Encoder:03962A</footprint>
+      <libsource lib="Encoder" part="03962A" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C345817</tstamp>
+    </comp>
+    <comp ref="Q1">
+      <value>Q_PMOS_GDS</value>
+      <footprint>Encoder:TO-220-3_Horizontal_TabDown</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="Q_PMOS_GDS" description="P-MOSFET transistor, gate/drain/source"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C345975</tstamp>
+    </comp>
+    <comp ref="U3">
+      <value>MT3608A</value>
+      <footprint>Encoder:Mt3608</footprint>
+      <libsource lib="Encoder" part="MT3608A" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C345A5C</tstamp>
+    </comp>
+    <comp ref="D1">
+      <value>D_Schottky</value>
+      <footprint>Encoder:D_DO-201AD_P15.24mm_Horizontal</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="D_Schottky" description="Schottky diode"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C345BC9</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>10K</value>
+      <footprint>Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C345C89</tstamp>
+    </comp>
+    <comp ref="S1">
+      <value>EG1218</value>
+      <footprint>Encoder:Switch_Slide_11.6x4mm_EG1218</footprint>
+      <datasheet>http://spec_sheets.e-switch.com/specs/P040040.pdf</datasheet>
+      <fields>
+        <field name="Category">Switches</field>
+        <field name="DK_Datasheet_Link">http://spec_sheets.e-switch.com/specs/P040040.pdf</field>
+        <field name="DK_Detail_Page">/product-detail/en/e-switch/EG1218/EG1903-ND/101726</field>
+        <field name="Description">SWITCH SLIDE SPDT 200MA 30V</field>
+        <field name="Digi-Key_PN">EG1903-ND</field>
+        <field name="Family">Slide Switches</field>
+        <field name="MPN">EG1218</field>
+        <field name="Manufacturer">E-Switch</field>
+        <field name="Status">Active</field>
+      </fields>
+      <libsource lib="Encoder" part="EG1218" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C32D155</tstamp>
+    </comp>
+    <comp ref="J3">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C32DA3D</tstamp>
+    </comp>
+    <comp ref="J4">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C32DB0E</tstamp>
+    </comp>
+    <comp ref="U2">
+      <value>LM1117-3.3</value>
+      <footprint>Encoder:TO-220-3_Horizontal_TabDown</footprint>
+      <datasheet>http://www.ti.com/lit/ds/symlink/lm1117.pdf</datasheet>
+      <libsource lib="Regulator_Linear" part="LM1117-3.3" description="800mA Low-Dropout Linear Regulator, 3.3V fixed output, TO-220/TO-252/TO-263/SOT-223"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C32F809</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>100nF</value>
+      <footprint>Encoder:C_Disc_D9.0mm_W5.0mm_P5.00mm</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C32FF3C</tstamp>
+    </comp>
+    <comp ref="C2">
+      <value>10uF</value>
+      <footprint>Encoder:C_Disc_D9.0mm_W5.0mm_P5.00mm</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C330348</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C333E3A</tstamp>
+    </comp>
+    <comp ref="J2">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C334249</tstamp>
+    </comp>
+    <comp ref="J5">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C33C90B</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="Conn_01x01_Male">
+      <description>Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x01_Male</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="D_Schottky">
+      <description>Schottky diode</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>TO-???*</fp>
+        <fp>*_Diode_*</fp>
+        <fp>*SingleDiode*</fp>
+        <fp>D_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">D_Schottky</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="Q_PMOS_GDS">
+      <description>P-MOSFET transistor, gate/drain/source</description>
+      <docs>~</docs>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">Q_PMOS_GDS</field>
+      </fields>
+      <pins>
+        <pin num="1" name="G" type="input"/>
+        <pin num="2" name="D" type="passive"/>
+        <pin num="3" name="S" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="03962A">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">03962A</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Vin+" type="power_out"/>
+        <pin num="2" name="Vin-" type="passive"/>
+        <pin num="3" name="Batt+" type="BiDi"/>
+        <pin num="4" name="Batt-" type="BiDi"/>
+        <pin num="5" name="OUT+" type="power_out"/>
+        <pin num="6" name="OUT-" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="EG1218">
+      <fields>
+        <field name="Reference">S</field>
+        <field name="Value">EG1218</field>
+        <field name="Footprint">digikey-footprints:Switch_Slide_11.6x4mm_EG1218</field>
+        <field name="Datasheet">http://spec_sheets.e-switch.com/specs/P040040.pdf</field>
+        <field name="Digi-Key_PN">EG1903-ND</field>
+        <field name="MPN">EG1218</field>
+        <field name="Category">Switches</field>
+        <field name="Family">Slide Switches</field>
+        <field name="DK_Datasheet_Link">http://spec_sheets.e-switch.com/specs/P040040.pdf</field>
+        <field name="DK_Detail_Page">/product-detail/en/e-switch/EG1218/EG1903-ND/101726</field>
+        <field name="Description">SWITCH SLIDE SPDT 200MA 30V</field>
+        <field name="Manufacturer">E-Switch</field>
+        <field name="Status">Active</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+        <pin num="3" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="MT3608A">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">MT3608A</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Vin+" type="power_in"/>
+        <pin num="2" name="Vin-" type="passive"/>
+        <pin num="3" name="Vout+" type="power_out"/>
+        <pin num="4" name="Vout-" type="power_out"/>
+      </pins>
+    </libpart>
+    <libpart lib="Regulator_Linear" part="LM1117-1.8">
+      <aliases>
+        <alias>LM1117-2.5</alias>
+        <alias>LM1117-3.3</alias>
+        <alias>LM1117-5.0</alias>
+        <alias>TLV1117-15</alias>
+        <alias>TLV1117-18</alias>
+        <alias>TLV1117-25</alias>
+        <alias>TLV1117-33</alias>
+        <alias>TLV1117-50</alias>
+      </aliases>
+      <description>800mA Low-Dropout Linear Regulator, 1.8V fixed output, TO-220/TO-252/TO-263/SOT-223</description>
+      <docs>http://www.ti.com/lit/ds/symlink/lm1117.pdf</docs>
+      <footprints>
+        <fp>SOT?223*</fp>
+        <fp>TO?263*</fp>
+        <fp>TO?252*</fp>
+        <fp>TO?220*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">LM1117-1.8</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND" type="power_in"/>
+        <pin num="2" name="VO" type="power_out"/>
+        <pin num="3" name="VI" type="power_in"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>/usr/share/kicad/library/Connector.lib</uri>
+    </library>
+    <library logical="Device">
+      <uri>/usr/share/kicad/library/Device.lib</uri>
+    </library>
+    <library logical="Encoder">
+      <uri>/home/paul/CProjects/Encoder/Mechatronics/Hardware/Electrical/Library/Encoder.lib</uri>
+    </library>
+    <library logical="Regulator_Linear">
+      <uri>/usr/share/kicad/library/Regulator_Linear.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="+3V3">
+      <node ref="U2" pin="2"/>
+      <node ref="J2" pin="1"/>
+      <node ref="J1" pin="1"/>
+      <node ref="C2" pin="1"/>
+    </net>
+    <net code="2" name="+5V">
+      <node ref="U3" pin="3"/>
+      <node ref="U2" pin="3"/>
+      <node ref="J3" pin="1"/>
+      <node ref="C1" pin="1"/>
+    </net>
+    <net code="3" name="GND">
+      <node ref="S1" pin="3"/>
+      <node ref="R1" pin="2"/>
+      <node ref="U3" pin="4"/>
+      <node ref="U3" pin="2"/>
+      <node ref="U1" pin="6"/>
+      <node ref="U1" pin="2"/>
+      <node ref="J4" pin="1"/>
+      <node ref="U2" pin="1"/>
+      <node ref="J5" pin="1"/>
+      <node ref="C1" pin="2"/>
+      <node ref="C2" pin="2"/>
+    </net>
+    <net code="4" name="Net-(U1-Pad4)">
+      <node ref="U1" pin="4"/>
+    </net>
+    <net code="5" name="Net-(U1-Pad3)">
+      <node ref="U1" pin="3"/>
+    </net>
+    <net code="6" name="VCC">
+      <node ref="U1" pin="1"/>
+      <node ref="D1" pin="2"/>
+      <node ref="R1" pin="1"/>
+      <node ref="Q1" pin="1"/>
+    </net>
+    <net code="7" name="Net-(S1-Pad2)">
+      <node ref="S1" pin="2"/>
+      <node ref="U3" pin="1"/>
+    </net>
+    <net code="8" name="Net-(D1-Pad1)">
+      <node ref="S1" pin="1"/>
+      <node ref="D1" pin="1"/>
+      <node ref="Q1" pin="2"/>
+    </net>
+    <net code="9" name="Net-(Q1-Pad3)">
+      <node ref="Q1" pin="3"/>
+      <node ref="U1" pin="5"/>
+    </net>
+  </nets>
+</export>

@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/paul/CProjects/Encoder/Mechatronics/Hardware/Electrical/BCommunicationBoard/CommunicationBoard.sch</source>
+    <date>sáb 26 ene 2019 21:49:57 CST</date>
+    <tool>Eeschema 5.0.2+dfsg1-1~bpo9+1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>CommunicationBoard.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="U1">
+      <value>SSD1306OLED</value>
+      <footprint>Encoder:SSD1306</footprint>
+      <libsource lib="Encoder" part="SSD1306OLED" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EB9CF</tstamp>
+    </comp>
+    <comp ref="J3">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EBC1C</tstamp>
+    </comp>
+    <comp ref="J4">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EBC6E</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EBC88</tstamp>
+    </comp>
+    <comp ref="J2">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EBCA6</tstamp>
+    </comp>
+    <comp ref="J5">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EBDAC</tstamp>
+    </comp>
+    <comp ref="J6">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EBDFA</tstamp>
+    </comp>
+    <comp ref="J7">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EBE22</tstamp>
+    </comp>
+    <comp ref="IC1">
+      <value>RN4020-V_RM120</value>
+      <footprint>Encoder:Bluetooth_Module_RN4020</footprint>
+      <datasheet>http://uk.rs-online.com/web/p/products/8282856</datasheet>
+      <fields>
+        <field name="Allied_Number">70574112</field>
+        <field name="Description">Microchip Bluetooth Development Module RN4020-V/RM120</field>
+        <field name="Manufacturer_Name">Microchip</field>
+        <field name="Manufacturer_Part_Number">RN4020-V/RM120</field>
+        <field name="RS Part Number">8282856</field>
+      </fields>
+      <libsource lib="Encoder" part="RN4020-V_RM120" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C2EB132</tstamp>
+    </comp>
+    <comp ref="J8">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C31483E</tstamp>
+    </comp>
+    <comp ref="J9">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C31521B</tstamp>
+    </comp>
+    <comp ref="J10">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:PinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C31525D</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>4.7uF</value>
+      <footprint>Encoder:C_Disc_D9.0mm_W5.0mm_P5.00mm</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C38FB11</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="Conn_01x01_Male">
+      <description>Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x01_Male</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="RN4020-V_RM120">
+      <fields>
+        <field name="Reference">IC</field>
+        <field name="Value">RN4020-V_RM120</field>
+        <field name="Footprint">RN4020-V/RM123</field>
+        <field name="Datasheet">http://uk.rs-online.com/web/p/products/8282856</field>
+        <field name="Description">Microchip Bluetooth Development Module RN4020-V/RM120</field>
+        <field name="RS Part Number">8282856</field>
+        <field name="Manufacturer_Name">Microchip</field>
+        <field name="Manufacturer_Part_Number">RN4020-V/RM120</field>
+        <field name="Allied_Number">70574112</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND_1" type="BiDi"/>
+        <pin num="2" name="AIO2" type="BiDi"/>
+        <pin num="3" name="AIO1" type="BiDi"/>
+        <pin num="4" name="AIO0" type="BiDi"/>
+        <pin num="5" name="UART_TX" type="BiDi"/>
+        <pin num="6" name="UART_RX" type="BiDi"/>
+        <pin num="7" name="WAKE_SW" type="BiDi"/>
+        <pin num="8" name="CMD/MLDP" type="BiDi"/>
+        <pin num="9" name="GND_2" type="BiDi"/>
+        <pin num="10" name="PIO1/SCK/PWM1" type="BiDi"/>
+        <pin num="11" name="PIO2/CS/PWM2" type="BiDi"/>
+        <pin num="12" name="PIO3/MOSI/PWM3" type="BiDi"/>
+        <pin num="13" name="PIO4/MISO" type="BiDi"/>
+        <pin num="14" name="PIO5/CTS" type="BiDi"/>
+        <pin num="15" name="WAKE_HW" type="BiDi"/>
+        <pin num="16" name="GND_3" type="BiDi"/>
+        <pin num="17" name="SPI/~PIO" type="BiDi"/>
+        <pin num="18" name="RTS/PIO6" type="BiDi"/>
+        <pin num="19" name="PWM4/PIO7" type="BiDi"/>
+        <pin num="20" name="RSVD" type="BiDi"/>
+        <pin num="21" name="SDA" type="BiDi"/>
+        <pin num="22" name="SCL" type="BiDi"/>
+        <pin num="23" name="VDD" type="BiDi"/>
+        <pin num="24" name="GND_4" type="BiDi"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="SSD1306OLED">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">SSD1306OLED</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND" type="input"/>
+        <pin num="2" name="VCC" type="input"/>
+        <pin num="3" name="SCL" type="input"/>
+        <pin num="4" name="SDA" type="input"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>/usr/share/kicad/library/Connector.lib</uri>
+    </library>
+    <library logical="Device">
+      <uri>/usr/share/kicad/library/Device.lib</uri>
+    </library>
+    <library logical="Encoder">
+      <uri>/home/paul/CProjects/Encoder/Mechatronics/Hardware/Electrical/BCommunicationBoard/../Library/Encoder.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="Net-(IC1-Pad13)">
+      <node ref="IC1" pin="13"/>
+    </net>
+    <net code="2" name="Net-(IC1-Pad22)">
+      <node ref="IC1" pin="22"/>
+    </net>
+    <net code="3" name="Net-(IC1-Pad21)">
+      <node ref="IC1" pin="21"/>
+    </net>
+    <net code="4" name="Net-(IC1-Pad20)">
+      <node ref="IC1" pin="20"/>
+    </net>
+    <net code="5" name="Net-(IC1-Pad2)">
+      <node ref="IC1" pin="2"/>
+    </net>
+    <net code="6" name="Net-(IC1-Pad19)">
+      <node ref="IC1" pin="19"/>
+    </net>
+    <net code="7" name="Net-(IC1-Pad17)">
+      <node ref="IC1" pin="17"/>
+    </net>
+    <net code="8" name="Net-(IC1-Pad16)">
+      <node ref="IC1" pin="16"/>
+    </net>
+    <net code="9" name="Net-(IC1-Pad15)">
+      <node ref="IC1" pin="15"/>
+    </net>
+    <net code="10" name="Net-(IC1-Pad14)">
+      <node ref="J10" pin="1"/>
+      <node ref="IC1" pin="14"/>
+    </net>
+    <net code="11" name="Net-(IC1-Pad3)">
+      <node ref="IC1" pin="3"/>
+    </net>
+    <net code="12" name="Net-(IC1-Pad12)">
+      <node ref="IC1" pin="12"/>
+    </net>
+    <net code="13" name="Net-(IC1-Pad11)">
+      <node ref="IC1" pin="11"/>
+    </net>
+    <net code="14" name="Net-(IC1-Pad10)">
+      <node ref="IC1" pin="10"/>
+    </net>
+    <net code="15" name="Net-(IC1-Pad1)">
+      <node ref="IC1" pin="1"/>
+    </net>
+    <net code="16" name="GND">
+      <node ref="IC1" pin="24"/>
+      <node ref="J2" pin="1"/>
+      <node ref="U1" pin="1"/>
+      <node ref="C1" pin="2"/>
+    </net>
+    <net code="17" name="Net-(IC1-Pad18)">
+      <node ref="IC1" pin="18"/>
+      <node ref="J9" pin="1"/>
+    </net>
+    <net code="18" name="Net-(IC1-Pad8)">
+      <node ref="J8" pin="1"/>
+      <node ref="IC1" pin="8"/>
+    </net>
+    <net code="19" name="Net-(IC1-Pad9)">
+      <node ref="IC1" pin="9"/>
+    </net>
+    <net code="20" name="Net-(IC1-Pad7)">
+      <node ref="J7" pin="1"/>
+      <node ref="IC1" pin="7"/>
+    </net>
+    <net code="21" name="Net-(IC1-Pad6)">
+      <node ref="J6" pin="1"/>
+      <node ref="IC1" pin="6"/>
+    </net>
+    <net code="22" name="Net-(IC1-Pad5)">
+      <node ref="J5" pin="1"/>
+      <node ref="IC1" pin="5"/>
+    </net>
+    <net code="23" name="Net-(IC1-Pad4)">
+      <node ref="IC1" pin="4"/>
+    </net>
+    <net code="24" name="+3V3">
+      <node ref="IC1" pin="23"/>
+      <node ref="J1" pin="1"/>
+      <node ref="U1" pin="2"/>
+      <node ref="C1" pin="1"/>
+    </net>
+    <net code="25" name="Net-(J4-Pad1)">
+      <node ref="J4" pin="1"/>
+      <node ref="U1" pin="3"/>
+    </net>
+    <net code="26" name="Net-(J3-Pad1)">
+      <node ref="J3" pin="1"/>
+      <node ref="U1" pin="4"/>
+    </net>
+  </nets>
+</export>

@@ -1,0 +1,923 @@
+EESchema Schematic File Version 4
+LIBS:EncoderBoard-cache
+EELAYER 26 0
+EELAYER END
+$Descr USLetter 11000 8500
+encoding utf-8
+Sheet 1 1
+Title "Encoder"
+Date "28/12/18"
+Rev "v1.0"
+Comp "S.D.T."
+Comment1 "Author:Paul Max Avalos Aguilar"
+Comment2 "SingleBoardEncoder"
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L MCU_Microchip_ATmega:ATmega328-PU U1
+U 1 1 5C26CFC4
+P 3550 3000
+F 0 "U1" H 2909 3046 50  0000 R CNN
+F 1 "ATmega328-PU" V 2909 2955 50  0000 R CNN
+F 2 "Encoder:DIP-28_W7.62mm_LongPads" H 3550 3000 50  0001 C CIN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega328_P%20AVR%20MCU%20with%20picoPower%20Technology%20Data%20Sheet%2040001984A.pdf" H 3550 3000 50  0001 C CNN
+	1    3550 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:Crystal Y1
+U 1 1 5C26D162
+P 4750 2450
+F 0 "Y1" V 4704 2581 50  0000 L CNN
+F 1 "20Mhz" V 4750 2350 50  0000 L CNN
+F 2 "Encoder:Crystal_HC49-U_Vertical" H 4750 2450 50  0001 C CNN
+F 3 "~" H 4750 2450 50  0001 C CNN
+	1    4750 2450
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4150 2400 4550 2400
+Wire Wire Line
+	4550 2400 4550 2300
+Wire Wire Line
+	4550 2300 4750 2300
+Wire Wire Line
+	4150 2500 4550 2500
+Wire Wire Line
+	4550 2500 4550 2600
+Wire Wire Line
+	4550 2600 4750 2600
+$Comp
+L Device:C C3
+U 1 1 5C26D29A
+P 5050 2300
+F 0 "C3" V 4798 2300 50  0000 C CNN
+F 1 "22pF" V 4889 2300 50  0000 C CNN
+F 2 "Encoder:C_Disc_D9.0mm_W5.0mm_P5.00mm" H 5088 2150 50  0001 C CNN
+F 3 "~" H 5050 2300 50  0001 C CNN
+	1    5050 2300
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:C C4
+U 1 1 5C26D2D4
+P 5050 2600
+F 0 "C4" V 4798 2600 50  0000 C CNN
+F 1 "22pF" V 4889 2600 50  0000 C CNN
+F 2 "Encoder:C_Disc_D9.0mm_W5.0mm_P5.00mm" H 5088 2450 50  0001 C CNN
+F 3 "~" H 5050 2600 50  0001 C CNN
+	1    5050 2600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4900 2300 4750 2300
+Connection ~ 4750 2300
+Wire Wire Line
+	4750 2600 4900 2600
+Connection ~ 4750 2600
+$Comp
+L power:GND #PWR0101
+U 1 1 5C26D3C5
+P 5250 2300
+F 0 "#PWR0101" H 5250 2050 50  0001 C CNN
+F 1 "GND" H 5255 2127 50  0000 C CNN
+F 2 "" H 5250 2300 50  0001 C CNN
+F 3 "" H 5250 2300 50  0001 C CNN
+	1    5250 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0102
+U 1 1 5C26D3DF
+P 5250 2600
+F 0 "#PWR0102" H 5250 2350 50  0001 C CNN
+F 1 "GND" H 5255 2427 50  0000 C CNN
+F 2 "" H 5250 2600 50  0001 C CNN
+F 3 "" H 5250 2600 50  0001 C CNN
+	1    5250 2600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5250 2600 5200 2600
+Wire Wire Line
+	5200 2300 5250 2300
+$Comp
+L power:GND #PWR0103
+U 1 1 5C26D699
+P 3550 4500
+F 0 "#PWR0103" H 3550 4250 50  0001 C CNN
+F 1 "GND" H 3555 4327 50  0000 C CNN
+F 2 "" H 3550 4500 50  0001 C CNN
+F 3 "" H 3550 4500 50  0001 C CNN
+	1    3550 4500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0104
+U 1 1 5C26D709
+P 3050 1150
+F 0 "#PWR0104" H 3050 1000 50  0001 C CNN
+F 1 "+5V" H 3065 1323 50  0000 C CNN
+F 2 "" H 3050 1150 50  0001 C CNN
+F 3 "" H 3050 1150 50  0001 C CNN
+	1    3050 1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0105
+U 1 1 5C26D769
+P 4050 1150
+F 0 "#PWR0105" H 4050 1000 50  0001 C CNN
+F 1 "+5V" H 4065 1323 50  0000 C CNN
+F 2 "" H 4050 1150 50  0001 C CNN
+F 3 "" H 4050 1150 50  0001 C CNN
+	1    4050 1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C1
+U 1 1 5C26D7FD
+P 3400 1150
+F 0 "C1" V 3148 1150 50  0000 C CNN
+F 1 ".1uF" V 3239 1150 50  0000 C CNN
+F 2 "Encoder:C_Disc_D9.0mm_W5.0mm_P5.00mm" H 3438 1000 50  0001 C CNN
+F 3 "~" H 3400 1150 50  0001 C CNN
+	1    3400 1150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:C C2
+U 1 1 5C26D881
+P 3800 1150
+F 0 "C2" V 3548 1150 50  0000 C CNN
+F 1 ".1uF" V 3639 1150 50  0000 C CNN
+F 2 "Encoder:C_Disc_D9.0mm_W5.0mm_P5.00mm" H 3838 1000 50  0001 C CNN
+F 3 "~" H 3800 1150 50  0001 C CNN
+	1    3800 1150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4050 1150 3950 1150
+Wire Wire Line
+	4050 1150 4050 1500
+Wire Wire Line
+	4050 1500 3650 1500
+Connection ~ 4050 1150
+Wire Wire Line
+	3050 1150 3250 1150
+Wire Wire Line
+	3250 1150 3250 1500
+Wire Wire Line
+	3250 1500 3550 1500
+Connection ~ 3250 1150
+Wire Wire Line
+	3550 1150 3600 1150
+Wire Wire Line
+	3600 1150 3600 1250
+Connection ~ 3600 1150
+Wire Wire Line
+	3600 1150 3650 1150
+$Comp
+L power:GND #PWR0106
+U 1 1 5C26E052
+P 3600 1250
+F 0 "#PWR0106" H 3600 1000 50  0001 C CNN
+F 1 "GND" H 3605 1077 50  0000 C CNN
+F 2 "" H 3600 1250 50  0001 C CNN
+F 3 "" H 3600 1250 50  0001 C CNN
+	1    3600 1250
+	1    0    0    -1  
+$EndComp
+Text Label 4250 1900 0    50   ~ 0
+PowSupStat
+Text Label 4250 2700 0    50   ~ 0
+BattVoltSens
+Wire Wire Line
+	4150 3100 4700 3100
+Text Label 4250 3100 0    50   ~ 0
+SDA
+Wire Wire Line
+	4150 3200 4700 3200
+Text Label 4250 3200 0    50   ~ 0
+SCL
+Wire Wire Line
+	4150 3500 4700 3500
+Text Label 4250 3500 0    50   ~ 0
+RX
+Wire Wire Line
+	4150 3600 4700 3600
+Text Label 4250 3600 0    50   ~ 0
+TX
+Wire Wire Line
+	4150 3700 4700 3700
+Text Label 4250 3700 0    50   ~ 0
+OUTA
+Text Label 4250 3800 0    50   ~ 0
+OUTB
+Text Label 4250 3900 0    50   ~ 0
+CMD
+Wire Wire Line
+	4150 3800 4700 3800
+Wire Wire Line
+	4700 3900 4150 3900
+NoConn ~ 2950 1800
+NoConn ~ 4150 1800
+NoConn ~ 4150 2000
+NoConn ~ 4150 2100
+NoConn ~ 4150 2200
+NoConn ~ 4150 2300
+NoConn ~ 4150 2800
+NoConn ~ 4150 2900
+NoConn ~ 4150 3000
+NoConn ~ 4150 3300
+NoConn ~ 4150 4000
+NoConn ~ 4150 4100
+NoConn ~ 4150 4200
+Wire Wire Line
+	4150 2700 4700 2700
+Wire Wire Line
+	4150 1900 4700 1900
+$Comp
+L Encoder:HEF40106BT U4
+U 1 1 5C279983
+P 6500 3950
+F 0 "U4" H 6500 4620 50  0000 C CNN
+F 1 "HEF40106BT" H 6500 4529 50  0000 C CNN
+F 2 "Encoder:SOIC-14" H 7650 3600 50  0001 L BNN
+F 3 "" V 8300 3550 50  0001 L BNN
+	1    6500 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0107
+U 1 1 5C279C71
+P 5700 3650
+F 0 "#PWR0107" H 5700 3500 50  0001 C CNN
+F 1 "+5V" H 5715 3823 50  0000 C CNN
+F 2 "" H 5700 3650 50  0001 C CNN
+F 3 "" H 5700 3650 50  0001 C CNN
+	1    5700 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5800 3650 5700 3650
+Wire Wire Line
+	5800 4550 5700 4550
+$Comp
+L power:GND #PWR0108
+U 1 1 5C27A8B2
+P 5700 4550
+F 0 "#PWR0108" H 5700 4300 50  0001 C CNN
+F 1 "GND" H 5705 4377 50  0000 C CNN
+F 2 "" H 5700 4550 50  0001 C CNN
+F 3 "" H 5700 4550 50  0001 C CNN
+	1    5700 4550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7200 3650 7650 3650
+Wire Wire Line
+	7200 3850 7650 3850
+Text Label 7300 3650 0    50   ~ 0
+OUTB
+Text Label 7300 3850 0    50   ~ 0
+OUTA
+NoConn ~ 7200 3950
+NoConn ~ 7200 4150
+NoConn ~ 5800 4150
+$Comp
+L Encoder:ITR1802 U2
+U 1 1 5C28311C
+P 6350 1950
+F 0 "U2" H 6350 2275 50  0000 C CNN
+F 1 "ITR1802A" H 6350 2184 50  0000 C CNN
+F 2 "Encoder:OptointerrupterConnector" H 6350 1950 50  0001 C CNN
+F 3 "" H 6350 1950 50  0001 C CNN
+	1    6350 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Encoder:ITR1802 U3
+U 1 1 5C28324D
+P 6350 2500
+F 0 "U3" H 6350 2825 50  0000 C CNN
+F 1 "ITR1802B" H 6350 2734 50  0000 C CNN
+F 2 "Encoder:OptointerrupterConnector" H 6350 2500 50  0001 C CNN
+F 3 "" H 6350 2500 50  0001 C CNN
+	1    6350 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0109
+U 1 1 5C2844D6
+P 6000 1750
+F 0 "#PWR0109" H 6000 1600 50  0001 C CNN
+F 1 "+5V" H 6015 1923 50  0000 C CNN
+F 2 "" H 6000 1750 50  0001 C CNN
+F 3 "" H 6000 1750 50  0001 C CNN
+	1    6000 1750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6000 1750 6000 1850
+Wire Wire Line
+	6000 1850 6050 1850
+Wire Wire Line
+	6050 2050 5800 2050
+$Comp
+L Device:R R1
+U 1 1 5C285A10
+P 5800 2200
+F 0 "R1" H 5870 2246 50  0000 L CNN
+F 1 "220" H 5870 2155 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 5730 2200 50  0001 C CNN
+F 3 "~" H 5800 2200 50  0001 C CNN
+	1    5800 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R2
+U 1 1 5C285A71
+P 5800 2750
+F 0 "R2" H 5870 2796 50  0000 L CNN
+F 1 "220" H 5870 2705 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 5730 2750 50  0001 C CNN
+F 3 "~" H 5800 2750 50  0001 C CNN
+	1    5800 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6050 2600 5800 2600
+$Comp
+L power:GND #PWR0110
+U 1 1 5C2863B3
+P 5800 2350
+F 0 "#PWR0110" H 5800 2100 50  0001 C CNN
+F 1 "GND" H 5805 2177 50  0000 C CNN
+F 2 "" H 5800 2350 50  0001 C CNN
+F 3 "" H 5800 2350 50  0001 C CNN
+	1    5800 2350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0111
+U 1 1 5C286420
+P 5800 2900
+F 0 "#PWR0111" H 5800 2650 50  0001 C CNN
+F 1 "GND" H 5805 2727 50  0000 C CNN
+F 2 "" H 5800 2900 50  0001 C CNN
+F 3 "" H 5800 2900 50  0001 C CNN
+	1    5800 2900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6000 2400 6050 2400
+Wire Wire Line
+	6000 2400 6000 1850
+Connection ~ 6000 1850
+$Comp
+L power:GND #PWR0112
+U 1 1 5C2895D3
+P 6750 1850
+F 0 "#PWR0112" H 6750 1600 50  0001 C CNN
+F 1 "GND" H 6755 1677 50  0000 C CNN
+F 2 "" H 6750 1850 50  0001 C CNN
+F 3 "" H 6750 1850 50  0001 C CNN
+	1    6750 1850
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:GND #PWR0113
+U 1 1 5C289611
+P 6750 2400
+F 0 "#PWR0113" H 6750 2150 50  0001 C CNN
+F 1 "GND" H 6755 2227 50  0000 C CNN
+F 2 "" H 6750 2400 50  0001 C CNN
+F 3 "" H 6750 2400 50  0001 C CNN
+	1    6750 2400
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6650 1850 6750 1850
+Wire Wire Line
+	6750 2400 6650 2400
+$Comp
+L Device:R R3
+U 1 1 5C28C76B
+P 6900 1900
+F 0 "R3" H 6970 1946 50  0000 L CNN
+F 1 "1.2K" H 6970 1855 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 6830 1900 50  0001 C CNN
+F 3 "~" H 6900 1900 50  0001 C CNN
+	1    6900 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0114
+U 1 1 5C28C873
+P 6900 1750
+F 0 "#PWR0114" H 6900 1600 50  0001 C CNN
+F 1 "+5V" H 6915 1923 50  0000 C CNN
+F 2 "" H 6900 1750 50  0001 C CNN
+F 3 "" H 6900 1750 50  0001 C CNN
+	1    6900 1750
+	1    0    0    -1  
+$EndComp
+Text Label 7100 2050 0    50   ~ 0
+SIGB
+Wire Wire Line
+	6650 2050 6900 2050
+Wire Wire Line
+	6900 2050 7300 2050
+Connection ~ 6900 2050
+$Comp
+L Device:R R4
+U 1 1 5C293966
+P 6900 2450
+F 0 "R4" H 6970 2496 50  0000 L CNN
+F 1 "1.2K" H 6970 2405 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 6830 2450 50  0001 C CNN
+F 3 "~" H 6900 2450 50  0001 C CNN
+	1    6900 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0115
+U 1 1 5C29396D
+P 6900 2300
+F 0 "#PWR0115" H 6900 2150 50  0001 C CNN
+F 1 "+5V" H 6915 2473 50  0000 C CNN
+F 2 "" H 6900 2300 50  0001 C CNN
+F 3 "" H 6900 2300 50  0001 C CNN
+	1    6900 2300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6650 2600 6900 2600
+Wire Wire Line
+	6900 2600 7300 2600
+Connection ~ 6900 2600
+Text Label 7100 2600 0    50   ~ 0
+SIGA
+Wire Wire Line
+	5800 3850 5550 3850
+Wire Wire Line
+	5800 4050 5550 4050
+Text Label 5600 3850 0    50   ~ 0
+SIGB
+Text Label 5600 4050 0    50   ~ 0
+SIGA
+$Comp
+L Device:Q_NMOS_SGD Q2
+U 1 1 5C29B368
+P 9500 2100
+F 0 "Q2" V 9400 2250 50  0000 C CNN
+F 1 "Q_NMOS_SGD" V 9750 2100 50  0000 C CNN
+F 2 "Encoder:TO-92_Inline_Wide" H 9700 2200 50  0001 C CNN
+F 3 "~" H 9500 2100 50  0001 C CNN
+	1    9500 2100
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R6
+U 1 1 5C29B5C2
+P 9250 2050
+F 0 "R6" H 9320 2096 50  0000 L CNN
+F 1 "10K" H 9320 2005 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 9180 2050 50  0001 C CNN
+F 3 "~" H 9250 2050 50  0001 C CNN
+	1    9250 2050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR0116
+U 1 1 5C29B9EF
+P 9250 1800
+F 0 "#PWR0116" H 9250 1650 50  0001 C CNN
+F 1 "+3.3V" H 9265 1973 50  0000 C CNN
+F 2 "" H 9250 1800 50  0001 C CNN
+F 3 "" H 9250 1800 50  0001 C CNN
+	1    9250 1800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9250 1800 9250 1850
+Wire Wire Line
+	9250 1850 9500 1850
+Wire Wire Line
+	9500 1850 9500 1900
+Connection ~ 9250 1850
+Wire Wire Line
+	9250 1850 9250 1900
+Connection ~ 9250 2200
+Wire Wire Line
+	9250 2200 9300 2200
+$Comp
+L Device:R R9
+U 1 1 5C2A08DA
+P 9750 2050
+F 0 "R9" H 9820 2096 50  0000 L CNN
+F 1 "10K" H 9820 2005 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 9680 2050 50  0001 C CNN
+F 3 "~" H 9750 2050 50  0001 C CNN
+	1    9750 2050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0117
+U 1 1 5C2A0A62
+P 9750 1800
+F 0 "#PWR0117" H 9750 1650 50  0001 C CNN
+F 1 "+5V" H 9765 1973 50  0000 C CNN
+F 2 "" H 9750 1800 50  0001 C CNN
+F 3 "" H 9750 1800 50  0001 C CNN
+	1    9750 1800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9750 1800 9750 1900
+Wire Wire Line
+	9700 2200 9750 2200
+Connection ~ 9750 2200
+Wire Wire Line
+	9750 2200 10000 2200
+Text Label 9800 2200 0    50   ~ 0
+RX
+Text Label 9000 2200 0    50   ~ 0
+3VTX
+$Comp
+L Device:Q_NMOS_SGD Q3
+U 1 1 5C2A6C8A
+P 9500 2950
+F 0 "Q3" V 9400 3100 50  0000 C CNN
+F 1 "Q_NMOS_SGD" V 9750 2950 50  0000 C CNN
+F 2 "Encoder:TO-92_Inline_Wide" H 9700 3050 50  0001 C CNN
+F 3 "~" H 9500 2950 50  0001 C CNN
+	1    9500 2950
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R7
+U 1 1 5C2A6C91
+P 9250 2900
+F 0 "R7" H 9320 2946 50  0000 L CNN
+F 1 "10K" H 9320 2855 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 9180 2900 50  0001 C CNN
+F 3 "~" H 9250 2900 50  0001 C CNN
+	1    9250 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR0118
+U 1 1 5C2A6C98
+P 9250 2650
+F 0 "#PWR0118" H 9250 2500 50  0001 C CNN
+F 1 "+3.3V" H 9265 2823 50  0000 C CNN
+F 2 "" H 9250 2650 50  0001 C CNN
+F 3 "" H 9250 2650 50  0001 C CNN
+	1    9250 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9250 2650 9250 2700
+Wire Wire Line
+	9250 2700 9500 2700
+Wire Wire Line
+	9500 2700 9500 2750
+Connection ~ 9250 2700
+Wire Wire Line
+	9250 2700 9250 2750
+Connection ~ 9250 3050
+Wire Wire Line
+	9250 3050 9300 3050
+$Comp
+L Device:R R10
+U 1 1 5C2A6CA5
+P 9750 2900
+F 0 "R10" H 9820 2946 50  0000 L CNN
+F 1 "10K" H 9820 2855 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 9680 2900 50  0001 C CNN
+F 3 "~" H 9750 2900 50  0001 C CNN
+	1    9750 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0119
+U 1 1 5C2A6CAC
+P 9750 2650
+F 0 "#PWR0119" H 9750 2500 50  0001 C CNN
+F 1 "+5V" H 9765 2823 50  0000 C CNN
+F 2 "" H 9750 2650 50  0001 C CNN
+F 3 "" H 9750 2650 50  0001 C CNN
+	1    9750 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9750 2650 9750 2750
+Wire Wire Line
+	9700 3050 9750 3050
+Connection ~ 9750 3050
+Wire Wire Line
+	9750 3050 10000 3050
+Text Label 9800 3050 0    50   ~ 0
+TX
+Text Label 9000 3050 0    50   ~ 0
+3VRX
+$Comp
+L Device:Q_NMOS_SGD Q1
+U 1 1 5C2A856F
+P 9500 1250
+F 0 "Q1" V 9400 1400 50  0000 C CNN
+F 1 "Q_NMOS_SGD" V 9750 1250 50  0000 C CNN
+F 2 "Encoder:TO-92_Inline_Wide" H 9700 1350 50  0001 C CNN
+F 3 "~" H 9500 1250 50  0001 C CNN
+	1    9500 1250
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R5
+U 1 1 5C2A8576
+P 9250 1200
+F 0 "R5" H 9320 1246 50  0000 L CNN
+F 1 "10K" H 9320 1155 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 9180 1200 50  0001 C CNN
+F 3 "~" H 9250 1200 50  0001 C CNN
+	1    9250 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR0120
+U 1 1 5C2A857D
+P 9250 950
+F 0 "#PWR0120" H 9250 800 50  0001 C CNN
+F 1 "+3.3V" H 9265 1123 50  0000 C CNN
+F 2 "" H 9250 950 50  0001 C CNN
+F 3 "" H 9250 950 50  0001 C CNN
+	1    9250 950 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9250 950  9250 1000
+Wire Wire Line
+	9250 1000 9500 1000
+Wire Wire Line
+	9500 1000 9500 1050
+Connection ~ 9250 1000
+Wire Wire Line
+	9250 1000 9250 1050
+Connection ~ 9250 1350
+Wire Wire Line
+	9250 1350 9300 1350
+$Comp
+L Device:R R8
+U 1 1 5C2A858A
+P 9750 1200
+F 0 "R8" H 9820 1246 50  0000 L CNN
+F 1 "10K" H 9820 1155 50  0000 L CNN
+F 2 "Encoder:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal" V 9680 1200 50  0001 C CNN
+F 3 "~" H 9750 1200 50  0001 C CNN
+	1    9750 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0121
+U 1 1 5C2A8591
+P 9750 950
+F 0 "#PWR0121" H 9750 800 50  0001 C CNN
+F 1 "+5V" H 9765 1123 50  0000 C CNN
+F 2 "" H 9750 950 50  0001 C CNN
+F 3 "" H 9750 950 50  0001 C CNN
+	1    9750 950 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9750 950  9750 1050
+Wire Wire Line
+	9700 1350 9750 1350
+Connection ~ 9750 1350
+Wire Wire Line
+	9750 1350 10000 1350
+Text Label 9800 1350 0    50   ~ 0
+CMD
+Text Label 9000 1350 0    50   ~ 0
+3VCMD
+NoConn ~ 5800 3950
+NoConn ~ 5800 4350
+NoConn ~ 7200 3750
+NoConn ~ 5800 4250
+NoConn ~ 7200 4050
+$Comp
+L Connector:Conn_01x01_Male J3
+U 1 1 5C2A1715
+P 8250 1150
+F 0 "J3" V 8310 1190 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 8401 1190 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 8250 1150 50  0001 C CNN
+F 3 "~" H 8250 1150 50  0001 C CNN
+	1    8250 1150
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:Conn_01x01_Male J4
+U 1 1 5C2A1868
+P 8250 2000
+F 0 "J4" V 8310 2040 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 8401 2040 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 8250 2000 50  0001 C CNN
+F 3 "~" H 8250 2000 50  0001 C CNN
+	1    8250 2000
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:Conn_01x01_Male J5
+U 1 1 5C2A3574
+P 8250 2850
+F 0 "J5" V 8310 2890 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 8401 2890 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 8250 2850 50  0001 C CNN
+F 3 "~" H 8250 2850 50  0001 C CNN
+	1    8250 2850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 1350 9250 1350
+Wire Wire Line
+	8250 2200 9250 2200
+Wire Wire Line
+	8250 3050 9250 3050
+$Comp
+L Connector:Conn_01x01_Male J1
+U 1 1 5C2A9C22
+P 1300 2250
+F 0 "J1" V 1360 2290 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 1451 2290 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 1300 2250 50  0001 C CNN
+F 3 "~" H 1300 2250 50  0001 C CNN
+	1    1300 2250
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:Conn_01x01_Male J2
+U 1 1 5C2A9CD5
+P 1300 3350
+F 0 "J2" V 1360 3390 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 1451 3390 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 1300 3350 50  0001 C CNN
+F 3 "~" H 1300 3350 50  0001 C CNN
+	1    1300 3350
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1300 2450 2100 2450
+Wire Wire Line
+	1300 3550 2100 3550
+$Comp
+L power:GND #PWR0122
+U 1 1 5C2AD00B
+P 2100 3550
+F 0 "#PWR0122" H 2100 3300 50  0001 C CNN
+F 1 "GND" H 2105 3377 50  0000 C CNN
+F 2 "" H 2100 3550 50  0001 C CNN
+F 3 "" H 2100 3550 50  0001 C CNN
+	1    2100 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0123
+U 1 1 5C2AE9D0
+P 2100 2450
+F 0 "#PWR0123" H 2100 2300 50  0001 C CNN
+F 1 "+5V" H 2115 2623 50  0000 C CNN
+F 2 "" H 2100 2450 50  0001 C CNN
+F 3 "" H 2100 2450 50  0001 C CNN
+	1    2100 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG0101
+U 1 1 5C284069
+P 950 2450
+F 0 "#FLG0101" H 950 2525 50  0001 C CNN
+F 1 "PWR_FLAG" H 950 2624 50  0000 C CNN
+F 2 "" H 950 2450 50  0001 C CNN
+F 3 "~" H 950 2450 50  0001 C CNN
+	1    950  2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG0102
+U 1 1 5C28438A
+P 950 3550
+F 0 "#FLG0102" H 950 3625 50  0001 C CNN
+F 1 "PWR_FLAG" H 950 3724 50  0000 C CNN
+F 2 "" H 950 3550 50  0001 C CNN
+F 3 "~" H 950 3550 50  0001 C CNN
+	1    950  3550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1300 3550 950  3550
+Connection ~ 1300 3550
+Wire Wire Line
+	950  2450 1300 2450
+Connection ~ 1300 2450
+$Comp
+L Connector:Conn_01x01_Male J6
+U 1 1 5C28E2B6
+P 1300 2800
+F 0 "J6" V 1360 2840 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 1451 2840 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 1300 2800 50  0001 C CNN
+F 3 "~" H 1300 2800 50  0001 C CNN
+	1    1300 2800
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1300 3000 2100 3000
+$Comp
+L power:PWR_FLAG #FLG0103
+U 1 1 5C28E2C4
+P 950 3000
+F 0 "#FLG0103" H 950 3075 50  0001 C CNN
+F 1 "PWR_FLAG" H 950 3174 50  0000 C CNN
+F 2 "" H 950 3000 50  0001 C CNN
+F 3 "~" H 950 3000 50  0001 C CNN
+	1    950  3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	950  3000 1300 3000
+Connection ~ 1300 3000
+$Comp
+L power:+3.3V #PWR0124
+U 1 1 5C291F83
+P 2100 3000
+F 0 "#PWR0124" H 2100 2850 50  0001 C CNN
+F 1 "+3.3V" H 2115 3173 50  0000 C CNN
+F 2 "" H 2100 3000 50  0001 C CNN
+F 3 "" H 2100 3000 50  0001 C CNN
+	1    2100 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x01_Male J7
+U 1 1 5C298E65
+P 8250 3600
+F 0 "J7" V 8310 3640 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 8401 3640 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 8250 3600 50  0001 C CNN
+F 3 "~" H 8250 3600 50  0001 C CNN
+	1    8250 3600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 3800 9600 3800
+$Comp
+L Connector:Conn_01x01_Male J8
+U 1 1 5C29AFCE
+P 8250 3950
+F 0 "J8" V 8310 3990 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 8401 3990 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 8250 3950 50  0001 C CNN
+F 3 "~" H 8250 3950 50  0001 C CNN
+	1    8250 3950
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 4150 9600 4150
+$Comp
+L Connector:Conn_01x01_Male J9
+U 1 1 5C29D02E
+P 8250 4300
+F 0 "J9" V 8310 4340 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 8401 4340 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 8250 4300 50  0001 C CNN
+F 3 "~" H 8250 4300 50  0001 C CNN
+	1    8250 4300
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 4500 9600 4500
+$Comp
+L Connector:Conn_01x01_Male J10
+U 1 1 5C2A18E3
+P 8250 4650
+F 0 "J10" V 8310 4690 50  0000 L CNN
+F 1 "Conn_01x01_Male" V 8401 4690 50  0000 L CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 8250 4650 50  0001 C CNN
+F 3 "~" H 8250 4650 50  0001 C CNN
+	1    8250 4650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 4850 9600 4850
+Text Label 9300 3800 0    50   ~ 0
+SDA
+Text Label 9300 4150 0    50   ~ 0
+SCL
+Text Label 9150 4500 0    50   ~ 0
+PowSupStat
+Text Label 9150 4850 0    50   ~ 0
+BattVoltSens
+$EndSCHEMATC

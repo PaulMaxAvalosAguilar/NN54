@@ -1,0 +1,15 @@
+THIS IS A GUIDE FOR KNOWING WHAT THE CONTENTS OF THIS
+DIRECTORY FOLDERS HAVE
+
+Ideal_Model is what the program calculates
+
+3D_Model is Ideal_Model plus .5mm more on everry side for
+the error that is introduced via 3d printer
+
+Test_Model is for testing 3d printing size with components
+
+Imported Stls is conformed by all mechanical figures that
+will be bought
+
+Stl Files contains ready to print versions of 3D_Model and
+Ideal Model

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/paul/CProjects/Encoder/Mechatronics/Hardware/Electrical/BSensorsBoard/SensorsBoard.sch</source>
+    <date>dom 06 ene 2019 16:29:34 CST</date>
+    <tool>Eeschema 5.0.2+dfsg1-1~bpo9+1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>SensorsBoard.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="U1">
+      <value>ITR1802</value>
+      <footprint>Encoder:itr8102</footprint>
+      <libsource lib="Encoder" part="ITR1802" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C323D9F</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C323F3E</tstamp>
+    </comp>
+    <comp ref="J2">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C323F5A</tstamp>
+    </comp>
+    <comp ref="J4">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C323F88</tstamp>
+    </comp>
+    <comp ref="J3">
+      <value>Conn_01x01_Male</value>
+      <footprint>Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x01_Male" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5C324004</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="Conn_01x01_Male">
+      <description>Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x01_Male</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="ITR1802">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ITR1802</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+        <pin num="3" name="~" type="passive"/>
+        <pin num="4" name="~" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>/usr/share/kicad/library/Connector.lib</uri>
+    </library>
+    <library logical="Encoder">
+      <uri>/home/paul/CProjects/Encoder/Mechatronics/Hardware/Electrical/Library/Encoder.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="Net-(J1-Pad1)">
+      <node ref="U1" pin="1"/>
+      <node ref="J1" pin="1"/>
+    </net>
+    <net code="2" name="Net-(J2-Pad1)">
+      <node ref="U1" pin="2"/>
+      <node ref="J2" pin="1"/>
+    </net>
+    <net code="3" name="Net-(J4-Pad1)">
+      <node ref="U1" pin="3"/>
+      <node ref="J4" pin="1"/>
+    </net>
+    <net code="4" name="Net-(J3-Pad1)">
+      <node ref="U1" pin="4"/>
+      <node ref="J3" pin="1"/>
+    </net>
+  </nets>
+</export>

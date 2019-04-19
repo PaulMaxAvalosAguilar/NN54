@@ -1,0 +1,18 @@
+Component,Part,References,Value,Footprint,Quantity Per PCB
+1,Conn_01x01_Male,J1 J2 J3 J4,Conn_01x01_Male,No3dmodelPinHeader_1x01_P2.54mm_Vertical,4
+2,ITR1802,U1,ITR1802,itr8102,1
+
+
+
+
+
+Component Groups:,2
+Component Count:,5
+Fitted Components:,5
+Number of PCBs:,1
+Total components:,5
+Schematic Version:,
+Schematic Date:,
+BoM Date:,dom 06 ene 2019 16:29:34 CST
+Schematic Source:,/home/paul/CProjects/Encoder/Mechatronics/Hardware/Electrical/BSensorsBoard/SensorsBoard.sch
+KiCad Version:,Eeschema 5.0.2+dfsg1-1~bpo9+1

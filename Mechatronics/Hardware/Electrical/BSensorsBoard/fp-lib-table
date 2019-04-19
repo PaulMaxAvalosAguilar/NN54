@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name Encoder)(type KiCad)(uri ${KIPRJMOD}/../FootPrints/Encoder.pretty)(options "")(descr ""))
+  (lib (name Atmega)(type KiCad)(uri /home/paul/Descargas/ATMEGA328-PU.mod)(options Legacy)(descr ""))
+)
