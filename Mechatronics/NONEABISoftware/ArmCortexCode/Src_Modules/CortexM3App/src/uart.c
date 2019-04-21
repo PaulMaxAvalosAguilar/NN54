@@ -59,6 +59,8 @@ void uart_init(){
 
   /* Finally enable the USART. */
   usart_enable(USART1);
+
+  nvic_get_active_irq(NVIC_USART1_IRQ);
   
 }
 
@@ -70,6 +72,12 @@ void printString(const char myString[]) {
     USART_CR1(USART1) |= USART_CR1_TXEIE;
     i++;
   }
+}
+
+void _putchar(char character){
+  while(ring_buffer_full(&usart_send_ring));//wait till there's space
+  ring_buffer_put(&usart_send_ring, &character);
+  USART_CR1(USART1) |= USART_CR1_TXEIE;
 }
 
 int serialAvailable(void){
