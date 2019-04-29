@@ -29,7 +29,15 @@ typedef struct Datos_Disco{
   double gruesoDisco;
   //Datos en memoria calculados por el programa
   double radiointerno;
+  double angulo_desfases;
 }Datos_Disco;
+
+typedef struct Datos_PosSensores{
+  //PosB = n1 * alpha(+/- 1/2*alpha) + x
+  int n1;
+  int n2;
+  double x;
+}Datos_PosSensores;
 
 typedef struct Datos_Soporte{
   double anguloParaAncho;
@@ -72,6 +80,7 @@ typedef struct Datos_Flecha{
 Datos_Sensor sensorGlobal;
 Datos_Balero baleroGlobal;
 Datos_Fleje flejeGlobal;
+Datos_PosSensores posSensoresGlobal;
 Datos_Disco discoGlobal;
 Datos_Soporte soporteGlobal;
 Datos_CajaResorte cajaResorteGlobal;

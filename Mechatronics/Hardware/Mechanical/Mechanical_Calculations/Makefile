@@ -29,6 +29,9 @@ installdirectories:
 	@sudo mkdir -p $(LIBINSTALLDIR)/
 	@sudo mkdir -p $(RESINSTALLDIR)/
 
+size:
+	$(SIZE) $(TARGETDIRECTORY)/$(VERSION)/$(TARGET).$(ELFEXT)
+
 Application:
 
 	@for module in $(DEPMODULES); do\

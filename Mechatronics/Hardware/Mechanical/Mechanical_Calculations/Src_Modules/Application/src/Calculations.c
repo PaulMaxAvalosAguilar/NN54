@@ -1,5 +1,6 @@
 #include "Archivos.h"
 #include "Calculations.h"
+#include "mathHelp.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -129,6 +130,70 @@ void Disk(int print){
     }
     //comunicación de cálculos
     discoGlobal.radiointerno = radio_interno;
+    discoGlobal.angulo_desfases = angulo_desfases;
+}
+
+void Sensores(int print){
+  //Dependencias
+  int *n1 = &posSensoresGlobal.n1;
+  int *n2 = &posSensoresGlobal.n2;
+  double *x = &posSensoresGlobal.x;
+  double *radioInternoDisco = &discoGlobal.radiointerno;
+  double *angulo = &discoGlobal.angulo_desfases;
+  double *anchoSensor = &sensorGlobal.AnchoempaqueSensor;
+  double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
+  
+  //variables de uso propio
+  double distanciaEjeABases;
+  double distCentroCentroBase;
+  
+  double anglePosition1;
+  double baseInclinationAngle;
+  double anglePosition2plus;
+  double anglePosition2negative;
+
+  double altoTrianguloBase;
+  double anchoTrianguloBase;
+
+  anglePosition1 = (*n1 * *angulo + *x);
+  
+  distanciaEjeABases = *radioInternoDisco + *altoempaqueSensor;
+  distCentroCentroBase = opuestoFromHipotenusa(
+					       anglePosition1, distanciaEjeABases);
+
+
+
+  baseInclinationAngle = getTriangleMissingAngle(
+		     90 - (90 - getTriangleMissingAngle(anglePosition1)));
+  altoTrianguloBase = opuestoFromHipotenusa(baseInclinationAngle, *anchoSensor/2);
+  anchoTrianguloBase = adyacenteFromHipotenusa(baseInclinationAngle,
+					       *anchoSensor/2);
+  
+  
+  
+  anglePosition2plus = (*n2 * *angulo + (.5 * *angulo) + *x);
+  anglePosition2negative = (*n2 * *angulo - (.5 * *angulo) + *x);
+  
+  if(print == 1){
+    printf("\nSENSOR UNO\n");
+    printf("positionAngle%.4f\n",anglePosition1);
+    printf("baseInclinationAngle %.4f\n",baseInclinationAngle);
+    printf(" %.4f %.4f %.4f\n",altoTrianguloBase,
+	   anchoTrianguloBase, distCentroCentroBase);
+
+    printf("\nSENSOR DOS\n");
+    printf("%.4f o %.4f\n",anglePosition2plus, anglePosition2negative);
+
+    //MANEJO DE ERRORES
+    printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
+    printf("\nPOSICION SENSORES\n");
+    if((anglePosition2negative) <= -0
+       || (anglePosition2plus) >=90){
+      printf("Angulo no posisionable\n"); 
+    }
+  }
+  printf("\n");
+  
 }
 
 void Soportes(int print){
@@ -475,7 +540,7 @@ void Flecha(int print){
         printf("El ancho de la linea del resorte debe de ser de: %.4f\n", anchoLineaResorte);
         printf("El  grosor de la linea debe de ser de:%.4f y debe estar a una distancia\n"
                "de %.4f a  partir de un extremo\n", gruesoLinea, posicionLineaResorte);
-        printf("El ancho del cilindro para el cable es de %.4f\n", anchocilindrocable);
+         printf("El ancho del cilindro para el cable es de %.4f\n", anchocilindrocable);
         printf("El radio del cilindro para el cable es de %.4f\n", radiocilindrocable);
         printf("La posición del cilindro debe de ser de %.4f\n", posicioncilcable);
         printf("\n");

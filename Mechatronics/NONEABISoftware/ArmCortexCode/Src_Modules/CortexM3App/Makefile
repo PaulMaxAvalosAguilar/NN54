@@ -9,7 +9,7 @@ HEADERDIR   := $(TOP_DIR)/$(HEADERSDIRECTORY)
 CCSOURCES   := $(shell find $(SRCDIR) -type f -name *.$(CCEXT))
 CPPSOURCES  := $(shell find $(SRCDIR) -type f -name *.$(CPPEXT))
 
-CCOBJECTS    := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CCSOURCES:.$(CCEXT)=.$(OBJEXT)))
+CCOBJECTS   := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CCSOURCES:.$(CCEXT)=.$(OBJEXT)))
 CPPOBJECTS  := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CPPSOURCES:.$(CPPEXT)=.$(OBJEXT)))
 
 CCDEPENDS   := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CCSOURCES:.$(CCEXT)=.d))
