@@ -142,10 +142,34 @@ void Sensores(int print){
   double *angulo = &discoGlobal.angulo_desfases;
   double *anchoSensor = &sensorGlobal.AnchoempaqueSensor;
   double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
+
+  //   angle
+  // a *  
+  // d * *  Hi
+  // y *  *  po
+  // a *   *  te
+  // c *    *  nu
+  // e *     *  sa
+  // n *      * 
+  // t *       *
+  // e ********** Opuesto
+
+
+  //   *  
+  //   * *      *
+  //   *  *    **
+  //   * A *  *B*
+  //   **********
+  //        **  *
+  //       *B*  *
+  //      ****  *
+  //      *     *
+  //      *******
+  
   
   //variables de uso propio
-  double distanciaEjeABases;
-  double distCentroCentroBase;
+  double hipotenusaTriangleA;
+  double oputestoTriangleA;
   
   double anglePosition1;
   double baseInclinationAngle;
@@ -176,7 +200,7 @@ void Sensores(int print){
   
   if(print == 1){
     printf("\nSENSOR UNO\n");
-    printf("positionAngle%.4f\n",anglePosition1);
+    printf("positionAngle %.4f\n",anglePosition1);
     printf("baseInclinationAngle %.4f\n",baseInclinationAngle);
     printf(" %.4f %.4f %.4f\n",altoTrianguloBase,
 	   anchoTrianguloBase, distCentroCentroBase);

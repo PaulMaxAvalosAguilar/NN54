@@ -93,7 +93,7 @@ void thirdMenuInstructions(void){
   printf("---Menu de cálculos---\n\n"
 	 "Cálculos Mecánicos:\n"
 	 "Oprime 1 para ver los calculos del disco\n"
-	 "Oprime 2 para ver los calculos de la posicion dle Soporte\n"
+	 "Oprime 2 para ver los calculos de la posicion del Soporte\n"
 	 "Oprime 3 para ver los calculos de los soportes\n"
 	 "Oprime 4 para ver los calculos de la Caja del Resorte\n"
 	 "Oprime 5 para ver los calculos de la Base\n"
