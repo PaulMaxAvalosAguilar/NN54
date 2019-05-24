@@ -169,6 +169,7 @@ void Sensores(int print){
   //                   Line4
   
   //variables de uso propio
+  //Sensor Soporte 1
   double s1angleAlphaTriangleA;
   double s1angleBetaTriangleA;
   double s1hipotenusaTriangleA;
@@ -188,11 +189,29 @@ void Sensores(int print){
   double s1line1Line3Angle;
   double s1line1ToOriginLength;
   
-  double anglePosition2plus;
-  double anglePosition2negative;
+  //Sensor Soporte 2
+  double s2angleAlphaTriangleA;
+  double s2angleBetaTriangleA;
+  double s2hipotenusaTriangleA;
+  double s2opuestoTriangleA;
+  double s2adyacenteTriangleA;
+
+  double s2angleAlphaTriangleB;
+  double s2angleBetaTriangleB;
+  double s2hipotenusaTriangleB;
+  double s2opuestoTriangleB;
+  double s2adyacenteTriangleB;
+
+  double s2line1Length;
+  double s2line2Length;
+  double s2line3Length;
+  double s2line4Length;
+  double s2line1Line3Angle;
+  double s2line1ToOriginLength;
+  
 
 
-  //Sensor Soporte 1
+  //Sensor Soporte 1  
   s1angleAlphaTriangleA = (*n1 * *angulo + *x);
   s1angleBetaTriangleA = getTriangleMissingAngle(s1angleAlphaTriangleA);
   s1hipotenusaTriangleA = *radioInternoDisco + *altoempaqueSensor;
@@ -215,14 +234,34 @@ void Sensores(int print){
   s1line4Length = s1opuestoTriangleB * 2;
   s1line1Line3Angle = s1angleBetaTriangleB + 90;
   s1line1ToOriginLength = s1opuestoTriangleA - s1opuestoTriangleB;
+ 
 
   //Sensor Soporte 2
-  anglePosition2plus = (*n2 * *angulo + (.5 * *angulo) + *x);
-  anglePosition2negative = (*n2 * *angulo - (.5 * *angulo) + *x);
+  s2angleAlphaTriangleA = (*n2 * *angulo - (.5 * *angulo) + *x);
+  s2angleBetaTriangleA = getTriangleMissingAngle(s2angleAlphaTriangleA);
+  s2hipotenusaTriangleA = *radioInternoDisco + *altoempaqueSensor;
+  s2opuestoTriangleA = opuestoFromHipotenusa(s2angleAlphaTriangleA,
+					   s2hipotenusaTriangleA);
+  s2adyacenteTriangleA = adyacenteFromHipotenusa(s2angleAlphaTriangleA,
+					       s2hipotenusaTriangleA);
+
+  s2angleAlphaTriangleB = 90 - (90 - s2angleBetaTriangleA);
+  s2angleBetaTriangleB = getTriangleMissingAngle(s2angleAlphaTriangleB);
+  s2hipotenusaTriangleB = *anchoSensor/2 ;
+  s2opuestoTriangleB = opuestoFromHipotenusa(s2angleAlphaTriangleB,
+					     s2hipotenusaTriangleB);
+  s2adyacenteTriangleB = adyacenteFromHipotenusa(s2angleAlphaTriangleB
+					     ,s2hipotenusaTriangleB);
+  
+  s2line1Length = *radioInternoDisco + *altoempaqueSensor - s2adyacenteTriangleA -s2adyacenteTriangleB;
+  s2line2Length = s2line1Length + (s2adyacenteTriangleB * 2);
+  s2line3Length = *anchoSensor;
+  s2line4Length = s2opuestoTriangleB * 2;
+  s2line1Line3Angle = s2angleBetaTriangleB + 90;
+  s2line1ToOriginLength = s2opuestoTriangleA - s2opuestoTriangleB;
   
   if(print == 1){
     
-    printf("\nSENSOR UNO\n");
     printf(
      ".\n"  
      ". .      .       Li  .\n"
@@ -236,6 +275,8 @@ void Sensores(int print){
      "   .......   1 .......2\n"
      "                Line4\n\n"
 );
+    
+    printf("\nSENSOR UNO\n");
     printf("PositionAngle %.4f\n"
 	   "Hipotenusa Triangle A %.4f\n",
 	   s1angleAlphaTriangleA,
@@ -252,17 +293,35 @@ void Sensores(int print){
 	   "Line1 to origin length %.4f\n",
 	   s1line1Line3Angle,
 	   s1line1ToOriginLength);
-
+    
     printf("\nSENSOR DOS\n");
-    printf("%.4f o %.4f\n",anglePosition2plus, anglePosition2negative);
+    printf("PositionAngle %.4f\n"
+	   "Hipotenusa Triangle A %.4f\n",
+	   s2angleAlphaTriangleA,
+	   s2hipotenusaTriangleA);
+    printf("Line1 lenght %.4f\n"
+           "Line2 lenght %.4f\n"
+           "Line3 lenght %.4f\n"
+	   "Line4 lenght %.4f\n",
+	   s2line1Length,
+	   s2line2Length,
+	   s2line3Length,
+	   s2line4Length);
+    printf("Line1-line3 angle %.4f\n"
+	   "Line1 to origin length %.4f\n",
+	   s2line1Line3Angle,
+	   s2line1ToOriginLength);
+    
 
     //MANEJO DE ERRORES
+    /*
     printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
     printf("\nPOSICION SENSORES\n");
     if((anglePosition2negative) <= -0
        || (anglePosition2plus) >=90){
       printf("Angulo no posisionable\n"); 
     }
+    */
   }
   printf("\n");
   
@@ -280,44 +339,31 @@ void Soportes(int print){
 
 
     //variables de uso propio
-    double angulo;
-    double anguloRadianes;
     double grosor_cilindro;
     double radiointerno;
     double radioexterno;
     double grosorsoporte;
     double catetopuesto;
-    double catetoadyacente;
     double anchosoporte;
     double altosoporte;
-    double altoTotalSoporte;
 
-    angulo = *anguloTotal/2.0;
-    anguloRadianes = (angulo * PI)/180;
     grosor_cilindro = *grosorBalero;
     radiointerno = *radioextBalero;
     radioexterno = radiointerno + *extradioExterno;
     grosorsoporte = grosor_cilindro;
-    catetopuesto = radioexterno * sin(anguloRadianes);
-    catetoadyacente = radioexterno * cos(anguloRadianes);
+    catetopuesto = opuestoFromHipotenusa(*anguloTotal/2.0,radioexterno);
     anchosoporte = catetopuesto*2;
     altosoporte = *altoSensor + *radioInternoDisco
             + *altoExtraBase - radioexterno;
-    altoTotalSoporte = altosoporte +
-            (radioexterno-catetoadyacente);
 
     if(print == 1){
-
-
         printf("\nMEDIDAS SOPORTE\n");
-        printf("El grosor del cilindro es de : %.4fmm\n", grosor_cilindro);
-        printf("El radio del cilindro interno es de: %.4fmm\n",radiointerno);
-        printf("El radio del cilindro externo es de: %.4fmm\n",radioexterno);
-        printf("El grosor del soporte es de %.4fmm\n", grosorsoporte);
-        printf("El ancho del soporte es de %.4fmm\n", anchosoporte);
-        printf("El alto del soporte debe ser de %.4fmm\n", altosoporte);
-        printf("El alto total del soporte para resta de figuras debe ser de %.4fmm\n",
-               altoTotalSoporte);
+        printf("Grosor cilindro %.4fmm\n", grosor_cilindro);
+        printf("Internal circle radius %.4fmm\n",radiointerno);
+        printf("External circle radius %.4fmm\n",radioexterno);
+        printf("Grosor soporte %.4fmm\n", grosorsoporte);
+        printf("Ancho del soporte es de %.4fmm\n", anchosoporte);
+        printf("Internal cilinder to origin legth %.4fmm\n", altosoporte);
         printf("\n");
 
 
@@ -327,9 +373,6 @@ void Soportes(int print){
         if((altosoporte <= 1)){
             printf("ERROR: EL contenedor del resorte no puede tener un soporte de %.4f\n"
                    "el contenedor es demasiado grande\n",altosoporte);
-        }else{
-            printf("El contenedor del resorte tiene un soporte permitido de %.4f\n",
-                   altosoporte);
         }
         printf("\n");
 

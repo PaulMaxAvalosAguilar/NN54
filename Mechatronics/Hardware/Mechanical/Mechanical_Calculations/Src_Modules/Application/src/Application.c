@@ -27,16 +27,9 @@ int main(int argc, char *argv[]){
   sensorGlobal.EspacioAlturaparaDisco = 7.4;
 
   //Baleros
-  //Calculos Ideales
   baleroGlobal.radiointerno = 4.5;
   baleroGlobal.radioexterno = 12.0;
   baleroGlobal.grosorBalero = 7.0;
-  //Calculos 3D
-  /*
-    baleroGlobal.radiointerno = 4.35;
-    baleroGlobal.radioexterno = 12.0;
-    baleroGlobal.grosorBalero = 7.0;
-  */
 
   //Fleje
   flejeGlobal.grueso_fleje = 13;
@@ -49,7 +42,7 @@ int main(int argc, char *argv[]){
 
   //PosSensores
   posSensoresGlobal.n1 = 2;
-  posSensoresGlobal.n2 = 3;
+  posSensoresGlobal.n2 = 2;
   posSensoresGlobal.x = 0;
 
   //Soporte
