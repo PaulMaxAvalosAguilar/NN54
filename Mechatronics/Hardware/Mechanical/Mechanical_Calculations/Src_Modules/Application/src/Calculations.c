@@ -169,57 +169,59 @@ void Sensores(int print){
   //                   Line4
   
   //variables de uso propio
-  double angleAlphaTriangleA;
-  double angleBetaTriangleA;
-  double hipotenusaTriangleA;
-  double opuestoTriangleA;
-  double adyacenteTriangleA;
+  double s1angleAlphaTriangleA;
+  double s1angleBetaTriangleA;
+  double s1hipotenusaTriangleA;
+  double s1opuestoTriangleA;
+  double s1adyacenteTriangleA;
 
-  double angleAlphaTriangleB;
-  double angleBetaTriangleB;
-  double hipotenusaTriangleB;
-  double opuestoTriangleB;
-  double adyacenteTriangleB;
+  double s1angleAlphaTriangleB;
+  double s1angleBetaTriangleB;
+  double s1hipotenusaTriangleB;
+  double s1opuestoTriangleB;
+  double s1adyacenteTriangleB;
 
-  double line1Length;
-  double line2Length;
-  double line3length;
-  double line4length;
-  double line1Line3Angle;
-  double line1ToOriginLength;
+  double s1line1Length;
+  double s1line2Length;
+  double s1line3Length;
+  double s1line4Length;
+  double s1line1Line3Angle;
+  double s1line1ToOriginLength;
   
   double anglePosition2plus;
   double anglePosition2negative;
 
-  angleAlphaTriangleA = (*n1 * *angulo + *x);
-  angleBetaTriangleA = getTriangleMissingAngle(angleAlphaTriangleA);
-  hipotenusaTriangleA = *radioInternoDisco + *altoempaqueSensor;
-  opuestoTriangleA = opuestoFromHipotenusa(angleAlphaTriangleA,
-					   hipotenusaTriangleA);
-  adyacenteTriangleA = adyacenteFromHipotenusa(angleAlphaTriangleA,
-					       hipotenusaTriangleA);
 
-  angleAlphaTriangleB = 90 - (90 - angleBetaTriangleA);
-  angleBetaTriangleB = getTriangleMissingAngle(angleAlphaTriangleB);
-  hipotenusaTriangleB = *anchoSensor/2 ;
-  opuestoTriangleB = opuestoFromHipotenusa(angleAlphaTriangleB,
-					     hipotenusaTriangleB);
-  adyacenteTriangleB = adyacenteFromHipotenusa(angleAlphaTriangleB
-					     ,hipotenusaTriangleB);
+  //Sensor Soporte 1
+  s1angleAlphaTriangleA = (*n1 * *angulo + *x);
+  s1angleBetaTriangleA = getTriangleMissingAngle(s1angleAlphaTriangleA);
+  s1hipotenusaTriangleA = *radioInternoDisco + *altoempaqueSensor;
+  s1opuestoTriangleA = opuestoFromHipotenusa(s1angleAlphaTriangleA,
+					   s1hipotenusaTriangleA);
+  s1adyacenteTriangleA = adyacenteFromHipotenusa(s1angleAlphaTriangleA,
+					       s1hipotenusaTriangleA);
 
+  s1angleAlphaTriangleB = 90 - (90 - s1angleBetaTriangleA);
+  s1angleBetaTriangleB = getTriangleMissingAngle(s1angleAlphaTriangleB);
+  s1hipotenusaTriangleB = *anchoSensor/2 ;
+  s1opuestoTriangleB = opuestoFromHipotenusa(s1angleAlphaTriangleB,
+					     s1hipotenusaTriangleB);
+  s1adyacenteTriangleB = adyacenteFromHipotenusa(s1angleAlphaTriangleB
+					     ,s1hipotenusaTriangleB);
   
-  line1Length = *radioInternoDisco + *altoempaqueSensor - adyacenteTriangleA;
-  line2Length = line1Length + (adyacenteTriangleB * 2);
-  line3Length = *anchoSensor;
-  line4length = opuestoTriangleB * 2;
-  line1Line3Angle = angleBetaTriangleB + 90;
-  line1ToOriginLength = opuestoTriangleA opuestoTriangleB;
-   
-  
+  s1line1Length = *radioInternoDisco + *altoempaqueSensor - s1adyacenteTriangleA -s1adyacenteTriangleB;
+  s1line2Length = s1line1Length + (s1adyacenteTriangleB * 2);
+  s1line3Length = *anchoSensor;
+  s1line4Length = s1opuestoTriangleB * 2;
+  s1line1Line3Angle = s1angleBetaTriangleB + 90;
+  s1line1ToOriginLength = s1opuestoTriangleA - s1opuestoTriangleB;
+
+  //Sensor Soporte 2
   anglePosition2plus = (*n2 * *angulo + (.5 * *angulo) + *x);
   anglePosition2negative = (*n2 * *angulo - (.5 * *angulo) + *x);
   
   if(print == 1){
+    
     printf("\nSENSOR UNO\n");
     printf(
      ".\n"  
@@ -232,18 +234,24 @@ void Sensores(int print){
      "   ....  .   Li.     .Li\n"
      "   .     .   ne.     .ne\n"
      "   .......   1 .......2\n"
-     "                Line4\n"
+     "                Line4\n\n"
 );
-    printf("PositionAngle %.4f\n",angleAlphaTriangleA);
-    printf("Line1-Line3 Angle %.4f\n",line1Line3Angle);
+    printf("PositionAngle %.4f\n"
+	   "Hipotenusa Triangle A %.4f\n",
+	   s1angleAlphaTriangleA,
+	   s1hipotenusaTriangleA);
     printf("Line1 lenght %.4f\n"
            "Line2 lenght %.4f\n"
            "Line3 lenght %.4f\n"
 	   "Line4 lenght %.4f\n",
-	   line1length,
-	   line2length,
-	   line3legth,
-	   line4length);
+	   s1line1Length,
+	   s1line2Length,
+	   s1line3Length,
+	   s1line4Length);
+    printf("Line1-line3 angle %.4f\n"
+	   "Line1 to origin length %.4f\n",
+	   s1line1Line3Angle,
+	   s1line1ToOriginLength);
 
     printf("\nSENSOR DOS\n");
     printf("%.4f o %.4f\n",anglePosition2plus, anglePosition2negative);
