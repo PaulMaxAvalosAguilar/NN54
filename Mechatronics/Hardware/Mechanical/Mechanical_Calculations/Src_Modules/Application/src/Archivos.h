@@ -32,13 +32,6 @@ typedef struct Datos_Disco{
   double angulo_desfases;
 }Datos_Disco;
 
-typedef struct Datos_PosSensores{
-  //PosB = n1 * alpha(+/- 1/2*alpha) + x
-  int n1;
-  int n2;
-  double x;
-}Datos_PosSensores;
-
 typedef struct Datos_Soporte{
   double anguloParaAncho;
   double altoExtradeBase;
@@ -47,6 +40,13 @@ typedef struct Datos_Soporte{
   double grosorSoporte;
   double anchoSoporte;
 }Datos_Soporte;
+
+typedef struct Datos_PosSensores{
+  //PosB = n1 * alpha(+/- 1/2*alpha) + x
+  int n1;
+  int n2;
+  double x;
+}Datos_PosSensores;
 
 typedef struct Datos_CajaResorte{
 

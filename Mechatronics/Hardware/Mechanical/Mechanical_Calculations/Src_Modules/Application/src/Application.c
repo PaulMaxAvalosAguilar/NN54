@@ -40,15 +40,15 @@ int main(int argc, char *argv[]){
   discoGlobal.agujerosDeseados = 10.0;
   discoGlobal.gruesoDisco = 1.5;
 
-  //PosSensores
-  posSensoresGlobal.n1 = 2;
-  posSensoresGlobal.n2 = 2;
-  posSensoresGlobal.x = 0;
-
   //Soporte
   soporteGlobal.anguloParaAncho= 60.0;
   soporteGlobal.altoExtradeBase= 3.0;
   soporteGlobal.extradioExterno = 3.0;
+
+  //PosSensores
+  posSensoresGlobal.n1 = 2;
+  posSensoresGlobal.n2 = 2;
+  posSensoresGlobal.x = 0;
 
   //CajaResorte
   cajaResorteGlobal.extraGrosorTambor = 4;
@@ -85,12 +85,12 @@ void cleanScreen(){
 void thirdMenuInstructions(void){
   printf("---Menu de cálculos---\n\n"
 	 "Cálculos Mecánicos:\n"
-	 "Oprime 1 para ver los calculos del disco\n"
-	 "Oprime 2 para ver los calculos de la posicion del Soporte\n"
-	 "Oprime 3 para ver los calculos de los soportes\n"
-	 "Oprime 4 para ver los calculos de la Caja del Resorte\n"
-	 "Oprime 5 para ver los calculos de la Base\n"
-	 "Oprime 6 para ver los calculos de la Flecha\n"
+	 "1 :calculos del disco\n"
+	 "2 :calculos de los soportes\n"
+	 "3 :calculos de los soportes sensores\n"
+	 "4 :calculos de la Caja del Resorte\n"
+	 "5 :calculos de la Base\n"
+	 "6 :calculos de la Flecha\n"
 	 "\nCálculos Electrónicos:\n"
 	 "Oprime -1 para salir");
   printf("\n");
@@ -128,26 +128,30 @@ void calculations(void){
       typeagain(&election);
     }else if(election ==2){
       Disk(0);
-      Sensores(1);
+      Soportes(1);
       typeagain(&election);
     }else if(election ==3){
       Disk(0);
-      Soportes(1);
+      Soportes(0);
+      SoporteSensores(1);
       typeagain(&election);
     }else if(election ==4){
       Disk(0);
       Soportes(0);
+      SoporteSensores(0);
       CajaResorte(1);
       typeagain(&election);
     }else if(election ==5){
       Disk(0);
       Soportes(0);
+      SoporteSensores(0);
       CajaResorte(0);
       Base(1);
       typeagain(&election);
     }else if(election ==6){
       Disk(0);
       Soportes(0);
+      SoporteSensores(0);
       CajaResorte(0);
       Base(0);
       Flecha(1);

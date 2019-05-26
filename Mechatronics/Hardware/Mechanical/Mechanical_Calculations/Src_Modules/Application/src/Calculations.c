@@ -49,7 +49,7 @@ void Disk(int print){
     arco_externo = 2*PI*radio_externo*(angulo_desfases/360);
     perim_externo = 2*PI*radio_externo;
     //Radio cilindro sujeción
-    radiocilindrosujecion = radio_interno/2;
+    radiocilindrosujecion = radio_interno/4;
     gruesocilindrosujecion = 4* *gruesoDisco;
 
 
@@ -57,23 +57,23 @@ void Disk(int print){
 
         printf("\nMEDIDAS GENERALES DISCO DENTADO\n");
         //impresion de medidas basicas
-        printf("El ancho de los desfases es de %.4fmm\n", ancho_desfases);
-        printf("El ancho de los agujeros es de %.4fmm\n", ancho_agujeros);
-        printf("El espacio entre agujeros es de %.4fmm\n", espacio_agujeros);
-        printf("El angulo entre desfases es de %.4f grados\n", angulo_desfases);
+        printf("Ancho de los desfases %.4fmm\n", ancho_desfases);
+        printf("Ancho de los agujeros %.4fmm\n", ancho_agujeros);
+        printf("Espacio entre agujeros %.4fmm\n", espacio_agujeros);
+        printf("Angulo entre desfases %.4f grados\n", angulo_desfases);
 
         printf("\nMEDIDAS INTERNAS\n");
         //impresion de medidas internas
-        printf("El arco interno de los agujeros es de %.4fmm\n", arco_interno);
-        printf("El perimetro interno de los agujeros es de %.6fmm\n",
+        printf("Arco interno de los agujeros %.4fmm\n", arco_interno);
+        printf("Perimetro interno de los agujeros %.6fmm\n",
                perim_interno);
-        printf("El radio interno del circulo es de %.4fmm\n", radio_interno);
+        printf("Radio interno del circulo %.4fmm\n", radio_interno);
 
         printf("\nMEDIDAS EXTERNAS\n");
         //impresion de medidas externas
-        printf("El arco externo de los agujeros es de %.4fmm\n", arco_externo);
-        printf("El perimetro externo de los agujeros es de %.4fmm\n",perim_externo);
-        printf("El radio externo del circulo es de %.4fmm\n", radio_externo);
+        printf("Arco externo de los agujeros %.4fmm\n", arco_externo);
+        printf("Perimetro externo de los agujeros %.4fmm\n",perim_externo);
+        printf("Radio externo del circulo %.4fmm\n", radio_externo);
 
         printf("\nMEDIDAS CILINDRO PARA SUJECIÓN\n");
         printf("El medio cilindro de 180 grados debe tener un radio de %.4f\n",
@@ -86,33 +86,21 @@ void Disk(int print){
         printf("\nGROSOR DEL DISCO\n");
         if(*gruesoDisco > *diotrans){
             printf("ERROR: El grueso del disco de %.4fmm es mayor que el espacio\n"
-                   "entre diodo y transistor de  %.4fmm\n", *gruesoDisco, *diotrans);
-        }else{
-            printf("El grueso del disco de %.4fmm cabe dentro del espacio"
-                   " entre\n el diodo y transistor de  %.4fmm\n",
-                   *gruesoDisco, *diotrans);
-        }
+                   "entre diodo y transistor de  %.4fmm\n", *gruesoDisco, *diotrans);        }
 
         printf("\nDIENTES DEL DISCO\n");
         if((radio_externo - radio_interno) > *altoMaximoDisco){
             printf("ERROR: La medida de alto de los dientes de %.4f del disco es mayor que el espacio\n"
                    "disponible en el sensor de %.4f\n", radio_externo-radio_interno,
                    sensorGlobal.EspacioAlturaparaDisco);
-        }else{
-            printf("La medida de alto de los dientes del disco de %.4f es adecuada dado\n"
-                   "el espacio disponible en el sensor de %.4f\n", radio_externo-radio_interno,
-                   sensorGlobal.EspacioAlturaparaDisco);
         }
-
+	
         printf("\nTAMAÑO DEL DISCO\n");
         if(*radioBalero > radio_interno){
             printf("ERROR: El radio del disco interno de %.4f es demasiado pequeño para el balero de %.4f\n"
                    "Aumenta la medida de seguridad del archivo disco o bien\n"
                    "Aumenta el numero de dientes deseados o\n"
                    "Consigue un balero más pequeño\n", radio_interno, *radioBalero);
-        }else{
-            printf("El radio del disco de %.4f es adecuado para el tamaño de balero usado\n"
-                   "de %.4f\n", radio_interno, *radioBalero);
         }
 
         printf("\nGRUESO CILINDRO PARA SUJECION\n");
@@ -120,12 +108,7 @@ void Disk(int print){
             printf("ERROR: El grueso del medio cilíndro de 180 grados de %.4f es mayor o igual\n"
                    "que la mitad del grueso del empaque de %.4f\n"
                    "diminuye el tamaño", gruesocilindrosujecion, (*gruesoEmpaque/2));
-        }else{
-            printf("El grueso del medio cliíndro de 180 grados de %.4f es menor que\n"
-                   "la mitad del grueso del empaque de %.4f\n",
-                   gruesocilindrosujecion,(*gruesoEmpaque/2));
         }
-
         printf("\n");
     }
     //comunicación de cálculos
@@ -133,7 +116,62 @@ void Disk(int print){
     discoGlobal.angulo_desfases = angulo_desfases;
 }
 
-void Sensores(int print){
+void Soportes(int print){
+    //Dependencias
+    double *altoExtraBase = &soporteGlobal.altoExtradeBase;
+    double *anguloTotal = &soporteGlobal.anguloParaAncho;
+    double *extradioExterno = &soporteGlobal.extradioExterno;
+    double *radioInternoDisco = &discoGlobal.radiointerno;
+    double *altoSensor = &sensorGlobal.AltoempaqueSensor;
+    double *grosorBalero = &baleroGlobal.grosorBalero;
+    double *radioextBalero = &baleroGlobal.radioexterno;
+
+
+    //variables de uso propio
+    double grosor_cilindro;
+    double radiointerno;
+    double radioexterno;
+    double grosorsoporte;
+    double catetopuesto;
+    double anchosoporte;
+    double altosoporte;
+
+    grosor_cilindro = *grosorBalero;
+    radiointerno = *radioextBalero;
+    radioexterno = radiointerno + *extradioExterno;
+    grosorsoporte = grosor_cilindro;
+    catetopuesto = opuestoFromHipotenusa(*anguloTotal/2.0,radioexterno);
+    anchosoporte = catetopuesto*2;
+    altosoporte = *altoSensor + *radioInternoDisco
+            + *altoExtraBase - radioexterno;
+
+    if(print == 1){
+        printf("\nMEDIDAS SOPORTE\n");
+        printf("Grosor cilindro %.4fmm\n", grosor_cilindro);
+        printf("Internal circle radius %.4fmm\n",radiointerno);
+        printf("External circle radius %.4fmm\n",radioexterno);
+        printf("Grosor soporte %.4fmm\n", grosorsoporte);
+        printf("Ancho del soporte es de %.4fmm\n", anchosoporte);
+        printf("Internal cilinder to origin legth %.4fmm\n", altosoporte);
+        printf("\n");
+
+
+        //MANEJO DE ERRORES
+        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
+        printf("\nALTURA DEL SOPORTE\n");
+        if((altosoporte <= 1)){
+            printf("ERROR: EL contenedor del resorte no puede tener un soporte de %.4f\n"
+                   "el contenedor es demasiado grande\n",altosoporte);
+        }
+        printf("\n");
+
+    }
+    //comunicación de calculos
+    soporteGlobal.grosorSoporte = grosorsoporte;
+    soporteGlobal.anchoSoporte = anchosoporte;
+}
+
+void SoporteSensores(int print){
   //Dependencias
   int *n1 = &posSensoresGlobal.n1;
   int *n2 = &posSensoresGlobal.n2;
@@ -142,6 +180,7 @@ void Sensores(int print){
   double *angulo = &discoGlobal.angulo_desfases;
   double *anchoSensor = &sensorGlobal.AnchoempaqueSensor;
   double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
+  double *anchoSopBaleros = &soporteGlobal.anchoSoporte;
 
   //   angle alpha
   // a *  
@@ -169,7 +208,7 @@ void Sensores(int print){
   //                   Line4
   
   //variables de uso propio
-  //Sensor Soporte 1
+  //Soporte sensor 1
   double s1angleAlphaTriangleA;
   double s1angleBetaTriangleA;
   double s1hipotenusaTriangleA;
@@ -189,7 +228,7 @@ void Sensores(int print){
   double s1line1Line3Angle;
   double s1line1ToOriginLength;
   
-  //Sensor Soporte 2
+  //Soporte sensor 2
   double s2angleAlphaTriangleA;
   double s2angleBetaTriangleA;
   double s2hipotenusaTriangleA;
@@ -211,7 +250,7 @@ void Sensores(int print){
   
 
 
-  //Sensor Soporte 1  
+  //Soporte sensor 1  
   s1angleAlphaTriangleA = (*n1 * *angulo + *x);
   s1angleBetaTriangleA = getTriangleMissingAngle(s1angleAlphaTriangleA);
   s1hipotenusaTriangleA = *radioInternoDisco + *altoempaqueSensor;
@@ -236,7 +275,7 @@ void Sensores(int print){
   s1line1ToOriginLength = s1opuestoTriangleA - s1opuestoTriangleB;
  
 
-  //Sensor Soporte 2
+  //Soporte sensor 2
   s2angleAlphaTriangleA = (*n2 * *angulo - (.5 * *angulo) + *x);
   s2angleBetaTriangleA = getTriangleMissingAngle(s2angleAlphaTriangleA);
   s2hipotenusaTriangleA = *radioInternoDisco + *altoempaqueSensor;
@@ -313,73 +352,23 @@ void Sensores(int print){
 	   s2line1ToOriginLength);
     
 
-    //MANEJO DE ERRORES
-    /*
+    //MANEJO DE ERRORES    
     printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
+    
     printf("\nPOSICION SENSORES\n");
-    if((anglePosition2negative) <= -0
-       || (anglePosition2plus) >=90){
+    if((s2angleAlphaTriangleA) <= -0
+       || (s1angleAlphaTriangleA) >=90){
       printf("Angulo no posisionable\n"); 
     }
-    */
+
+    printf("\nCOLISIÓN CON SOPORTE BALEROS\n");
+    if(s2line1ToOriginLength < (*anchoSopBaleros / 2.0)){
+      printf("Ángulo muy corto\n");
+    }
+    
   }
   printf("\n");
   
-}
-
-void Soportes(int print){
-    //Dependencias
-    double *altoExtraBase = &soporteGlobal.altoExtradeBase;
-    double *anguloTotal = &soporteGlobal.anguloParaAncho;
-    double *extradioExterno = &soporteGlobal.extradioExterno;
-    double *radioInternoDisco = &discoGlobal.radiointerno;
-    double *altoSensor = &sensorGlobal.AltoempaqueSensor;
-    double *grosorBalero = &baleroGlobal.grosorBalero;
-    double *radioextBalero = &baleroGlobal.radioexterno;
-
-
-    //variables de uso propio
-    double grosor_cilindro;
-    double radiointerno;
-    double radioexterno;
-    double grosorsoporte;
-    double catetopuesto;
-    double anchosoporte;
-    double altosoporte;
-
-    grosor_cilindro = *grosorBalero;
-    radiointerno = *radioextBalero;
-    radioexterno = radiointerno + *extradioExterno;
-    grosorsoporte = grosor_cilindro;
-    catetopuesto = opuestoFromHipotenusa(*anguloTotal/2.0,radioexterno);
-    anchosoporte = catetopuesto*2;
-    altosoporte = *altoSensor + *radioInternoDisco
-            + *altoExtraBase - radioexterno;
-
-    if(print == 1){
-        printf("\nMEDIDAS SOPORTE\n");
-        printf("Grosor cilindro %.4fmm\n", grosor_cilindro);
-        printf("Internal circle radius %.4fmm\n",radiointerno);
-        printf("External circle radius %.4fmm\n",radioexterno);
-        printf("Grosor soporte %.4fmm\n", grosorsoporte);
-        printf("Ancho del soporte es de %.4fmm\n", anchosoporte);
-        printf("Internal cilinder to origin legth %.4fmm\n", altosoporte);
-        printf("\n");
-
-
-        //MANEJO DE ERRORES
-        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
-        printf("\nALTURA DEL SOPORTE\n");
-        if((altosoporte <= 1)){
-            printf("ERROR: EL contenedor del resorte no puede tener un soporte de %.4f\n"
-                   "el contenedor es demasiado grande\n",altosoporte);
-        }
-        printf("\n");
-
-    }
-    //comunicación de calculos
-    soporteGlobal.grosorSoporte = grosorsoporte;
-    soporteGlobal.anchoSoporte = anchosoporte;
 }
 
 void CajaResorte(int print)
