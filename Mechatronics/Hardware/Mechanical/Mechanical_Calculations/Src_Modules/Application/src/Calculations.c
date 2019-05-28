@@ -422,7 +422,7 @@ void CajaResorte(int print)
     
     radioexterno = *radioInterno + *extraRadioInt;
 
-    radioCirculoFleje = (*grosFleje/2)/2.5;
+    radioCirculoFleje = (*grosFleje/2)/1.85;
     radioAlma = *radioInterno/2;
 
     if(print == 1){
