@@ -51,20 +51,10 @@ int main(int argc, char *argv[]){
   posSensoresGlobal.x = 0;
 
   //CajaResorte
-  cajaResorteGlobal.extraGrosorTambor = 4;
+  cajaResorteGlobal.extraGrosorTambor = 1.5;
   cajaResorteGlobal.grosorTapas = 2;
   cajaResorteGlobal.radioCilInterno = 23;
   cajaResorteGlobal.extradioexterno = 3;
-  cajaResorteGlobal.angulo = 90;
-  cajaResorteGlobal.altoExtadeBase = 3;
-  cajaResorteGlobal.extradioAlma = 2;
-
-  //Base
-  baseGlobal.extraBase = 3.0;
-  baseGlobal.extraAncho = 10.0;
-  baseGlobal.espacioentresensores = 3.0;
-  baseGlobal.espacioentreResorteySoporte = 2.0;
-  baseGlobal.espacioenorillas = 2.0;
 
   //Flecha
   flechaGlobal.extraGruesoparaCuerda = 50;
@@ -88,9 +78,8 @@ void thirdMenuInstructions(void){
 	 "1 :calculos del disco\n"
 	 "2 :calculos de los soportes\n"
 	 "3 :calculos de los soportes sensores\n"
-	 "4 :calculos de la Caja del Resorte\n"
-	 "5 :calculos de la Base\n"
-	 "6 :calculos de la Flecha\n"
+	 "4 :calculos de la Flecha\n"
+	 "5 :calculos de la Caja del Resorte\n"
 	 "\nCálculos Electrónicos:\n"
 	 "Oprime -1 para salir");
   printf("\n");
@@ -139,22 +128,14 @@ void calculations(void){
       Disk(0);
       Soportes(0);
       SoporteSensores(0);
-      CajaResorte(1);
+      Flecha(1);
       typeagain(&election);
     }else if(election ==5){
       Disk(0);
       Soportes(0);
       SoporteSensores(0);
-      CajaResorte(0);
-      Base(1);
-      typeagain(&election);
-    }else if(election ==6){
-      Disk(0);
-      Soportes(0);
-      SoporteSensores(0);
-      CajaResorte(0);
-      Base(0);
-      Flecha(1);
+      Flecha(0);
+      CajaResorte(1);
       typeagain(&election);
     }else{
       printf("No option with that number\n");

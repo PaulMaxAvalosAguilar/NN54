@@ -4,7 +4,6 @@
 #include <math.h>
 #include <stdio.h>
 
-
 void Disk(int print){
     //Dependencias
     double *anchosensor = &sensorGlobal.AnchodelTransistor;
@@ -49,7 +48,7 @@ void Disk(int print){
     arco_externo = 2*PI*radio_externo*(angulo_desfases/360);
     perim_externo = 2*PI*radio_externo;
     //Radio cilindro sujeción
-    radiocilindrosujecion = radio_interno/4;
+    radiocilindrosujecion = radio_interno/3;
     gruesocilindrosujecion = 4* *gruesoDisco;
 
 
@@ -74,6 +73,11 @@ void Disk(int print){
         printf("Arco externo de los agujeros %.4fmm\n", arco_externo);
         printf("Perimetro externo de los agujeros %.4fmm\n",perim_externo);
         printf("Radio externo del circulo %.4fmm\n", radio_externo);
+
+	printf("\nGROSOR DISCO\n");
+        //impresion de medidas externas
+        printf("Grosor disco %.4fmm\n", *gruesoDisco);
+
 
         printf("\nMEDIDAS CILINDRO PARA SUJECIÓN\n");
         printf("El medio cilindro de 180 grados debe tener un radio de %.4f\n",
@@ -181,7 +185,8 @@ void SoporteSensores(int print){
   double *anchoSensor = &sensorGlobal.AnchoempaqueSensor;
   double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
   double *anchoSopBaleros = &soporteGlobal.anchoSoporte;
-
+  double *grosorSoportes = &sensorGlobal.GrosorEspacioExtremoATorre;
+  
   //   angle alpha
   // a *  
   // d * *  Hi
@@ -316,41 +321,42 @@ void SoporteSensores(int print){
 );
     
     printf("\nSENSOR UNO\n");
-    printf("PositionAngle %.4f\n"
-	   "Hipotenusa Triangle A %.4f\n",
+    printf("PositionAngle %.4fmm\n"
+	   "Hipotenusa Triangle A %.4fmm\n",
 	   s1angleAlphaTriangleA,
 	   s1hipotenusaTriangleA);
-    printf("Line1 lenght %.4f\n"
-           "Line2 lenght %.4f\n"
-           "Line3 lenght %.4f\n"
-	   "Line4 lenght %.4f\n",
+    printf("Line1 lenght %.4fmm\n"
+           "Line2 lenght %.4fmm\n"
+           "Line3 lenght %.4fmm\n"
+	   "Line4 lenght %.4fmm\n",
 	   s1line1Length,
 	   s1line2Length,
 	   s1line3Length,
 	   s1line4Length);
-    printf("Line1-line3 angle %.4f\n"
-	   "Line1 to origin length %.4f\n",
+    printf("Line1-line3 angle %.4fmm\n"
+	   "Line1 to origin length %.4fmm\n",
 	   s1line1Line3Angle,
 	   s1line1ToOriginLength);
     
     printf("\nSENSOR DOS\n");
-    printf("PositionAngle %.4f\n"
-	   "Hipotenusa Triangle A %.4f\n",
+    printf("PositionAngle %.4fmm\n"
+	   "Hipotenusa Triangle A %.4fmm\n",
 	   s2angleAlphaTriangleA,
 	   s2hipotenusaTriangleA);
-    printf("Line1 lenght %.4f\n"
-           "Line2 lenght %.4f\n"
-           "Line3 lenght %.4f\n"
-	   "Line4 lenght %.4f\n",
+    printf("Line1 lenght %.4fmm\n"
+           "Line2 lenght %.4fmm\n"
+           "Line3 lenght %.4fmm\n"
+	   "Line4 lenght %.4fmm\n",
 	   s2line1Length,
 	   s2line2Length,
 	   s2line3Length,
 	   s2line4Length);
-    printf("Line1-line3 angle %.4f\n"
-	   "Line1 to origin length %.4f\n",
+    printf("Line1-line3 angle %.4fmm\n"
+	   "Line1 to origin length %.4fmm\n",
 	   s2line1Line3Angle,
 	   s2line1ToOriginLength);
-    
+    printf("\nGROSOR SOPORTES\n");
+    printf("Grosor soportes %.4fmm\n", *grosorSoportes);
 
     //MANEJO DE ERRORES    
     printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
@@ -371,6 +377,24 @@ void SoporteSensores(int print){
   
 }
 
+void Flecha(int print){
+    //Dependencias
+    double *rinterno = &baleroGlobal.radiointerno;
+
+    //Variables para uso propio
+
+    if(print == 1){
+
+        printf("\nMEDIDAS FLECHA\n");
+        printf("Rardio arcos: %.4fmm\n", *rinterno);
+	printf("Ángulo arcos: 45grados\n");
+
+        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
+
+        printf("\n");
+    }
+}
+
 void CajaResorte(int print)
 {
     //Dependencias
@@ -378,297 +402,50 @@ void CajaResorte(int print)
     double *extranchoFleje = &cajaResorteGlobal.extraGrosorTambor;
     double *radioInterno = &cajaResorteGlobal.radioCilInterno;
     double *extraRadioInt = &cajaResorteGlobal.extradioexterno;
-    double *anguloTotal = &cajaResorteGlobal.angulo;
-    double *altoExtra = &cajaResorteGlobal.altoExtadeBase;
-    double *extraRAlm = &cajaResorteGlobal.extradioAlma;
-
     double *grosFleje = &flejeGlobal.grueso_fleje;
 
-    double *radioInternoDisco = &discoGlobal.radiointerno;
-    double *altoSensor = &sensorGlobal.AltoempaqueSensor;
-
-    double *radioBalero = &baleroGlobal.radiointerno;
-
     //variables de uso propio
-    double angulo;
-    double anguloRadianes;
-    double catetoOpuesto;
-    double catetoAdyacente;
     double GrosorCuerpo;
     double GrosorSoporte;
     double GrosorTapaExterna;
     double grosorTotal;
     double radioexterno;
-    double anchoSoporte;
-    double altoSoporte;
-    double altoTotalSoporte;
-    double circuloFleje;
-    double radioAlma;
 
-    angulo = *anguloTotal/2.0;
-    anguloRadianes = (angulo * PI)/180;
+    double radioCirculoFleje;
+    double radioAlma;
 
     //GROSORES
     GrosorCuerpo = *grosFleje + *extranchoFleje;
     GrosorSoporte = GrosorCuerpo;
     GrosorTapaExterna = *grosTapaExt;
     grosorTotal = GrosorTapaExterna *2  + GrosorCuerpo;
-    //Anchosoporte
+    
     radioexterno = *radioInterno + *extraRadioInt;
-    catetoOpuesto = radioexterno * sin(anguloRadianes);
-    catetoAdyacente = radioexterno * cos(anguloRadianes);
-    anchoSoporte = catetoOpuesto *2;
-    altoSoporte = *altoSensor + *radioInternoDisco +
-            *altoExtra - radioexterno;
-    altoTotalSoporte = altoSoporte +
-            (radioexterno - catetoAdyacente);
 
-    circuloFleje = .25 * *grosFleje;
-    radioAlma = *radioBalero + *extraRAlm;
+    radioCirculoFleje = (*grosFleje/2)/2.5;
+    radioAlma = *radioInterno/2;
 
     if(print == 1){
-        printf("\nMEDIDAS Caja Resorte\n");
-        printf("El grosor del cuerpo es de: %.4fmm\n", GrosorCuerpo);
-        printf("El grosor del soporte es de: %.4fmm\n", GrosorSoporte);
-        printf("El grosor de la TapaExterna es de: %.4fmm\n",
+        printf("\nMEDIDAS GROSOR CAJA RESORTE\n");
+        printf("Grosor cuerpo %.4fmm\n", GrosorCuerpo);
+        printf("Grosor soporte: %.4fmm\n", GrosorSoporte);
+        printf("Grosor TapaExterna: %.4fmm\n",
                GrosorTapaExterna);
-        printf("El grosor Total es de: %.4fmm\n", grosorTotal);
-        printf("El radio interno es de: %.4fmm\n", *radioInterno);
-        printf("El radio externo es de: %.4fmm\n", radioexterno);
-        printf("El ancho del Soporte por el ángulo es de: %.4fmm\n",
-               anchoSoporte);
-        printf("El alto del soporte es de %.4fmm\n", altoSoporte);
-        printf("El alto total del soporte para resta de figuras debe de ser"
-               "de %.4fmm\n", altoTotalSoporte);
-        printf("El radio para anclar el fleje a 180 grados es de %.4f\n", circuloFleje);
-        printf("El radio del circulo del alma es de %.4f\n", radioAlma);
+        printf("Grosor Total: %.4fmm\n", grosorTotal);
+
+	printf("\nMEDIDAS RADIO CAJA RESORTE\n");
+        printf("Radio interno: %.4fmm\n", *radioInterno);
+        printf("Radio externo: %.4fmm\n", radioexterno);
+
+	printf("\n MEDIDAS ABERTURAS CAJA RESORTE\n");
+        printf("Radio para anclar fleje horizontalmente %.4fmm\n", radioCirculoFleje);
+        printf("Radio circulo fleche  %.4fmm\n", radioAlma);
         printf("\n");
 
         //MANEJO DE ERRORES
         printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
-        printf("\nALTURA DEL SOPORTE\n");
-        if((altoSoporte <= 1)){
-            printf("ERROR: EL contenedor del resorte no puede tener un soporte de %.4f\n"
-                   "el contenedor es demasiado grande\n",altoSoporte);
-        }else{
-            printf("El contenedor del resorte tiene un soporte permitido de %.4f\n",
-                   altoSoporte);
-        }
-        printf("\n");
-    }
+        printf("\nRADIO EXTERNO CAJA RESORTE\n");
 
-    //comunicación de calculos
-    cajaResorteGlobal.grosorTamborcTapas = grosorTotal;
-    cajaResorteGlobal.grosorTambor = GrosorCuerpo;
-    cajaResorteGlobal.anchoSoporte = anchoSoporte;
-}
-
-
-void Base(int print){
-
-    //Dependencias
-    double *profundidadextra = &baseGlobal.extraBase;
-    double *anchoExtra = &baseGlobal.extraAncho;
-    double *espesens = &baseGlobal.espacioentresensores;
-    double *esperessop = &baseGlobal.espacioentreResorteySoporte;
-    double *esporillas = &baseGlobal.espacioenorillas;
-
-    double *grosSopor = &soporteGlobal.grosorSoporte;
-    double *anchSopor = &soporteGlobal.anchoSoporte;
-    double *altoxtraSopor = &soporteGlobal.altoExtradeBase;
-
-    double *grosCajcTap = &cajaResorteGlobal.grosorTamborcTapas;
-    double *grosCaj = &cajaResorteGlobal.grosorTambor;
-    double *grosTap = &cajaResorteGlobal.grosorTapas;
-    double *anchCajaRes = &cajaResorteGlobal.anchoSoporte;
-    double *altoxtraCajaRes = &cajaResorteGlobal.altoExtadeBase;
-
-    double *grosSens = &sensorGlobal.GrosorempaqueSensor;
-    double *anchSens = &sensorGlobal.AnchoempaqueSensor;
-    double *orillaSensorAHueco = &sensorGlobal.GrosorEspacioExtremoATorre;
-
-    //Variables de uso propio
-    double soporteMasAncho;
-    double soporteextraMasAlto;
-    double anchoTotal;
-    double altoTotal;
-    double grosorTotal;
-    double posicionSoporteone;
-    double posicionsensorone;
-    double posicionsensortwo;
-    double posicionSoportetwo;
-    double posicionCajRes;
-    double distanciaprimerhueco;
-    double distanciasegundohueco;
-
-    double mitadAnchoTotal;
-    double centroSoportes;
-    double centroSensores;
-    double centroCajRes;
-
-
-    soporteMasAncho = *anchCajaRes;
-    if(*anchSens > soporteMasAncho){
-        soporteMasAncho = *anchSens;
-    }
-    if(*anchSopor > soporteMasAncho){
-        soporteMasAncho = *anchSopor;
-    }
-    anchoTotal = soporteMasAncho + *anchoExtra;
-
-
-    soporteextraMasAlto = *altoxtraCajaRes;
-    if(*altoxtraSopor > soporteextraMasAlto){
-        soporteextraMasAlto = *altoxtraSopor;
-    }
-    altoTotal = soporteextraMasAlto + *profundidadextra;
-
-
-
-    grosorTotal = *esporillas + *grosSopor + *espesens + *grosSens + *grosSens
-            + *espesens + *grosSopor + *esperessop
-            +*grosCajcTap + *esporillas;
-
-    posicionSoporteone = *esporillas;
-    posicionsensorone = posicionSoporteone + *grosSopor + *espesens;
-    posicionsensortwo = posicionsensorone +*grosSens;
-    posicionSoportetwo = posicionsensortwo +*grosSens +*espesens;
-    posicionCajRes = posicionSoportetwo + *grosSopor + *esperessop + *grosTap;
-    distanciaprimerhueco = posicionsensorone + *orillaSensorAHueco;
-    distanciasegundohueco = posicionsensortwo + *orillaSensorAHueco;
-
-    mitadAnchoTotal = anchoTotal/2;
-    centroSoportes = mitadAnchoTotal - (*anchSopor/2);
-    centroSensores = mitadAnchoTotal - (*anchSens/2);
-    centroCajRes = mitadAnchoTotal - (*anchCajaRes/2);
-
-    if(print == 1){
-
-        printf("\nMEDIDAS BASE\n");
-        printf("El dispositivo mas ancho es de %.2f\n", soporteMasAncho);
-        printf("El ancho Total de la base es de %.2fmm\n", anchoTotal);
-        printf("El dispositivo con más alto extra de base es de %.2f\n",
-               soporteextraMasAlto);
-        printf("El alto total de la base es de %.4fmm\n", altoTotal);
-        printf("El grosor Total es de %.4fmm\n\n", grosorTotal);
-        printf("La distancia del primer soporte a la orilla es de: %.4f\n"
-               "La distancia del primer sensor a la orilla es de: %.4f\n"
-               "La distancia del segundo sensor a la orilla es de: %.4f\n"
-               "La distancia del segundo soporte a la orilla es de: %.4f\n"
-               "La distancia de la cajaResorte a la orilla es de: %.4f\n",
-               posicionSoporteone, posicionsensorone, posicionsensortwo,
-               posicionSoportetwo, posicionCajRes);
-
-        printf("\nANCHOS\n");
-        printf("El ancho de los soportes de los baleros es de %.4f\n", *anchSopor);
-        printf("El ancho de los sensores es de %.4f\n", *anchSens);
-        printf("El ancho de la cajaResorte es de %.4f\n", *anchCajaRes);
-
-        printf("\nGROSORES\n");
-        printf("El grosor de los soportes de los baleros es de %.4f\n", *grosSopor);
-        printf("El grosor del sensor es de %.4f\n", *grosSens);
-        printf("El grosor de la cajaResorte sin tapas es de es de %.4f\n", *grosCaj);
-
-        printf("\nCENTROS\n");
-        printf("Soporte baleros a %.4f de la orilla de ancho\n", centroSoportes);
-        printf("Sensores a %.4f de la orilla de ancho\n", centroSensores);
-        printf("CajaResorte a %.4f de la orilla de ancho\n", centroCajRes);
-
-        printf("\nPROFUNDIDADES\n");
-        printf("La profundidad (alto) de los agujeros para los soportes\n"
-               "de los baleros es de %.4f\n", soporteextraMasAlto);
-
-        printf("\nAGUJEROS SENSORES\n");
-        printf("La distancia del agujero que atraviesa la base para el sensor\n"
-               "es de %.4f respecto a la orilla\n", distanciaprimerhueco);
-        printf("La distancia del agujero que atraviesa la base para el sensor 2\n"
-               "es de %.4f respecto a la orilla\n", distanciasegundohueco);
-        printf("\n");
-    }
-
-    baseGlobal.distanciaSoporte_Extremo = *grosSopor + *espesens + *grosSens + *grosSens
-            + *espesens + *grosSopor + *esperessop + *grosCajcTap+ *esporillas;
-}
-
-void Flecha(int print){
-    //Dependencias
-    double *rinterno = &baleroGlobal.radiointerno;
-    double *distanciaEntreSopaExt = &baseGlobal.distanciaSoporte_Extremo;
-    double *esporillas = &baseGlobal.espacioenorillas;
-    double *tamanioCajaResorte = &cajaResorteGlobal.grosorTamborcTapas;
-    double *gruesCuer = &flechaGlobal.extraGruesoparaCuerda;
-
-    //Variables para uso propio
-    double radioCirculo;
-    double angulo;
-    double anguloRadianes;
-    double diagonalCuadrado;
-    double catetopuesto;
-    double lados;
-    double grosor;
-    double anchoLineaResorte;
-    double posicionLineaResorte;
-    double gruesoLinea;
-
-    //cilindro
-    double anchocilindrocable;
-    double radiocilindrocable;
-    double posicioncilcable;
-
-
-    //Calculos
-    radioCirculo = *rinterno;
-    angulo = 45;
-    anguloRadianes = (angulo * PI)/180;
-    diagonalCuadrado = radioCirculo * 2;
-    catetopuesto = diagonalCuadrado * sin(anguloRadianes);
-    lados = catetopuesto;
-
-    grosor = *distanciaEntreSopaExt+*gruesCuer;
-    anchoLineaResorte = (1/5.0)*catetopuesto;
-    posicionLineaResorte = *distanciaEntreSopaExt
-            + *gruesCuer - *tamanioCajaResorte - *esporillas;
-    gruesoLinea = *tamanioCajaResorte +*esporillas;
-
-    //cilindro
-    anchocilindrocable = lados;
-    radiocilindrocable = lados/4;
-    posicioncilcable = *gruesCuer/2;
-
-    if(print == 1){
-
-        printf("\nMEDIDAS FLECHA\n");
-        printf("El radio del Círculo es de: %.4fmm\n", radioCirculo);
-        printf("Los lados del cuadrado deben de ser de: %.4fmm\n", lados);
-        printf("El grosor de la flecha debe de ser de: %.4f\n", grosor);
-        printf("El ancho de la linea del resorte debe de ser de: %.4f\n", anchoLineaResorte);
-        printf("El  grosor de la linea debe de ser de:%.4f y debe estar a una distancia\n"
-               "de %.4f a  partir de un extremo\n", gruesoLinea, posicionLineaResorte);
-         printf("El ancho del cilindro para el cable es de %.4f\n", anchocilindrocable);
-        printf("El radio del cilindro para el cable es de %.4f\n", radiocilindrocable);
-        printf("La posición del cilindro debe de ser de %.4f\n", posicioncilcable);
-        printf("\n");
-
-        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
-        printf("\nANCHO LINEA RESORTE\n");
-        if(anchoLineaResorte <=1){
-            printf("ERROR: EL ancho de la línea de %.4f del resorte es igual o menor"
-                   " que 1mm", anchoLineaResorte);
-        }else{
-            printf("El ancho de la línea de %.4f del resorte es mayor que 1mm",
-                   anchoLineaResorte);
-        }
-
-        printf("\nRADIO DEL CILÍNDRO\n");
-        if(radiocilindrocable <=1){
-            printf("ERROR: El radio del cilíndro de %.4f del resorte es igual o menor"
-                   " que 1mm", radiocilindrocable);
-        }else{
-            printf("El radio del cilíndro de %.4f del resorte es mayor que 1mm",
-                   radiocilindrocable);
-        }
         printf("\n");
     }
 }
-
-
