@@ -387,7 +387,7 @@ void Flecha(int print){
 
         printf("\nMEDIDAS FLECHA\n");
         printf("Rardio arcos: %.4fmm\n", *rinterno);
-	printf("Ángulo arcos: 45grados\n");
+	printf("Ángulo arcos: 90 grados\n");
 
         printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
 
@@ -406,7 +406,6 @@ void CajaResorte(int print)
 
     //variables de uso propio
     double GrosorCuerpo;
-    double GrosorSoporte;
     double GrosorTapaExterna;
     double grosorTotal;
     double radioexterno;
@@ -416,7 +415,6 @@ void CajaResorte(int print)
 
     //GROSORES
     GrosorCuerpo = *grosFleje + *extranchoFleje;
-    GrosorSoporte = GrosorCuerpo;
     GrosorTapaExterna = *grosTapaExt;
     grosorTotal = GrosorTapaExterna *2  + GrosorCuerpo;
     
@@ -428,7 +426,6 @@ void CajaResorte(int print)
     if(print == 1){
         printf("\nMEDIDAS GROSOR CAJA RESORTE\n");
         printf("Grosor cuerpo %.4fmm\n", GrosorCuerpo);
-        printf("Grosor soporte: %.4fmm\n", GrosorSoporte);
         printf("Grosor TapaExterna: %.4fmm\n",
                GrosorTapaExterna);
         printf("Grosor Total: %.4fmm\n", grosorTotal);

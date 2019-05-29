@@ -11,6 +11,7 @@ int checkyorn(char);//function to check for y or no values
 void calculations(void);//Function for initiate calculations and display them
 void typeagain(int *election);
 
+void (*functions[5])(int) = {Disk,Soportes, SoporteSensores,Flecha,CajaResorte};
 
 int main(int argc, char *argv[]){
 
@@ -55,9 +56,6 @@ int main(int argc, char *argv[]){
   cajaResorteGlobal.grosorTapas = 2;
   cajaResorteGlobal.radioCilInterno = 23;
   cajaResorteGlobal.extradioexterno = 3;
-
-  //Flecha
-  flechaGlobal.extraGruesoparaCuerda = 50;
 
   cleanScreen();
   calculations();
@@ -111,32 +109,12 @@ void calculations(void){
   cleanScreen();
 
   while(election != -1){
-    if(election ==1){
-
-      Disk(1);
-      typeagain(&election);
-    }else if(election ==2){
-      Disk(0);
-      Soportes(1);
-      typeagain(&election);
-    }else if(election ==3){
-      Disk(0);
-      Soportes(0);
-      SoporteSensores(1);
-      typeagain(&election);
-    }else if(election ==4){
-      Disk(0);
-      Soportes(0);
-      SoporteSensores(0);
-      Flecha(1);
-      typeagain(&election);
-    }else if(election ==5){
-      Disk(0);
-      Soportes(0);
-      SoporteSensores(0);
-      Flecha(0);
-      CajaResorte(1);
-      typeagain(&election);
+    if(election >=1 || election <=5){
+      for(int i = 0; i < election;i++){
+	(*functions[i])(0);
+      }
+      (*functions[election-1])(1);
+      typeagain(&election);      
     }else{
       printf("No option with that number\n");
       typeagain(&election);
