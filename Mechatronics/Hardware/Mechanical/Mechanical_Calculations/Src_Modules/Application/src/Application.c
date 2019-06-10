@@ -11,12 +11,11 @@ int checkyorn(char);//function to check for y or no values
 void calculations(void);//Function for initiate calculations and display them
 void typeagain(int *election);
 
-void (*functions[5])(int) = {Disk,Soportes, SoporteSensores,Flecha,CajaResorte};
+void (*functions[5])(int) = {Disk,SoportesBaleros, SoportesSensores,CajaResorte};
 
 int main(int argc, char *argv[]){
 
   //medidas en milímetros
-
   //Sensores
   sensorGlobal.AnchodelTransistor = 1.0;
   sensorGlobal.AltodelTransistor = 4.0;
@@ -53,7 +52,6 @@ int main(int argc, char *argv[]){
 
   //CajaResorte
   cajaResorteGlobal.extraGrosorTambor = 1.5;
-  cajaResorteGlobal.grosorTapas = 2;
   cajaResorteGlobal.radioCilInterno = 23;
   cajaResorteGlobal.extradioexterno = 3;
 
@@ -74,10 +72,9 @@ void thirdMenuInstructions(void){
   printf("---Menu de cálculos---\n\n"
 	 "Cálculos Mecánicos:\n"
 	 "1 :calculos del disco\n"
-	 "2 :calculos de los soportes\n"
+	 "2 :calculos de los soportes baleros\n"
 	 "3 :calculos de los soportes sensores\n"
-	 "4 :calculos de la Flecha\n"
-	 "5 :calculos de la Caja del Resorte\n"
+	 "4 :calculos de la caja del resorte\n"
 	 "\nCálculos Electrónicos:\n"
 	 "Oprime -1 para salir");
   printf("\n");

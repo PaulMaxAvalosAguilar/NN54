@@ -5,177 +5,162 @@
 #include <stdio.h>
 
 void Disk(int print){
-    //Dependencias
-    double *anchosensor = &sensorGlobal.AnchodelTransistor;
-    double *altosensor = &sensorGlobal.AltodelTransistor;
-    double *diotrans = &sensorGlobal.GrosorEspaciodiodoTransistor;
-    double *altoMaximoDisco = &sensorGlobal.EspacioAlturaparaDisco;
-    double *gruesoEmpaque = &sensorGlobal.GrosorempaqueSensor;
-    double *medidaseguridad = &discoGlobal.AnchoSeguridad;
-    double *altoseguridad = &discoGlobal.AltoSeguridad;
-    double *agujeros_desea = &discoGlobal.agujerosDeseados;
-    double *gruesoDisco = &discoGlobal.gruesoDisco;
-    double *radioBalero = &baleroGlobal.radioexterno;
+  //Dependencias
+  double *anchosensor = &sensorGlobal.AnchodelTransistor;
+  double *altosensor = &sensorGlobal.AltodelTransistor;
+  double *diotrans = &sensorGlobal.GrosorEspaciodiodoTransistor;
+  double *altoMaximoDisco = &sensorGlobal.EspacioAlturaparaDisco;
+  double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
+  double *medidaseguridad = &discoGlobal.AnchoSeguridad;
+  double *altoseguridad = &discoGlobal.AltoSeguridad;
+  double *agujeros_desea = &discoGlobal.agujerosDeseados;
+  double *gruesoDisco = &discoGlobal.gruesoDisco;
+  double *radioBalero = &baleroGlobal.radioexterno;
 
-    //Variables de uso propio
-    double ancho_desfases;
-    double ancho_agujeros;
-    double espacio_agujeros;
-    double angulo_desfases;
+  //Variables de uso propio
+  double ancho_desfases;
+  double ancho_agujeros;
+  double espacio_agujeros;
+  double angulo_desfases;
 
-    double arco_interno;
-    double perim_interno;
-    double radio_interno;
+  double arco_interno;
+  double perim_interno;
+  double radio_interno;
 
-    double arco_externo;
-    double perim_externo;
-    double radio_externo;
+  double arco_externo;
+  double perim_externo;
+  double radio_externo;
 
-    double radiocilindrosujecion;
-    double gruesocilindrosujecion;
+  double eje;
+      
+  //MEDIDAS GENERALES
+  ancho_desfases = *anchosensor + *medidaseguridad;
+  ancho_agujeros = ancho_desfases *2;
+  espacio_agujeros = ancho_agujeros;
+  //MEDIDAS INTERNAS
+  arco_interno = ancho_agujeros;
+  perim_interno = *agujeros_desea * 2 * ancho_agujeros;
+  radio_interno = (perim_interno)/(2*PI);
+  angulo_desfases = (180*arco_interno)/(PI*radio_interno);
+  //MEDIDAS EXTERNAS
+  radio_externo = radio_interno + *altosensor + *altoseguridad;
+  arco_externo = 2*PI*radio_externo*(angulo_desfases/360);
+  perim_externo = 2*PI*radio_externo;
+  //EJE
+  eje = radio_interno + *altoempaqueSensor;
 
-    //MEDIDAS GENERALES
-    ancho_desfases = *anchosensor + *medidaseguridad;
-    ancho_agujeros = ancho_desfases *2;
-    espacio_agujeros = ancho_agujeros;
-    //MEDIDAS INTERNAS
-    arco_interno = ancho_agujeros;
-    perim_interno = *agujeros_desea * 2 * ancho_agujeros;
-    radio_interno = (perim_interno)/(2*PI);
-    angulo_desfases = (180*arco_interno)/(PI*radio_interno);
-    //MEDIDAS EXTERNAS
-    radio_externo = radio_interno + *altosensor + *altoseguridad;
-    arco_externo = 2*PI*radio_externo*(angulo_desfases/360);
-    perim_externo = 2*PI*radio_externo;
-    //Radio cilindro sujeción
-    radiocilindrosujecion = radio_interno/3;
-    gruesocilindrosujecion = 4* *gruesoDisco;
+  if(print == 1){
 
+    printf("\nMEDIDAS EJE\n");
+    printf("Eje pieza %.4fmm\n", eje);
+      
+    printf("\nMEDIDAS GENERALES DISCO DENTADO\n");
+    //impresion de medidas basicas
+    printf("Ancho desfases %.4fmm\n", ancho_desfases);
+    printf("Ancho agujeros %.4fmm\n", ancho_agujeros);
+    printf("Espacio entre agujeros %.4fmm\n", espacio_agujeros);
+    printf("Angulo entre desfases %.4f grados\n", angulo_desfases);
 
-    if(print == 1){
+    printf("\nMEDIDAS INTERNAS\n");
+    //impresion de medidas internas
+    printf("Arco interno %.4fmm\n", arco_interno);
+    printf("Perimetro agujeros %.6fmm\n",
+	   perim_interno);
+    printf("Radio interno circulo %.4fmm\n", radio_interno);
 
-        printf("\nMEDIDAS GENERALES DISCO DENTADO\n");
-        //impresion de medidas basicas
-        printf("Ancho de los desfases %.4fmm\n", ancho_desfases);
-        printf("Ancho de los agujeros %.4fmm\n", ancho_agujeros);
-        printf("Espacio entre agujeros %.4fmm\n", espacio_agujeros);
-        printf("Angulo entre desfases %.4f grados\n", angulo_desfases);
+    printf("\nMEDIDAS EXTERNAS\n");
+    //impresion de medidas externas
+    printf("Arco externo agujeros %.4fmm\n", arco_externo);
+    printf("Perimetro externo agujeros %.4fmm\n",perim_externo);
+    printf("Radio externo circulo %.4fmm\n", radio_externo);
 
-        printf("\nMEDIDAS INTERNAS\n");
-        //impresion de medidas internas
-        printf("Arco interno de los agujeros %.4fmm\n", arco_interno);
-        printf("Perimetro interno de los agujeros %.6fmm\n",
-               perim_interno);
-        printf("Radio interno del circulo %.4fmm\n", radio_interno);
+    printf("\nGROSOR DISCO\n");
+    //impresion de medidas externas
+    printf("Grosor disco %.4fmm\n", *gruesoDisco);
 
-        printf("\nMEDIDAS EXTERNAS\n");
-        //impresion de medidas externas
-        printf("Arco externo de los agujeros %.4fmm\n", arco_externo);
-        printf("Perimetro externo de los agujeros %.4fmm\n",perim_externo);
-        printf("Radio externo del circulo %.4fmm\n", radio_externo);
+    //MANEJO DE ERRORES
+    printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
+    printf("\nGROSOR DEL DISCO\n");
+    if(*gruesoDisco > *diotrans){
+      printf("ERROR: El grueso del disco de %.4fmm es mayor que el espacio\n"
+	     "entre diodo y transistor de  %.4fmm\n", *gruesoDisco, *diotrans);        }
 
-	printf("\nGROSOR DISCO\n");
-        //impresion de medidas externas
-        printf("Grosor disco %.4fmm\n", *gruesoDisco);
-
-
-        printf("\nMEDIDAS CILINDRO PARA SUJECIÓN\n");
-        printf("El medio cilindro de 180 grados debe tener un radio de %.4f\n",
-               radiocilindrosujecion);
-        printf("El medio cilíndro de 180 grados debe tener un grueso de %.4f\n",
-               gruesocilindrosujecion);
-
-        //MANEJO DE ERRORES
-        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
-        printf("\nGROSOR DEL DISCO\n");
-        if(*gruesoDisco > *diotrans){
-            printf("ERROR: El grueso del disco de %.4fmm es mayor que el espacio\n"
-                   "entre diodo y transistor de  %.4fmm\n", *gruesoDisco, *diotrans);        }
-
-        printf("\nDIENTES DEL DISCO\n");
-        if((radio_externo - radio_interno) > *altoMaximoDisco){
-            printf("ERROR: La medida de alto de los dientes de %.4f del disco es mayor que el espacio\n"
-                   "disponible en el sensor de %.4f\n", radio_externo-radio_interno,
-                   sensorGlobal.EspacioAlturaparaDisco);
-        }
+    printf("\nDIENTES DEL DISCO\n");
+    if((radio_externo - radio_interno) > *altoMaximoDisco){
+      printf("ERROR: La medida de alto de los dientes de %.4f del disco es mayor que el espacio\n"
+	     "disponible en el sensor de %.4f\n", radio_externo-radio_interno,
+	     sensorGlobal.EspacioAlturaparaDisco);
+    }
 	
-        printf("\nTAMAÑO DEL DISCO\n");
-        if(*radioBalero > radio_interno){
-            printf("ERROR: El radio del disco interno de %.4f es demasiado pequeño para el balero de %.4f\n"
-                   "Aumenta la medida de seguridad del archivo disco o bien\n"
-                   "Aumenta el numero de dientes deseados o\n"
-                   "Consigue un balero más pequeño\n", radio_interno, *radioBalero);
-        }
-
-        printf("\nGRUESO CILINDRO PARA SUJECION\n");
-        if(gruesocilindrosujecion >= (*gruesoEmpaque/2)){
-            printf("ERROR: El grueso del medio cilíndro de 180 grados de %.4f es mayor o igual\n"
-                   "que la mitad del grueso del empaque de %.4f\n"
-                   "diminuye el tamaño", gruesocilindrosujecion, (*gruesoEmpaque/2));
-        }
-        printf("\n");
+    printf("\nTAMAÑO DEL DISCO\n");
+    if(*radioBalero > radio_interno){
+      printf("ERROR: El radio del disco interno de %.4f es demasiado pequeño para el balero de %.4f\n"
+	     "Aumenta la medida de seguridad del archivo disco o bien\n"
+	     "Aumenta el numero de dientes deseados o\n"
+	     "Consigue un balero más pequeño\n", radio_interno, *radioBalero);
     }
-    //comunicación de cálculos
-    discoGlobal.radiointerno = radio_interno;
-    discoGlobal.angulo_desfases = angulo_desfases;
+
+    printf("\n");
+  }
+  //comunicación de cálculos
+  discoGlobal.radiointerno = radio_interno;
+  discoGlobal.angulo_desfases = angulo_desfases;
 }
 
-void Soportes(int print){
-    //Dependencias
-    double *altoExtraBase = &soporteGlobal.altoExtradeBase;
-    double *anguloTotal = &soporteGlobal.anguloParaAncho;
-    double *extradioExterno = &soporteGlobal.extradioExterno;
-    double *radioInternoDisco = &discoGlobal.radiointerno;
-    double *altoSensor = &sensorGlobal.AltoempaqueSensor;
-    double *grosorBalero = &baleroGlobal.grosorBalero;
-    double *radioextBalero = &baleroGlobal.radioexterno;
+void SoportesBaleros(int print){
+  //Dependencias
+  double *altoExtraBase = &soporteGlobal.altoExtradeBase;
+  double *anguloTotal = &soporteGlobal.anguloParaAncho;
+  double *extradioExterno = &soporteGlobal.extradioExterno;
+  double *radioInternoDisco = &discoGlobal.radiointerno;
+  double *altoSensor = &sensorGlobal.AltoempaqueSensor;
+  double *grosorBalero = &baleroGlobal.grosorBalero;
+  double *radioextBalero = &baleroGlobal.radioexterno;
 
+  //variables de uso propio
+  double grosor_cilindro;
+  double radiointerno;
+  double radioexterno;
+  double grosorsoporte;
+  double catetopuesto;
+  double anchosoporte;
+  double altosoporte;
 
-    //variables de uso propio
-    double grosor_cilindro;
-    double radiointerno;
-    double radioexterno;
-    double grosorsoporte;
-    double catetopuesto;
-    double anchosoporte;
-    double altosoporte;
+  grosor_cilindro = *grosorBalero;
+  radiointerno = *radioextBalero;
+  radioexterno = radiointerno + *extradioExterno;
+  grosorsoporte = grosor_cilindro;
+  catetopuesto = opuestoFromHipotenusa(*anguloTotal/2.0,radioexterno);
+  anchosoporte = catetopuesto*2;
+  altosoporte = *altoSensor + *radioInternoDisco
+    + *altoExtraBase - radioexterno;
 
-    grosor_cilindro = *grosorBalero;
-    radiointerno = *radioextBalero;
-    radioexterno = radiointerno + *extradioExterno;
-    grosorsoporte = grosor_cilindro;
-    catetopuesto = opuestoFromHipotenusa(*anguloTotal/2.0,radioexterno);
-    anchosoporte = catetopuesto*2;
-    altosoporte = *altoSensor + *radioInternoDisco
-            + *altoExtraBase - radioexterno;
+  if(print == 1){    
+    printf("\nMEDIDAS SOPORTE\n");
+    printf("Grosor cilindro %.4fmm\n", grosor_cilindro);
+    printf("Internal circle radius %.4fmm\n",radiointerno);
+    printf("External circle radius %.4fmm\n",radioexterno);
+    printf("Grosor soporte %.4fmm\n", grosorsoporte);
+    printf("Ancho del soporte es de %.4fmm\n", anchosoporte);
+    printf("Internal cilinder perimeter-origin legth %.4fmm\n", altosoporte);
+    printf("\n");
 
-    if(print == 1){
-        printf("\nMEDIDAS SOPORTE\n");
-        printf("Grosor cilindro %.4fmm\n", grosor_cilindro);
-        printf("Internal circle radius %.4fmm\n",radiointerno);
-        printf("External circle radius %.4fmm\n",radioexterno);
-        printf("Grosor soporte %.4fmm\n", grosorsoporte);
-        printf("Ancho del soporte es de %.4fmm\n", anchosoporte);
-        printf("Internal cilinder to origin legth %.4fmm\n", altosoporte);
-        printf("\n");
-
-
-        //MANEJO DE ERRORES
-        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
-        printf("\nALTURA DEL SOPORTE\n");
-        if((altosoporte <= 1)){
-            printf("ERROR: EL contenedor del resorte no puede tener un soporte de %.4f\n"
-                   "el contenedor es demasiado grande\n",altosoporte);
-        }
-        printf("\n");
-
+    //MANEJO DE ERRORES
+    printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
+    printf("\nALTURA DEL SOPORTE\n");
+    if((altosoporte <= 1)){
+      printf("ERROR: EL contenedor del resorte no puede tener un soporte de %.4f\n"
+	     "el contenedor es demasiado grande\n",altosoporte);
     }
-    //comunicación de calculos
-    soporteGlobal.grosorSoporte = grosorsoporte;
-    soporteGlobal.anchoSoporte = anchosoporte;
+    printf("\n");
+
+  }
+  //comunicación de calculos
+  soporteGlobal.grosorSoporte = grosorsoporte;
+  soporteGlobal.anchoSoporte = anchosoporte;
 }
 
-void SoporteSensores(int print){
+void SoportesSensores(int print){
   //Dependencias
   int *n1 = &posSensoresGlobal.n1;
   int *n2 = &posSensoresGlobal.n2;
@@ -253,8 +238,6 @@ void SoporteSensores(int print){
   double s2line1Line3Angle;
   double s2line1ToOriginLength;
   
-
-
   //Soporte sensor 1  
   s1angleAlphaTriangleA = (*n1 * *angulo + *x);
   s1angleBetaTriangleA = getTriangleMissingAngle(s1angleAlphaTriangleA);
@@ -355,6 +338,7 @@ void SoporteSensores(int print){
 	   "Line1 to origin length %.4fmm\n",
 	   s2line1Line3Angle,
 	   s2line1ToOriginLength);
+    
     printf("\nGROSOR SOPORTES\n");
     printf("Grosor soportes %.4fmm\n", *grosorSoportes);
 
@@ -377,72 +361,51 @@ void SoporteSensores(int print){
   
 }
 
-void Flecha(int print){
-    //Dependencias
-    double *rinterno = &baleroGlobal.radiointerno;
-
-    //Variables para uso propio
-
-    if(print == 1){
-
-        printf("\nMEDIDAS FLECHA\n");
-        printf("Rardio arcos: %.4fmm\n", *rinterno);
-	printf("Ángulo arcos: 90 grados\n");
-
-        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
-
-        printf("\n");
-    }
-}
-
 void CajaResorte(int print)
 {
-    //Dependencias
-    double *grosTapaExt = &cajaResorteGlobal.grosorTapas;
-    double *extranchoFleje = &cajaResorteGlobal.extraGrosorTambor;
-    double *radioInterno = &cajaResorteGlobal.radioCilInterno;
-    double *extraRadioInt = &cajaResorteGlobal.extradioexterno;
-    double *grosFleje = &flejeGlobal.grueso_fleje;
+  //Dependencias
+  double *extranchoFleje = &cajaResorteGlobal.extraGrosorTambor;
+  double *radioInterno = &cajaResorteGlobal.radioCilInterno;
+  double *extraRadioInt = &cajaResorteGlobal.extradioexterno;
+  double *grosFleje = &flejeGlobal.grueso_fleje;
 
-    //variables de uso propio
-    double GrosorCuerpo;
-    double GrosorTapaExterna;
-    double grosorTotal;
-    double radioexterno;
+  double *rinterno = &baleroGlobal.radiointerno;
 
-    double radioCirculoFleje;
-    double radioAlma;
+  double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
+  double *radioInternoDisco = &discoGlobal.radiointerno;
 
-    //GROSORES
-    GrosorCuerpo = *grosFleje + *extranchoFleje;
-    GrosorTapaExterna = *grosTapaExt;
-    grosorTotal = GrosorTapaExterna *2  + GrosorCuerpo;
+  //variables de uso propio
+  double GrosorCuerpo;
+  double radioexterno;
+
+  double eje;
+
+  //GROSORES
+  GrosorCuerpo = *grosFleje + *extranchoFleje;
     
-    radioexterno = *radioInterno + *extraRadioInt;
+  radioexterno = *radioInterno + *extraRadioInt;
+  eje = *radioInternoDisco + *altoempaqueSensor;
 
-    radioCirculoFleje = (*grosFleje/2)/1.85;
-    radioAlma = *radioInterno/2;
+  if(print == 1){
+    printf("\nMEDIDAS EJE\n");
+    printf("Eje pieza %.4fmm\n", eje);
+    
+    printf("\nMEDIDAS GROSOR CAJA RESORTE\n");
+    printf("Grosor cuerpo %.4fmm\n", GrosorCuerpo);
 
-    if(print == 1){
-        printf("\nMEDIDAS GROSOR CAJA RESORTE\n");
-        printf("Grosor cuerpo %.4fmm\n", GrosorCuerpo);
-        printf("Grosor TapaExterna: %.4fmm\n",
-               GrosorTapaExterna);
-        printf("Grosor Total: %.4fmm\n", grosorTotal);
+    printf("\nMEDIDAS RADIO CAJA RESORTE\n");
+    printf("Radio interno: %.4fmm\n", *radioInterno);
+    printf("Radio externo: %.4fmm\n", radioexterno);
 
-	printf("\nMEDIDAS RADIO CAJA RESORTE\n");
-        printf("Radio interno: %.4fmm\n", *radioInterno);
-        printf("Radio externo: %.4fmm\n", radioexterno);
+    printf("\n MEDIDAS ABERTURAS CAJA RESORTE\n");
+    printf("\n");
 
-	printf("\n MEDIDAS ABERTURAS CAJA RESORTE\n");
-        printf("Radio para anclar fleje horizontalmente %.4fmm\n", radioCirculoFleje);
-        printf("Radio circulo fleche  %.4fmm\n", radioAlma);
-        printf("\n");
-
-        //MANEJO DE ERRORES
-        printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
-        printf("\nRADIO EXTERNO CAJA RESORTE\n");
-
-        printf("\n");
-    }
+    printf("\nMEDIDAS FLECHA\n");
+    printf("Rardio arcos: %.4fmm\n", *rinterno);
+    printf("Ángulo arcos: 90 grados\n");
+	
+    //MANEJO DE ERRORES
+    printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");
+    printf("\n");
+  }
 }

@@ -50,7 +50,6 @@ typedef struct Datos_Fleje{
 
 typedef struct Datos_CajaResorte{
   double extraGrosorTambor;
-  double grosorTapas;
   double radioCilInterno;
   double extradioexterno;
 }Datos_CajaResorte;

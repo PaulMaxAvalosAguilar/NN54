@@ -3,9 +3,8 @@
 
 //Functions for showing calculations
 void Disk(int print);
-void Soportes(int print);
-void SoporteSensores(int print);
-void Flecha(int print);
+void SoportesBaleros(int print);
+void SoportesSensores(int print);
 void CajaResorte(int print);
 
 #endif
