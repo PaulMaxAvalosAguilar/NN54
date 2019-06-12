@@ -3,9 +3,15 @@
 
 double degreesToRadians(double angle);
 
+double radiansToDegrees(double angle);
+
 double sinDegree(double angle);
 double cosDegree(double angle);
 double tanDegree(double angle);
+
+double asinDegree(double value);
+double acosDegree(double value);
+double atanDegree(double value);
 
 double opuestoFromHipotenusa(double angle, double hipotenusa);
 double adyacenteFromHipotenusa(double angle, double hipotenusa);

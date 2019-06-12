@@ -54,6 +54,11 @@ typedef struct Datos_CajaResorte{
   double extradioexterno;
 }Datos_CajaResorte;
 
+typedef struct Datos_Flecha{
+  double angulo;
+  double offset;
+}Datos_Flecha;
+
 Datos_Sensor sensorGlobal;
 Datos_Balero baleroGlobal;
 Datos_Disco discoGlobal;
@@ -61,5 +66,6 @@ Datos_Soporte soporteGlobal;
 Datos_PosSensores posSensoresGlobal;
 Datos_Fleje flejeGlobal;
 Datos_CajaResorte cajaResorteGlobal;
+Datos_Flecha flechaGlobal;
 
 #endif

@@ -5,6 +5,6 @@
 void Disk(int print);
 void SoportesBaleros(int print);
 void SoportesSensores(int print);
-void CajaResorte(int print);
+void SistemaTraccion(int print);
 
 #endif

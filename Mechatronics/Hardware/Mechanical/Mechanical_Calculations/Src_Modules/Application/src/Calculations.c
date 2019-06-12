@@ -361,7 +361,7 @@ void SoportesSensores(int print){
   
 }
 
-void CajaResorte(int print)
+void SistemaTraccion(int print)
 {
   //Dependencias
   double *extranchoFleje = &cajaResorteGlobal.extraGrosorTambor;
@@ -374,18 +374,36 @@ void CajaResorte(int print)
   double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
   double *radioInternoDisco = &discoGlobal.radiointerno;
 
+  double *anguloFlecha = &flechaGlobal.angulo;
+  double *offset = &flechaGlobal.offset;
+
   //variables de uso propio
   double GrosorCuerpo;
   double radioexterno;
 
+  double anchoFlecha;
+  double radioFlechaChica;
+  double anguloFlechaChica;
+  double radioFlechaDiscoGrande;
+  double anguloFlechaDiscoGrande;
+  
   double eje;
 
-  //GROSORES
+  //CAJA RESORTE
   GrosorCuerpo = *grosFleje + *extranchoFleje;
-    
   radioexterno = *radioInterno + *extraRadioInt;
-  eje = *radioInternoDisco + *altoempaqueSensor;
 
+  //Flecha
+  anchoFlecha = opuestoFromHipotenusa(*anguloFlecha/2,*rinterno) * 2;
+  radioFlechaChica = *rinterno - (*offset/2);
+  anguloFlechaChica = asinDegree(((anchoFlecha/2)-(*offset/2))/
+				 radioFlechaChica)*2;
+  radioFlechaDiscoGrande = *rinterno + (*offset/2);
+  anguloFlechaDiscoGrande = asinDegree(((anchoFlecha/2)+(*offset/2))/
+				 radioFlechaDiscoGrande)*2;;
+
+  eje = *radioInternoDisco + *altoempaqueSensor;
+  
   if(print == 1){
     printf("\nMEDIDAS EJE\n");
     printf("Eje pieza %.4fmm\n", eje);
@@ -397,12 +415,19 @@ void CajaResorte(int print)
     printf("Radio interno: %.4fmm\n", *radioInterno);
     printf("Radio externo: %.4fmm\n", radioexterno);
 
-    printf("\n MEDIDAS ABERTURAS CAJA RESORTE\n");
-    printf("\n");
-
     printf("\nMEDIDAS FLECHA\n");
     printf("Rardio arcos: %.4fmm\n", *rinterno);
-    printf("Ángulo arcos: 90 grados\n");
+    printf("Ángulo arcos:%.4fmm\n", *anguloFlecha);
+    printf("Ancho flecha: %.4fmm\n", anchoFlecha);
+
+    printf("\nMEDIDAS EXPANSION FLECHA\n");
+    printf ("Radio Flecha Chica: %.4fmm\n", radioFlechaChica);
+    printf ("Angulo Flecha Chica: %.4fmm\n", anguloFlechaChica);
+    printf ("Radio Flecha Disco Grande: %.4fmm\n",
+	    radioFlechaDiscoGrande);
+    printf ("Angulo Flecha Disco Grande: %.4fmm\n",
+	    anguloFlechaDiscoGrande);
+    
 	
     //MANEJO DE ERRORES
     printf("\n--CHECKING FOR POSSIBLE ERRORS--\n");

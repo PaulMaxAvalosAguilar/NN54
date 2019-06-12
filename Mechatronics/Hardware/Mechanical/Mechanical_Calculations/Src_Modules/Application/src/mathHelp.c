@@ -5,6 +5,10 @@ double degreesToRadians(double angle){
   return (angle *PI)/180;
 }
 
+double radiansToDegrees(double angle){
+  return (angle *180)/PI;
+}
+
 double sinDegree(double angle){
   return sin(degreesToRadians(angle));
 }
@@ -15,6 +19,18 @@ double cosDegree(double angle){
 
 double tanDegree(double angle){
   return tan(degreesToRadians(angle));
+}
+
+double asinDegree(double value){
+  return radiansToDegrees(asin(value));
+}
+
+double acosDegree(double value){
+  return radiansToDegrees(acos(value));
+}
+
+double atanDegree(double value){
+  return radiansToDegrees(atan(value));
 }
 
 double opuestoFromHipotenusa(double angle, double hipotenusa){
