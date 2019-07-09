@@ -13,8 +13,8 @@ void configurePeriphereals(void);
 
 void configurePeriphereals(void){
   rcc_periph_clock_enable(RCC_AFIO);    // I2C
-  rcc_periph_clock_enable(RCC_GPIOA);   // TIM1
-  rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM4
+  rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2
+  rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM4 TIM2
   rcc_periph_clock_enable(RCC_I2C1);	// I2C
   rcc_periph_clock_enable(RCC_TIM1);    // TIM1
   rcc_periph_clock_enable(RCC_TIM2);    // TIM2
