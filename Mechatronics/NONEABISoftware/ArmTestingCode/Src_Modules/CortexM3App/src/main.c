@@ -1,18 +1,45 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/cm3/nvic.h>
 #include "FreeRTOS.h"
 #include "printf.h"
 #include "task.h"
 #include "lcd.h"
 
+static volatile uint32_t timesCalled = 0;
+
 void configurePeriphereals(void);
 
 void configurePeriphereals(void){
   rcc_periph_clock_enable(RCC_AFIO);    // I2C
+  rcc_periph_clock_enable(RCC_GPIOA);   // TIM1
   rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM4
   rcc_periph_clock_enable(RCC_I2C1);	// I2C
+  rcc_periph_clock_enable(RCC_TIM1);    // TIM1
+  rcc_periph_clock_enable(RCC_TIM2);    // TIM2
   rcc_periph_clock_enable(RCC_TIM4);    // TIM4
+
+  //32bit Timer
+  
+  //TIM1
+  TIM1_CCMR1 |= (TIM_CCMR1_CC1S_IN_TI1);
+  TIM1_CCER &= ~(TIM_CCER_CC1P);
+  TIM1_CCER |= (TIM_CCER_CC1E);
+  timer_enable_irq(TIM1, TIM_DIER_CC1IE);
+  TIM1_PSC = 72;
+  TIM1_CR1 |= TIM_CR1_CEN;
+
+  TIM1_CR2 |= TIM_CR2_MMS_UPDATE;
+  //TIM1
+
+  //TIM2
+  TIM2_SMCR |= (TIM_SMCR_TS_ITR0 | TIM_SMCR_SMS_ECM1);
+  TIM2_PSC = 0;
+  TIM2_CR1 |= TIM_CR1_CEN;
+  //TIM2
+
+  //32bit Timer
 
   //I2C
   gpio_set_mode(GPIOB,
@@ -36,6 +63,7 @@ void configurePeriphereals(void){
   //TIM4  
 
   gpio_primary_remap(0,AFIO_MAPR_I2C1_REMAP);  //I2C PB8 + PB9
+  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
 }
 
 static void
@@ -49,10 +77,21 @@ task1(void *args __attribute__((unused))) {
   char buffer[20];
   
   for (;;) {
+    
     sprintf(buffer,"%d", TIM4_CNT - 32767);
     lcd_gotoxy(0,2);
-    lcd_puts(buffer);    
+    lcd_puts(buffer);
+
+    
+    sprintf(buffer,"%d", timesCalled);
+    lcd_gotoxy(0,3);
+    lcd_puts(buffer); 
   }
+}
+
+void tim1_cc_isr(){
+  //Reading TIMX_CCRX clears TIMX_CCXIF in status register 
+  timesCalled = (TIM2_CNT << 16) | TIM1_CCR1;
 }
 
 int main(void)
