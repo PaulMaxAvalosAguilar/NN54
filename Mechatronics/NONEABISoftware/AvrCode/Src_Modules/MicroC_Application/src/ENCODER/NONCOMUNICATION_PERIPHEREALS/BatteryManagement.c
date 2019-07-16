@@ -173,7 +173,7 @@ ISR(ADC_vect){
   if(!correctVoltageMode){
     
     //Determine Voltage
-    analogIncorrectVoltage = 5 * ADC*1000UL/1023;
+    analogIncorrectVoltage = 5 * ADC/1023 * 1000UL;
     
     //Set voltage correction conversion to occur as soon as possible 
     currentWaitingCount = fiftyMillis;
@@ -206,3 +206,5 @@ ISR(ADC_vect){
   //RESTART ANALOG TIMER
   START_ANALOGTIMER;
 }
+
+// 5523096070 

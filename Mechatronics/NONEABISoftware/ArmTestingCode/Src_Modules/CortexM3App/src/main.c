@@ -8,6 +8,12 @@
 #include "lcd.h"
 
 static volatile uint32_t timesCalled = 0;
+static volatile uint32_t error = 0;
+static volatile uint32_t lastTimesCalled = 0;
+static volatile uint32_t lastTimeValue = 0;
+static volatile uint32_t currTimeValue = 0;
+
+static volatile uint32_t overflowCounter=0 ;
 
 void configurePeriphereals(void);
 
@@ -23,21 +29,21 @@ void configurePeriphereals(void){
   //32bit Timer
   
   //TIM1
-  TIM1_CCMR1 |= (TIM_CCMR1_CC1S_IN_TI1);
-  TIM1_CCER &= ~(TIM_CCER_CC1P);
-  TIM1_CCER |= (TIM_CCER_CC1E);
-  timer_enable_irq(TIM1, TIM_DIER_CC1IE);
+  TIM1_CCMR1 |= (TIM_CCMR1_CC1S_IN_TI1);//TI1 for CaptureChannel 1
+  TIM1_CCER &= ~(TIM_CCER_CC1P);//Rising Edge
+  TIM1_CCER |= (TIM_CCER_CC1E);//Enable capture on Channel1
+  
+  TIM1_CCMR1 |= (TIM_CCMR1_CC2S_IN_TI1);//TI1 for CaptureChannel 2
+  TIM1_CCER |= (TIM_CCER_CC2P);//Falling Edge
+  TIM1_CCER |= (TIM_CCER_CC2E);//Enable capture on Channel2
+
+  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
+  
   TIM1_PSC = 72;
-  TIM1_CR1 |= TIM_CR1_CEN;
-
-  TIM1_CR2 |= TIM_CR2_MMS_UPDATE;
+  TIM1_CR1 |= TIM_CR1_CEN;  
   //TIM1
-
-  //TIM2
-  TIM2_SMCR |= (TIM_SMCR_TS_ITR0 | TIM_SMCR_SMS_ECM1);
-  TIM2_PSC = 0;
-  TIM2_CR1 |= TIM_CR1_CEN;
-  //TIM2
 
   //32bit Timer
 
@@ -64,6 +70,9 @@ void configurePeriphereals(void){
 
   gpio_primary_remap(0,AFIO_MAPR_I2C1_REMAP);  //I2C PB8 + PB9
   nvic_enable_irq(NVIC_TIM1_CC_IRQ);
+  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
+  nvic_set_priority(NVIC_TIM1_CC_IRQ,0);
+  nvic_set_priority(NVIC_TIM1_UP_IRQ,0);
 }
 
 static void
@@ -71,27 +80,49 @@ task1(void *args __attribute__((unused))) {
 
   lcd_init(LCD_DISP_ON);
   lcd_puts("Hello");
-  lcd_gotoxy(0,1);
-  lcd_puts("Good");
+
 
   char buffer[20];
   
   for (;;) {
-    
-    sprintf(buffer,"%d", TIM4_CNT - 32767);
-    lcd_gotoxy(0,2);
-    lcd_puts(buffer);
+
+    if(error){    
+      sprintf(buffer,"%u", lastTimeValue);
+      lcd_gotoxy(0,2);
+      lcd_puts(buffer);
+
+      sprintf(buffer,"%u",currTimeValue);
+      lcd_gotoxy(0,3);
+      lcd_puts(buffer);
+    }
 
     
-    sprintf(buffer,"%d", timesCalled);
-    lcd_gotoxy(0,3);
+    sprintf(buffer,"%u", timesCalled);
+    lcd_gotoxy(0,4);
     lcd_puts(buffer); 
   }
 }
 
 void tim1_cc_isr(){
-  //Reading TIMX_CCRX clears TIMX_CCXIF in status register 
-  timesCalled = (TIM2_CNT << 16) | TIM1_CCR1;
+
+  if(TIM1_SR & TIM_SR_CC1IF){
+    timesCalled = (overflowCounter << 16) | TIM1_CCR1;
+  }else if(TIM1_SR & TIM_SR_CC2IF){
+    timesCalled = (overflowCounter << 16) | TIM1_CCR2;
+  }
+  
+  if(timesCalled < lastTimesCalled){
+    error = 1;
+    lastTimeValue = lastTimesCalled;
+    currTimeValue = timesCalled;    
+  }
+  
+  lastTimesCalled = timesCalled;
+}
+
+void tim1_up_isr(){
+  TIM1_SR &= ~TIM_SR_UIF;
+  overflowCounter++;  
 }
 
 int main(void)
