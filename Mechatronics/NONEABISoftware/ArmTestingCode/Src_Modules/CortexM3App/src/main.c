@@ -115,12 +115,11 @@ task1(void *args __attribute__((unused))) {
   for (;;) {
 
     zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
-    printf("%d\n", zeroCounter);
     sprintf(buffer,"%d ", zeroCounter);
     lcd_gotoxy(0,2);
     lcd_puts(buffer);
 
-    /*
+
     if(lastTC != timesCalled){
       if(!error){
 	printf("%u \n", timesCalled);
@@ -132,7 +131,7 @@ task1(void *args __attribute__((unused))) {
       }
       lastTC = timesCalled;
     }
-    */
+
 
   }
 }
