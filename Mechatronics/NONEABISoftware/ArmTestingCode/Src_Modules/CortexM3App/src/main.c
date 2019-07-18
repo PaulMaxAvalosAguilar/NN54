@@ -1,6 +1,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/adc.h>
 #include <libopencm3/cm3/nvic.h>
 #include "FreeRTOS.h"
 #include "printf.h"
@@ -19,9 +20,20 @@ static volatile uint32_t overflowCounter=0 ;
 
 void configurePeriphereals(void);
 
+static uint16_t
+read_adc(uint8_t channel) {
+
+	adc_set_sample_time(ADC1,channel,ADC_SMPR_SMP_239DOT5CYC);
+	adc_set_regular_sequence(ADC1,1,&channel);
+	adc_start_conversion_direct(ADC1);
+	while ( !adc_eoc(ADC1) )
+		taskYIELD();
+	return adc_read_regular(ADC1);
+}
+
 void configurePeriphereals(void){
   rcc_periph_clock_enable(RCC_AFIO);    // I2C UART
-  rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 
+  rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 ADC
   rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM2 UART
   rcc_periph_clock_enable(RCC_GPIOC);	// I2C TIM2
   rcc_periph_clock_enable(RCC_I2C1);	// I2C
@@ -87,6 +99,30 @@ void configurePeriphereals(void){
   uart_init();
   //UART
 
+  //ADC
+
+  gpio_set_mode(GPIOA,
+		GPIO_MODE_INPUT,
+		GPIO_CNF_INPUT_ANALOG,
+		GPIO0);	
+  
+  rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN);
+  adc_power_off(ADC1);
+  rcc_peripheral_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
+  rcc_peripheral_clear_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
+  rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);	// Set. 12MHz, Max. 14MHz
+  adc_set_dual_mode(ADC_CR1_DUALMOD_IND);		// Independent mode
+  adc_disable_scan_mode(ADC1);
+  adc_set_right_aligned(ADC1);
+  adc_set_single_conversion_mode(ADC1);
+  adc_set_sample_time(ADC1,ADC_CHANNEL_VREF,ADC_SMPR_SMP_239DOT5CYC);
+  adc_enable_temperature_sensor();
+  adc_power_on(ADC1);
+  adc_reset_calibration(ADC1);
+  adc_calibrate_async(ADC1);
+  while ( adc_is_calibrating(ADC1) );
+  //ADC
+
   gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
 		     AFIO_MAPR_I2C1_REMAP |  //I2C PB8 + PB9
 		     AFIO_MAPR_TIM2_REMAP_PARTIAL_REMAP1 |
@@ -111,9 +147,11 @@ task1(void *args __attribute__((unused))) {
 
   uint32_t lastTC = 0;
   int16_t zeroCounter;
+  int vref;
   
   for (;;) {
 
+    /*
     zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
     sprintf(buffer,"%d ", zeroCounter);
     lcd_gotoxy(0,2);
@@ -131,8 +169,12 @@ task1(void *args __attribute__((unused))) {
       }
       lastTC = timesCalled;
     }
+    */
 
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    vref = read_adc(ADC_CHANNEL_VREF);
 
+    printf("%d \n", vref*330/4095);
   }
 }
 
