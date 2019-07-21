@@ -2,6 +2,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/adc.h>
+
 #include <libopencm3/cm3/nvic.h>
 #include "FreeRTOS.h"
 #include "printf.h"
@@ -32,7 +33,7 @@ read_adc(uint8_t channel) {
 }
 
 void configurePeriphereals(void){
-  rcc_periph_clock_enable(RCC_AFIO);    // I2C UART
+  rcc_periph_clock_enable(RCC_AFIO);    // I2C UART ADC
   rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 ADC
   rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM2 UART
   rcc_periph_clock_enable(RCC_GPIOC);	// I2C TIM2
@@ -40,6 +41,8 @@ void configurePeriphereals(void){
   rcc_periph_clock_enable(RCC_TIM1);    // TIM1
   rcc_periph_clock_enable(RCC_TIM2);    // TIM2
   rcc_periph_clock_enable(RCC_USART1);  // UART
+  rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN); //ADC
+  rcc_periph_clock_enable(RCC_DMA1);    // DMA
 
   //32bit Timer
   
@@ -75,7 +78,7 @@ void configurePeriphereals(void){
 		GPIO_MODE_INPUT,
 		GPIO_CNF_INPUT_FLOAT,
 		GPIO15);  
-   gpio_set_mode(GPIOB,
+  gpio_set_mode(GPIOB,
 		GPIO_MODE_INPUT,
 		GPIO_CNF_INPUT_FLOAT,
 		GPIO3);
@@ -100,23 +103,22 @@ void configurePeriphereals(void){
   //UART
 
   //ADC
-
   gpio_set_mode(GPIOA,
 		GPIO_MODE_INPUT,
 		GPIO_CNF_INPUT_ANALOG,
 		GPIO0);	
   
-  rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN);
   adc_power_off(ADC1);
-  rcc_peripheral_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
-  rcc_peripheral_clear_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
   rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);	// Set. 12MHz, Max. 14MHz
-  adc_set_dual_mode(ADC_CR1_DUALMOD_IND);		// Independent mode
-  adc_disable_scan_mode(ADC1);
+  adc_set_dual_mode(ADC_CR1_DUALMOD_IND);       // Independent mode
   adc_set_right_aligned(ADC1);
-  adc_set_single_conversion_mode(ADC1);
-  adc_set_sample_time(ADC1,ADC_CHANNEL_VREF,ADC_SMPR_SMP_239DOT5CYC);
+  adc_set_single_conversion_mode(ADC1);// Continous mode disabled
   adc_enable_temperature_sensor();
+
+  /*
+
+  */
+  
   adc_power_on(ADC1);
   adc_reset_calibration(ADC1);
   adc_calibrate_async(ADC1);
@@ -133,7 +135,7 @@ void configurePeriphereals(void){
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
-  nvic_set_priority(NVIC_TIM1_UP_IRQ,(1 << 4));
+  nvic_set_priority(NVIC_USART1_IRQ,(1 << 4));
 }
 
 static void
@@ -147,34 +149,43 @@ task1(void *args __attribute__((unused))) {
 
   uint32_t lastTC = 0;
   int16_t zeroCounter;
-  int vref;
-  
+  adc_start_conversion_direct(ADC1);
   for (;;) {
 
     /*
-    zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
-    sprintf(buffer,"%d ", zeroCounter);
-    lcd_gotoxy(0,2);
-    lcd_puts(buffer);
+      zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
+      sprintf(buffer,"%d ", zeroCounter);
+      lcd_gotoxy(0,2);
+      lcd_puts(buffer);
 
 
-    if(lastTC != timesCalled){
+      if(lastTC != timesCalled){
       if(!error){
-	printf("%u \n", timesCalled);
-	printf("%u \n\n", interruptCall);
+      printf("%u \n", timesCalled);
+      printf("%u \n\n", interruptCall);
       } else  if(error){
-	printf("ERROR %u %u %u \n", timesCalled, lastTimeValue, currTimeValue);
-	printf("%u \n\n", interruptCall);
-	error = 0;
+      printf("ERROR %u %u %u \n", timesCalled, lastTimeValue, currTimeValue);
+      printf("%u \n\n", interruptCall);
+      error = 0;
       }
       lastTC = timesCalled;
-    }
+      }
     */
 
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    vref = read_adc(ADC_CHANNEL_VREF);
+    //1.20 - 4095             INVERSE RULE OF 3
+    //V+   - ADC_CHANNEL_VREF
+    
+    //V+ - 4095              DIRECT RULE OF 3
+    // x  - ADC_CHANNEL0
 
-    printf("%d \n", vref*330/4095);
+    int voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
+    int adc0Voltage = read_adc(ADC_CHANNEL0) * voltageSupply / 4095;
+
+
+    printf("%d %d \n", voltageSupply , adc0Voltage);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
+  
   }
 }
 
@@ -204,7 +215,7 @@ void tim1_cc_isr(){
 }
 
 void tim1_up_isr(){
-  TIM1_SR &= ~TIM_SR_UIF;
+  TIM1_SR &= ~TIM_SR_UIF;//Should go first
   overflowCounter++;  
 }
 

@@ -4,6 +4,9 @@
 
 #include "uart.h"
 #include "ring.h"
+#include <string.h>
+
+static volatile uint8_t transfereComplete = 0;
 
 #define USART0_SEND_BUFFER_LEN 256
 #define USART0_RECEIVE_BUFFER_LEN   256
@@ -54,20 +57,25 @@ void uart_init(){
 
   /* Enable USART1 Receive interrupt. */
   USART_CR1(USART1) |= USART_CR1_RXNEIE;
-
+  
   /* Finally enable the USART. */
   usart_enable(USART1);
  
 }
 
 void printString(const char myString[]) {
+
   uint8_t i = 0;
+
   while (myString[i]) {
-    while(ring_buffer_full(&usart_send_ring));//wait till there's space
+    while(ring_buffer_full(&usart_send_ring)){
+      USART_CR1(USART1) |= USART_CR1_TXEIE;
+    }//wait till there's space
     ring_buffer_put(&usart_send_ring, &myString[i]);
-    USART_CR1(USART1) |= USART_CR1_TXEIE;
     i++;
   }
+  USART_CR1(USART1) |= USART_CR1_TXEIE;
+
 }
 
 void _putchar(char character){
@@ -95,13 +103,14 @@ void usart1_isr(void)
       ((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
 
     char i = usart_recv(USART1);
+    ring_buffer_put(&usart_receive_ring,&i);
+    /*
     ring_buffer_put(&usart_send_ring, &i);
-    
-    /* Enable transmit interrupt so it sends back the data. */
     USART_CR1(USART1) |= USART_CR1_TXEIE;
+    */
   }
 
-
+  
   if (((USART_CR1(USART1) & USART_CR1_TXEIE) != 0) &&
       ((USART_SR(USART1) & USART_SR_TXE) != 0)) {
 
@@ -112,5 +121,6 @@ void usart1_isr(void)
     }else{
       USART_CR1(USART1) &= ~USART_CR1_TXEIE;
     }
-  }
+  }  
 }
+
