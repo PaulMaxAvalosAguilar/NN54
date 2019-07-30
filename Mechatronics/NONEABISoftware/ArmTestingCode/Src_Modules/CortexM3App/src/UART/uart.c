@@ -1,12 +1,10 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/nvic.h>
-
+#include <libopencm3/stm32/dma.h>
 #include "uart.h"
 #include "ring.h"
 #include <string.h>
-
-static volatile uint8_t transfereComplete = 0;
 
 #define USART0_SEND_BUFFER_LEN 256
 #define USART0_RECEIVE_BUFFER_LEN   256
@@ -33,6 +31,9 @@ char usart_receive_buffer[USART0_RECEIVE_BUFFER_LEN];
 	#warning USART0_RECEIVE_BUFFER NOT POWER OF 2
 #endif
 
+char receiveBuffer[10]; //elements inialized to 0
+int idle = 0;
+
 void uart_init(){			
   ring_buffer_init(&usart_receive_ring, usart_receive_buffer, sizeof(usart_send_buffer[0]), sizeof(usart_send_buffer));
 
@@ -56,26 +57,54 @@ void uart_init(){
   usart_set_mode(USART1, USART_MODE_TX_RX);
 
   /* Enable USART1 Receive interrupt. */
-  USART_CR1(USART1) |= USART_CR1_RXNEIE;
+  //  USART_CR1(USART1) |= USART_CR1_RXNEIE;
+  //USART_CR1(USART1) |= USART_CR1_IDLEIE;
   
   /* Finally enable the USART. */
   usart_enable(USART1);
+
+  //Write DMA
+  usart_enable_tx_dma(USART1);
+  dma_set_priority(DMA1, DMA_CHANNEL4, DMA_CCR_PL_LOW );
+  dma_set_read_from_memory(DMA1, DMA_CHANNEL4);
+  dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL4);
+  
+  dma_set_memory_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
+  dma_set_peripheral_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
+
+  dma_set_peripheral_address(DMA1, DMA_CHANNEL4, (uint32_t)&USART1_DR);
+  //Write DMA
+
+  //Receive DMA
+  usart_enable_rx_dma(USART1);
+  dma_set_priority(DMA1, DMA_CHANNEL5, DMA_CCR_PL_VERY_HIGH);
+  dma_set_read_from_peripheral(DMA1, DMA_CHANNEL5);
+  dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL5);
+  dma_enable_circular_mode(DMA1, DMA_CHANNEL5);
+  
+  dma_set_memory_size(DMA1, DMA_CHANNEL5, DMA_CCR_MSIZE_8BIT);
+  dma_set_peripheral_size(DMA1, DMA_CHANNEL5, DMA_CCR_MSIZE_8BIT);
+
+  dma_set_memory_address(DMA1, DMA_CHANNEL5, (uint32_t)receiveBuffer);
+  dma_set_peripheral_address(DMA1, DMA_CHANNEL5, (uint32_t)&USART1_DR);
+
+  dma_set_number_of_data(DMA1, DMA_CHANNEL5, 10);
+  
+  dma_enable_channel(DMA1, DMA_CHANNEL5);
+  //Receive DMA
+  
  
 }
 
 void printString(const char myString[]) {
 
-  uint8_t i = 0;
+  dma_disable_channel(DMA1, DMA_CHANNEL4);
+  dma_set_number_of_data(DMA1, DMA_CHANNEL4, strlen(myString));
+  dma_set_memory_address(DMA1, DMA_CHANNEL4, (uint32_t)myString);
+  dma_enable_channel(DMA1, DMA_CHANNEL4);
 
-  while (myString[i]) {
-    while(ring_buffer_full(&usart_send_ring)){
-      USART_CR1(USART1) |= USART_CR1_TXEIE;
-    }//wait till there's space
-    ring_buffer_put(&usart_send_ring, &myString[i]);
-    i++;
-  }
-  USART_CR1(USART1) |= USART_CR1_TXEIE;
-
+  while(!dma_get_interrupt_flag(DMA1, DMA_CHANNEL4, DMA_TCIF));
+  dma_clear_interrupt_flags(DMA1, DMA_CHANNEL4, DMA_TCIF); 
 }
 
 void _putchar(char character){
@@ -98,29 +127,10 @@ char get_char(void){
 
 void usart1_isr(void)
 {
-
-  if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
-      ((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
-
-    char i = usart_recv(USART1);
-    ring_buffer_put(&usart_receive_ring,&i);
-    /*
-    ring_buffer_put(&usart_send_ring, &i);
-    USART_CR1(USART1) |= USART_CR1_TXEIE;
-    */
+  if (((USART_CR1(USART1) & USART_CR1_IDLEIE) != 0) &&
+      ((USART_SR(USART1) & USART_SR_IDLE) != 0)) {
+    usart_recv(USART1);
+    idle = 1;
   }
-
-  
-  if (((USART_CR1(USART1) & USART_CR1_TXEIE) != 0) &&
-      ((USART_SR(USART1) & USART_SR_TXE) != 0)) {
-
-    char c;
-	  
-    if(ring_buffer_get(&usart_send_ring,&c) != -1){
-      usart_send(USART1, c);
-    }else{
-      USART_CR1(USART1) &= ~USART_CR1_TXEIE;
-    }
-  }  
 }
 

@@ -2,21 +2,17 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/adc.h>
-
+#include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 #include "FreeRTOS.h"
 #include "printf.h"
 #include "task.h"
 #include "lcd.h"
 #include "uart.h"
+#include <libopencm3/stm32/usart.h>
+#include <string.h>
 
-static volatile uint32_t interruptCall = 0;
-static volatile uint32_t timesCalled = 0;
-static volatile uint32_t error = 0;
-static volatile uint32_t lastTimesCalled = 0;
-static volatile uint32_t lastTimeValue = 0;
-static volatile uint32_t currTimeValue = 0;
-
+static volatile uint32_t capturedTime = 0;
 static volatile uint32_t overflowCounter=0 ;
 
 void configurePeriphereals(void);
@@ -133,44 +129,31 @@ void configurePeriphereals(void){
   nvic_enable_irq(NVIC_TIM1_CC_IRQ);
   nvic_enable_irq(NVIC_TIM1_UP_IRQ);
   nvic_enable_irq(NVIC_USART1_IRQ);
-  nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
-  nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
-  nvic_set_priority(NVIC_USART1_IRQ,(1 << 4));
+  nvic_set_priority(NVIC_TIM1_CC_IRQ,(1 << 4));
+  nvic_set_priority(NVIC_TIM1_UP_IRQ,(1 << 4));
+  nvic_set_priority(NVIC_USART1_IRQ,(0 << 4));
 }
 
 static void
 task1(void *args __attribute__((unused))) {
 
+
   lcd_init(LCD_DISP_ON);
   lcd_puts("Hello");
 
   char buffer[20];
-
-
-  uint32_t lastTC = 0;
   int16_t zeroCounter;
+  
   adc_start_conversion_direct(ADC1);
+
+  printString("Hola\n");
+
   for (;;) {
 
-    /*
-      zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
-      sprintf(buffer,"%d ", zeroCounter);
-      lcd_gotoxy(0,2);
-      lcd_puts(buffer);
-
-
-      if(lastTC != timesCalled){
-      if(!error){
-      printf("%u \n", timesCalled);
-      printf("%u \n\n", interruptCall);
-      } else  if(error){
-      printf("ERROR %u %u %u \n", timesCalled, lastTimeValue, currTimeValue);
-      printf("%u \n\n", interruptCall);
-      error = 0;
-      }
-      lastTC = timesCalled;
-      }
-    */
+    zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
+    sprintf(buffer,"%d ", zeroCounter);
+    lcd_gotoxy(0,2);
+    lcd_puts(buffer);
 
     //1.20 - 4095             INVERSE RULE OF 3
     //V+   - ADC_CHANNEL_VREF
@@ -178,40 +161,37 @@ task1(void *args __attribute__((unused))) {
     //V+ - 4095              DIRECT RULE OF 3
     // x  - ADC_CHANNEL0
 
+    /*
     int voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
     int adc0Voltage = read_adc(ADC_CHANNEL0) * voltageSupply / 4095;
 
-
-    printf("%d %d \n", voltageSupply , adc0Voltage);
+    printf("%d %d %u \n", voltageSupply , adc0Voltage, overflowCounter);
     vTaskDelay(pdMS_TO_TICKS(1000));
-
-  
+    */
+    
+    /*
+    static int i = 0;
+    while(receiveBuffer[i]){
+      sprintf(buffer, "%c", receiveBuffer[i]);
+      printString(buffer);
+      receiveBuffer[i] = 0;
+      i = (i+1) % 10;
+    }
+    */
+ 
   }
 }
 
 void tim1_cc_isr(){
-
   if(TIM1_SR & TIM_SR_CC1IF){
-    timesCalled = (overflowCounter << 16) | TIM1_CCR1;
-    interruptCall = 1;
+    capturedTime = (overflowCounter << 16) | TIM1_CCR1;
   }else if(TIM1_SR & TIM_SR_CC2IF){
-    timesCalled = (overflowCounter << 16) | TIM1_CCR2;
-    interruptCall = 2;
+    capturedTime = (overflowCounter << 16) | TIM1_CCR2;
   }else if(TIM1_SR & TIM_SR_CC3IF){
-    timesCalled = (overflowCounter << 16) | TIM1_CCR3;
-    interruptCall = 3;
+    capturedTime = (overflowCounter << 16) | TIM1_CCR3;
   }else if(TIM1_SR & TIM_SR_CC4IF){
-    timesCalled = (overflowCounter << 16) | TIM1_CCR4;
-    interruptCall = 4;
+    capturedTime = (overflowCounter << 16) | TIM1_CCR4;
   }
-  
-  if(timesCalled < lastTimesCalled){
-    error = 1;
-    lastTimeValue = lastTimesCalled;
-    currTimeValue = timesCalled;    
-  }
-  
-  lastTimesCalled = timesCalled;
 }
 
 void tim1_up_isr(){
