@@ -1,4 +1,4 @@
-(module DFN-6_DC (layer F.Cu) (tedit 5D445B07)
+(module DFN-6_DC (layer F.Cu) (tedit 5D4E4F58)
   (attr smd)
   (fp_text reference DFN-6_DC (at 0 0) (layer F.SilkS)
     (effects (font (size 1 0.9) (thickness 0.05)))
