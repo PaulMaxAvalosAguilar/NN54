@@ -649,8 +649,6 @@ Connection ~ 2150 900
 Wire Wire Line
 	2150 900  3200 900 
 Wire Wire Line
-	750  900  1700 900 
-Wire Wire Line
 	4450 3050 6900 3050
 Wire Wire Line
 	6900 3050 6900 3900
@@ -973,19 +971,10 @@ NoConn ~ 4450 2250
 NoConn ~ 4450 2350
 NoConn ~ 4450 2450
 NoConn ~ 4450 2650
-NoConn ~ 4450 2750
 Wire Wire Line
 	4450 3450 5100 3450
-Text Label 2000 2350 0    50   ~ 0
-BattVolt
 Text Label 4650 3450 0    50   ~ 0
 CHG
-Wire Wire Line
-	4450 3350 7400 3350
-Wire Wire Line
-	7400 3050 7750 3050
-Wire Wire Line
-	7400 3050 7400 3350
 NoConn ~ 7750 3150
 Wire Wire Line
 	1000 3250 1000 3750
@@ -1325,46 +1314,36 @@ Wire Wire Line
 $Comp
 L Device:R R13
 U 1 1 5D7ED20E
-P 1700 1550
-F 0 "R13" H 1770 1596 50  0000 L CNN
-F 1 "10K" H 1770 1505 50  0000 L CNN
-F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 1630 1550 50  0001 C CNN
-F 3 "~" H 1700 1550 50  0001 C CNN
-	1    1700 1550
+P 1700 2550
+F 0 "R13" H 1770 2596 50  0000 L CNN
+F 1 "10K" H 1770 2505 50  0000 L CNN
+F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 1630 2550 50  0001 C CNN
+F 3 "~" H 1700 2550 50  0001 C CNN
+	1    1700 2550
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:R R14
 U 1 1 5D7ED33E
-P 1700 2500
-F 0 "R14" H 1770 2546 50  0000 L CNN
-F 1 "10K" H 1770 2455 50  0000 L CNN
-F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 1630 2500 50  0001 C CNN
-F 3 "~" H 1700 2500 50  0001 C CNN
-	1    1700 2500
+P 1700 2850
+F 0 "R14" H 1770 2896 50  0000 L CNN
+F 1 "10K" H 1770 2805 50  0000 L CNN
+F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 1630 2850 50  0001 C CNN
+F 3 "~" H 1700 2850 50  0001 C CNN
+	1    1700 2850
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR038
 U 1 1 5D7ED632
-P 1700 2650
-F 0 "#PWR038" H 1700 2400 50  0001 C CNN
-F 1 "GND" H 1705 2477 50  0000 C CNN
-F 2 "" H 1700 2650 50  0001 C CNN
-F 3 "" H 1700 2650 50  0001 C CNN
-	1    1700 2650
+P 1700 3000
+F 0 "#PWR038" H 1700 2750 50  0001 C CNN
+F 1 "GND" H 1705 2827 50  0000 C CNN
+F 2 "" H 1700 3000 50  0001 C CNN
+F 3 "" H 1700 3000 50  0001 C CNN
+	1    1700 3000
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1700 2350 2450 2350
-Wire Wire Line
-	1700 2350 1700 1700
-Connection ~ 1700 2350
-Wire Wire Line
-	1700 1400 1700 900 
-Connection ~ 1700 900 
-Wire Wire Line
-	1700 900  2150 900 
 Wire Wire Line
 	5000 5700 6450 5700
 Wire Wire Line
@@ -1397,22 +1376,20 @@ Wire Wire Line
 	11050 1750 10550 1750
 Text Label 10800 2050 0    50   ~ 0
 CTS
-Text Label 10800 1950 0    50   ~ 0
+Text Label 10800 1750 0    50   ~ 0
 RTS
 Wire Wire Line
 	5450 2800 7400 2800
 Wire Wire Line
 	5650 2850 7750 2850
-Text Label 10800 1850 0    50   ~ 0
+Text Label 10800 1950 0    50   ~ 0
 F1TX
-Text Label 10800 1750 0    50   ~ 0
+Text Label 10800 1850 0    50   ~ 0
 F1RX
 Wire Wire Line
 	1950 3550 2450 3550
 Wire Wire Line
 	1950 3650 2450 3650
-Text Label 10800 2250 0    50   ~ 0
-SWDIO
 Text Label 10800 2150 0    50   ~ 0
 SWCLK
 $Comp
@@ -1469,4 +1446,31 @@ Wire Wire Line
 	6750 6100 6750 6750
 NoConn ~ 3850 8650
 NoConn ~ 5050 8650
+Text Label 10800 2250 0    50   ~ 0
+SWDIO
+Wire Wire Line
+	7100 3050 7100 2750
+Wire Wire Line
+	7100 2750 4450 2750
+Wire Wire Line
+	7100 3050 7750 3050
+NoConn ~ 4450 3250
+NoConn ~ 4450 3350
+Text Label 2150 1550 3    50   ~ 0
+BOOT0
+Text Label 4450 2450 0    50   ~ 0
+BOOT0
+Wire Wire Line
+	750  900  2150 900 
+Text Label 1700 2100 3    50   ~ 0
+BattVolt
+Wire Wire Line
+	1700 2700 2150 2700
+Wire Wire Line
+	2150 2700 2150 2350
+Wire Wire Line
+	2150 2350 2450 2350
+Connection ~ 1700 2700
+Wire Wire Line
+	1700 2400 1700 2050
 $EndSCHEMATC
