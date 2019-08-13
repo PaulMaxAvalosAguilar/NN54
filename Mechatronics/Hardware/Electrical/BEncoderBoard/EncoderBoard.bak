@@ -969,7 +969,6 @@ NoConn ~ 2450 4050
 NoConn ~ 2450 4150
 NoConn ~ 4450 2250
 NoConn ~ 4450 2350
-NoConn ~ 4450 2450
 NoConn ~ 4450 2650
 Wire Wire Line
 	4450 3450 5100 3450
@@ -1390,7 +1389,7 @@ Wire Wire Line
 	1950 3550 2450 3550
 Wire Wire Line
 	1950 3650 2450 3650
-Text Label 10800 2250 0    50   ~ 0
+Text Label 10800 2150 0    50   ~ 0
 SWCLK
 $Comp
 L Connector:Conn_01x07_Male J1
@@ -1446,7 +1445,7 @@ Wire Wire Line
 	6750 6100 6750 6750
 NoConn ~ 3850 8650
 NoConn ~ 5050 8650
-Text Label 10800 2150 0    50   ~ 0
+Text Label 10800 2250 0    50   ~ 0
 SWDIO
 Wire Wire Line
 	7100 3050 7100 2750
@@ -1459,7 +1458,7 @@ NoConn ~ 4450 3350
 Text Label 2150 1550 3    50   ~ 0
 BOOT0
 Text Label 4450 2450 0    50   ~ 0
-BOOT0
+BOOT1
 Wire Wire Line
 	750  900  2150 900 
 Text Label 1700 2100 3    50   ~ 0
@@ -1473,4 +1472,19 @@ Wire Wire Line
 Connection ~ 1700 2700
 Wire Wire Line
 	1700 2400 1700 2050
+Wire Wire Line
+	4450 2450 5350 2450
+Wire Wire Line
+	5350 2450 5350 2500
+$Comp
+L power:GND #PWR?
+U 1 1 5D535B59
+P 5350 2500
+F 0 "#PWR?" H 5350 2250 50  0001 C CNN
+F 1 "GND" H 5355 2327 50  0000 C CNN
+F 2 "" H 5350 2500 50  0001 C CNN
+F 3 "" H 5350 2500 50  0001 C CNN
+	1    5350 2500
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
