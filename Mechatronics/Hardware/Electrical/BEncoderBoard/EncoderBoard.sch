@@ -1560,36 +1560,14 @@ Connection ~ 6200 8050
 Wire Wire Line
 	6200 8050 6600 8050
 $Comp
-L Connector:Conn_01x01_Male J2
-U 1 1 5D5761FD
-P 1300 5700
-F 0 "J2" H 1600 5750 50  0000 R CNN
-F 1 "VCC" H 1273 5721 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 1300 5700 50  0001 C CNN
-F 3 "~" H 1300 5700 50  0001 C CNN
-	1    1300 5700
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:Conn_01x01_Male J3
-U 1 1 5D576465
-P 1300 5800
-F 0 "J3" H 1600 5850 50  0000 R CNN
-F 1 "GND" H 1273 5821 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 1300 5800 50  0001 C CNN
-F 3 "~" H 1300 5800 50  0001 C CNN
-	1    1300 5800
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:Conn_01x01_Male J4
-U 1 1 5D5766CD
-P 1300 5900
-F 0 "J4" H 1600 5950 50  0000 R CNN
-F 1 "GND" H 1273 5921 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 1300 5900 50  0001 C CNN
-F 3 "~" H 1300 5900 50  0001 C CNN
-	1    1300 5900
+L Connector:Barrel_Jack_Switch J4
+U 1 1 5D5D067D
+P 1200 5800
+F 0 "J4" H 1255 6117 50  0000 C CNN
+F 1 "Barrel_Jack_Switch" H 1255 6026 50  0000 C CNN
+F 2 "Encoder:BarrelJack_Horizontal" H 1250 5760 50  0001 C CNN
+F 3 "~" H 1250 5760 50  0001 C CNN
+	1    1200 5800
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
