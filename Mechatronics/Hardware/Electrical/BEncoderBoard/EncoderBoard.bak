@@ -980,11 +980,7 @@ Wire Wire Line
 	4850 6650 4900 6650
 NoConn ~ 5600 7250
 Wire Wire Line
-	4200 5700 6300 5700
-Wire Wire Line
-	6600 6550 6300 6550
-Wire Wire Line
-	6750 6650 6300 6650
+	4200 5700 4750 5700
 Wire Wire Line
 	6300 6450 6300 5700
 Connection ~ 6300 5700
@@ -1048,21 +1044,6 @@ F 3 "~" H 7650 7850 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 NoConn ~ 6500 7750
-$Comp
-L Encoder:FS8205 Q1
-U 1 1 5D5C94A5
-P 5150 8550
-F 0 "Q1" H 5750 8815 50  0000 C CNN
-F 1 "FS8205" H 5750 8724 50  0000 C CNN
-F 2 "Encoder:Sot-23(6)" H 6200 8650 50  0001 L CNN
-F 3 "https://www.ic-fortune.com/upload/Download/FS8205-DS-19_EN.pdf" H 6200 8550 50  0001 L CNN
-F 4 "DUAL N-CHANNEL ENHANCEMENT MODE POWER MOFSET" H 6200 8450 50  0001 L CNN "Description"
-F 5 "1" H 6200 8350 50  0001 L CNN "Height"
-F 6 "Fortune Semiconductor Corporation" H 6200 8250 50  0001 L CNN "Manufacturer_Name"
-F 7 "FS8205" H 6200 8150 50  0001 L CNN "Manufacturer_Part_Number"
-	1    5150 8550
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	5500 7550 5000 7550
 Wire Wire Line
@@ -1231,18 +1212,6 @@ F 3 "" H 1600 3000 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	6300 5700 7750 5700
-Wire Wire Line
-	6750 6650 6750 6250
-Wire Wire Line
-	6600 6250 6600 6550
-Wire Wire Line
-	4450 3550 5100 3550
-Text Label 6600 6500 1    50   ~ 0
-CHG
-Text Label 6750 6500 1    50   ~ 0
-STDBY
-Text Label 4900 3550 2    50   ~ 0
-STDBY
 Text Label 9800 2550 0    50   ~ 0
 CTS
 Text Label 9800 2950 0    50   ~ 0
@@ -1491,12 +1460,12 @@ $EndComp
 $Comp
 L power:GNDPWR #PWR039
 U 1 1 5D5A1C8E
-P 6550 8650
-F 0 "#PWR039" H 6550 8450 50  0001 C CNN
-F 1 "GNDPWR" H 6554 8496 50  0000 C CNN
-F 2 "" H 6550 8600 50  0001 C CNN
-F 3 "" H 6550 8600 50  0001 C CNN
-	1    6550 8650
+P 4800 8550
+F 0 "#PWR039" H 4800 8350 50  0001 C CNN
+F 1 "GNDPWR" H 4804 8396 50  0000 C CNN
+F 2 "" H 4800 8500 50  0001 C CNN
+F 3 "" H 4800 8500 50  0001 C CNN
+	1    4800 8550
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -1553,16 +1522,15 @@ F 3 "" H 3050 6350 50  0001 C CNN
 	1    3050 6400
 	1    0    0    -1  
 $EndComp
-NoConn ~ 5150 8550
 $Comp
 L power:GND #PWR0103
 U 1 1 5D665A31
-P 6850 8650
-F 0 "#PWR0103" H 6850 8400 50  0001 C CNN
-F 1 "GND" H 6855 8477 50  0000 C CNN
-F 2 "" H 6850 8650 50  0001 C CNN
-F 3 "" H 6850 8650 50  0001 C CNN
-	1    6850 8650
+P 4500 8550
+F 0 "#PWR0103" H 4500 8300 50  0001 C CNN
+F 1 "GND" H 4505 8377 50  0000 C CNN
+F 2 "" H 4500 8550 50  0001 C CNN
+F 3 "" H 4500 8550 50  0001 C CNN
+	1    4500 8550
 	-1   0    0    -1  
 $EndComp
 NoConn ~ 5150 8650
@@ -1577,10 +1545,10 @@ Wire Wire Line
 Connection ~ 6600 7550
 Connection ~ 7050 8050
 Wire Wire Line
-	6350 8650 6550 8650
-Connection ~ 6550 8650
+	5150 8550 4800 8550
+Connection ~ 4800 8550
 Wire Wire Line
-	6550 8650 6850 8650
+	4800 8550 4500 8550
 $Comp
 L Connector:Conn_01x01_Male J2
 U 1 1 5D611BB9
@@ -1604,12 +1572,12 @@ F 3 "" H 1900 7650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Encoder:LTC3240 U?
+L Encoder:LTC3240 U6
 U 1 1 5D5E0FAC
 P 10250 6700
-F 0 "U?" H 10275 7265 50  0000 C CNN
+F 0 "U6" H 10275 7265 50  0000 C CNN
 F 1 "LTC3240" H 10275 7174 50  0000 C CNN
-F 2 "" H 10250 6700 50  0001 C CNN
+F 2 "Encoder:DFN-6_DC" H 10250 6700 50  0001 C CNN
 F 3 "" H 10250 6700 50  0001 C CNN
 	1    10250 6700
 	1    0    0    -1  
@@ -1621,4 +1589,29 @@ Wire Wire Line
 Connection ~ 2600 5700
 Wire Wire Line
 	2600 5700 3050 5700
+NoConn ~ 6300 6550
+NoConn ~ 6300 6650
+Wire Wire Line
+	4750 5700 4750 5400
+Connection ~ 4750 5700
+Wire Wire Line
+	4750 5700 6300 5700
+NoConn ~ 4450 3550
+Text Label 4750 5650 1    50   ~ 0
+CHG
+$Comp
+L Encoder:FS8205 Q1
+U 1 1 5D5C94A5
+P 5150 8550
+F 0 "Q1" H 5750 8815 50  0000 C CNN
+F 1 "FS8205" H 5750 8724 50  0000 C CNN
+F 2 "Encoder:Sot-23(6)" H 6200 8650 50  0001 L CNN
+F 3 "https://www.ic-fortune.com/upload/Download/FS8205-DS-19_EN.pdf" H 6200 8550 50  0001 L CNN
+F 4 "DUAL N-CHANNEL ENHANCEMENT MODE POWER MOFSET" H 6200 8450 50  0001 L CNN "Description"
+F 5 "1" H 6200 8350 50  0001 L CNN "Height"
+F 6 "Fortune Semiconductor Corporation" H 6200 8250 50  0001 L CNN "Manufacturer_Name"
+F 7 "FS8205" H 6200 8150 50  0001 L CNN "Manufacturer_Part_Number"
+	1    5150 8550
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
