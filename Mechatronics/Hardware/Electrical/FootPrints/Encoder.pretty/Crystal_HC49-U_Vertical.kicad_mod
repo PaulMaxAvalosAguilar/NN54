@@ -1,4 +1,4 @@
-(module Crystal_HC49-U_Vertical (layer F.Cu) (tedit 5C285503)
+(module Crystal_HC49-U_Vertical (layer F.Cu) (tedit 5D65DEB8)
   (descr "Crystal THT HC-49/U http://5hertz.com/pdfs/04404_D.pdf")
   (tags "THT crystalHC-49/U")
   (fp_text reference REF** (at 2.44 -3.525) (layer F.SilkS)
@@ -28,11 +28,6 @@
   (fp_arc (start 5.565 0) (end 5.565 -2.525) (angle 180) (layer F.SilkS) (width 0.12))
   (pad 1 thru_hole circle (at 0 0) (size 1.5 1.5) (drill 0.8) (layers *.Cu *.Mask))
   (pad 2 thru_hole circle (at 4.88 0) (size 1.5 1.5) (drill 0.8) (layers *.Cu *.Mask))
-  (model ${KISYS3DMOD}/Crystal.3dshapes/Crystal_HC49-U_Vertical.wrl
-    (at (xyz 0 0 0))
-    (scale (xyz 1 1 1))
-    (rotate (xyz 0 0 0))
-  )
   (model "${KIPRJMOD}/../FootPrints/3DModels/HC49-S Crystal/User Library-HC49S.STEP"
     (at (xyz 0 0 0))
     (scale (xyz 1 1 1))
