@@ -129,4 +129,4 @@ CMakeLists.txt.user*
 #write everything beginning with a / from root directory
 
 /Mechatronics/Mechanical_Calculations/Release/
-/Mechatronics/NONEABISoftware/ArmTestingCode/Libraries/ReleaseStm32F1Static/*
+/Mechatronics/NONEABISoftware/ArmTestingCode/Libraries/ReleaseStm32F1Static/*.a
