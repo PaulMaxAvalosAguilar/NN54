@@ -129,4 +129,3 @@ CMakeLists.txt.user*
 #write everything beginning with a / from root directory
 
 /Mechatronics/Mechanical_Calculations/Release/
-/Mechatronics/NONEABISoftware/ArmTestingCode/Libraries/ReleaseStm32F1Static/libopencm3_stm32f1.a
