@@ -149,7 +149,7 @@ task1(void *args __attribute__((unused))) {
   printString("Hola\n");
 
   for (;;) {
-
+    printString("Hola!\n");
     zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
     sprintf(buffer,"%d ", zeroCounter);
     lcd_gotoxy(0,2);
