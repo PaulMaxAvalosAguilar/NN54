@@ -1608,10 +1608,7 @@ $EndComp
 Text Label 2800 7350 3    50   ~ 0
 Batt-
 Wire Wire Line
-	2800 7150 2800 7350
-Wire Wire Line
 	2800 7350 2800 7550
-Connection ~ 2800 7350
 Wire Wire Line
 	8950 6700 9150 6700
 Connection ~ 9150 6700
