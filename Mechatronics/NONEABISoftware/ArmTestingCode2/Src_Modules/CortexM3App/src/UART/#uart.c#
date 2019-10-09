@@ -35,12 +35,9 @@ char receiveBuffer[10]; //elements inialized to 0
 int idle = 0;
 
 void uart_init(){			
-
-  /*
   ring_buffer_init(&usart_receive_ring, usart_receive_buffer, sizeof(usart_send_buffer[0]), sizeof(usart_send_buffer));
 
   ring_buffer_init(&usart_send_ring, usart_send_buffer, sizeof(usart_send_buffer[0]),sizeof(usart_send_buffer));
-  */
   
 
   /* Setup GPIO pin GPIO_USART1_RE_TX on GPIO port B for transmit. */
@@ -59,8 +56,6 @@ void uart_init(){
   usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
   usart_set_mode(USART1, USART_MODE_TX_RX);
 
-  /* Enable USART1 Receive interrupt. */
-  //  USART_CR1(USART1) |= USART_CR1_IDLEIE;
   
   /* Finally enable the USART. */
   usart_enable(USART1);
@@ -72,7 +67,6 @@ void uart_init(){
   dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL4);
   
   dma_set_memory_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
-
   dma_set_peripheral_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
 
   dma_set_peripheral_address(DMA1, DMA_CHANNEL4, (uint32_t)&USART1_DR);
@@ -95,6 +89,9 @@ void uart_init(){
   
   dma_enable_channel(DMA1, DMA_CHANNEL5);
   //Receive DMA
+
+  /* Enable USART1 Receive interrupt. */
+  //USART_CR1(USART1) |= USART_CR1_IDLEIE;
   
  
 }

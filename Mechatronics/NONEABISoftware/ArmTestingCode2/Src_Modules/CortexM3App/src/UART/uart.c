@@ -60,7 +60,7 @@ void uart_init(){
   usart_set_mode(USART1, USART_MODE_TX_RX);
 
   /* Enable USART1 Receive interrupt. */
-  //  USART_CR1(USART1) |= USART_CR1_IDLEIE;
+  //USART_CR1(USART1) |= USART_CR1_IDLEIE;
   
   /* Finally enable the USART. */
   usart_enable(USART1);
@@ -72,7 +72,6 @@ void uart_init(){
   dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL4);
   
   dma_set_memory_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
-
   dma_set_peripheral_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
 
   dma_set_peripheral_address(DMA1, DMA_CHANNEL4, (uint32_t)&USART1_DR);

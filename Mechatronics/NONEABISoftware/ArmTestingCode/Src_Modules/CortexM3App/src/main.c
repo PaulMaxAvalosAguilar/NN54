@@ -1,18 +1,47 @@
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/adc.h>
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
-#include "FreeRTOS.h"
+#include <libopencm3/stm32/usart.h>
 #include "printf.h"
-#include "task.h"
 #include "lcd.h"
 #include "uart.h"
-#include <libopencm3/stm32/usart.h>
+#include "ring.h"
 #include <string.h>
 
+QueueHandle_t communicationQueue;
+
+typedef enum DataSource_t{
+	     adcSender,
+	     encoderSender
+}DataSource_t;
+
+typedef struct commData_t{
+  DataSource_t eDataSource;
+  uint16_t uValue;
+} commData_t;
+
+typedef struct encoderValues{
+  int16_t encoderCounter;
+  uint32_t inputCapture;
+} encoderValues;
+
+#define ENCODER_BUFFER_LEN 256
+ring_t encoder_ring;
+encoderValues encoder_buffer[ENCODER_BUFFER_LEN];
+#if ((ENCODER_BUFFER_LEN - 1) & ENCODER_BUFFER_LEN) == 0
+#else
+	#warning ENCODER_BUFFER NOT POWER OF 2
+#endif
+
+static volatile int16_t tim2Counter = 0;
 static volatile uint32_t capturedTime = 0;
+static volatile encoderValues encInterruptValues;
 static volatile uint32_t overflowCounter=0 ;
 
 void configurePeriphereals(void);
@@ -102,7 +131,7 @@ void configurePeriphereals(void){
   gpio_set_mode(GPIOA,
 		GPIO_MODE_INPUT,
 		GPIO_CNF_INPUT_ANALOG,
-		GPIO0);	
+		GPIO1);	
   
   adc_power_off(ADC1);
   rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);	// Set. 12MHz, Max. 14MHz
@@ -121,6 +150,23 @@ void configurePeriphereals(void){
   while ( adc_is_calibrating(ADC1) );
   //ADC
 
+
+  //Bluetooth
+
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_10_MHZ,
+		  GPIO_CNF_OUTPUT_PUSHPULL, GPIO5);
+  gpio_clear(GPIOB, GPIO5);
+
+  //Bluetooth
+
+  //Encoder Sensors Powering up
+  gpio_set_mode(GPIOA,
+		GPIO_MODE_OUTPUT_10_MHZ,
+		GPIO_CNF_OUTPUT_PUSHPULL,
+		GPIO4);
+  gpio_clear(GPIOA, GPIO4);
+  //Encoder Sensors Powering up
+
   gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
 		     AFIO_MAPR_I2C1_REMAP |  //I2C PB8 + PB9
 		     AFIO_MAPR_TIM2_REMAP_PARTIAL_REMAP1 |
@@ -135,54 +181,122 @@ void configurePeriphereals(void){
 }
 
 static void
-task1(void *args __attribute__((unused))) {
+communicationTask(void *args __attribute__((unused))) {
 
 
   lcd_init(LCD_DISP_ON);
-  lcd_puts("Hello");
+  lcd_puts("Hello my dear");
 
   char buffer[20];
-  int16_t zeroCounter;
-  
-  adc_start_conversion_direct(ADC1);
 
-  printString("Hola\n");
+  BaseType_t xStatus;
+  commData_t dataStruct;
+
+  uint16_t adc1Value = 0;      
+  int16_t encCounter = 0;
 
   for (;;) {
+
     printString("Hola!\n");
-    zeroCounter = (uint16_t)TIM2_CNT - (int16_t)32767;
-    sprintf(buffer,"%d ", zeroCounter);
+
+    xStatus = xQueueReceive(communicationQueue, &dataStruct,0);
+    if(xStatus == pdPASS){
+      if(dataStruct.eDataSource == adcSender){
+	adc1Value = dataStruct.uValue;
+      }else if(dataStruct.eDataSource == encoderSender){
+	encCounter = dataStruct.uValue;
+      }
+    }        
+
+    sprintf(buffer,"%d ", -encCounter);
     lcd_gotoxy(0,2);
     lcd_puts(buffer);
 
-    //1.20 - 4095             INVERSE RULE OF 3
-    //V+   - ADC_CHANNEL_VREF
-    
-    //V+ - 4095              DIRECT RULE OF 3
-    // x  - ADC_CHANNEL0
+    sprintf(buffer,"%u ", adc1Value);
+    lcd_gotoxy(0,4);
+    lcd_puts(buffer);    
+
 
     /*
-    int voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
-    int adc0Voltage = read_adc(ADC_CHANNEL0) * voltageSupply / 4095;
-
-    printf("%d %d %u \n", voltageSupply , adc0Voltage, overflowCounter);
+    printf("%d %d \n", voltageSupply , adc0Voltage);
     vTaskDelay(pdMS_TO_TICKS(1000));
     */
-    
+
     /*
     static int i = 0;
     while(receiveBuffer[i]){
-      sprintf(buffer, "%c", receiveBuffer[i]);
-      printString(buffer);
+
+      
+      sprintf(buffer, "%u", receiveBuffer[i]);
+      //printString(buffer);
+      lcd_gotoxy(0,3);
+      lcd_puts(buffer);
       receiveBuffer[i] = 0;
       i = (i+1) % 10;
     }
     */
- 
+
+    /*
+    sprintf(buffer, "%u",usart_recv(USART1));
+    //printString(buffer);
+    lcd_gotoxy(0,3);
+    lcd_puts(buffer);
+    */
+  }
+}
+
+static void
+adcTask(void *args __attribute__((unused))) {
+  //1.20 - 4095             INVERSE RULE OF 3
+  //V+   - ADC_CHANNEL_VREF
+    
+  //V+ - 4095              DIRECT RULE OF 3
+  // x  - ADC_CHANNEL1
+  uint16_t voltageSupply = 0;
+  uint16_t adc1Voltage = 0;
+
+  commData_t dataStruct;
+  dataStruct.eDataSource = adcSender;
+
+  adc_start_conversion_direct(ADC1);
+  
+  for(;;){
+    voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
+    adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
+
+
+    dataStruct.uValue = adc1Voltage;
+    xQueueSendToBack(communicationQueue, &dataStruct, 0);
+    
+    vTaskDelay(pdMS_TO_TICKS(2000));
+  }
+}
+
+static void encoderTask(void *args __attribute__((unused))){
+
+  int16_t encCounter = 0;
+  uint32_t inputCapture = 0;
+
+  encoderValues receiveEncValues;
+  commData_t dataStruct;
+  dataStruct.eDataSource = encoderSender;
+    
+  for(;;){
+    while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
+      encCounter = receiveEncValues.encoderCounter;
+      inputCapture = receiveEncValues.inputCapture;
+
+      dataStruct.uValue = encCounter;
+      xQueueSendToBack(communicationQueue, &dataStruct,0);
+    }
+    vTaskDelay(pdMS_TO_TICKS(30));
   }
 }
 
 void tim1_cc_isr(){
+
+  tim2Counter = (uint16_t)TIM2_CNT - (int16_t)32767;
+  
   if(TIM1_SR & TIM_SR_CC1IF){
     capturedTime = (overflowCounter << 16) | TIM1_CCR1;
   }else if(TIM1_SR & TIM_SR_CC2IF){
@@ -192,6 +306,11 @@ void tim1_cc_isr(){
   }else if(TIM1_SR & TIM_SR_CC4IF){
     capturedTime = (overflowCounter << 16) | TIM1_CCR4;
   }
+
+  encInterruptValues.encoderCounter = tim2Counter;
+  encInterruptValues.inputCapture = capturedTime;
+
+  ring_buffer_put(&encoder_ring, (encoderValues*)&encInterruptValues);
 }
 
 void tim1_up_isr(){
@@ -203,7 +322,14 @@ int main(void)
 {
   rcc_clock_setup_in_hse_8mhz_out_72mhz();// For "blue pill"
   configurePeriphereals();
-  xTaskCreate(task1,"task1",800,NULL,1,NULL);
+
+
+  ring_buffer_init(&encoder_ring, encoder_buffer, sizeof(encoder_buffer[0]),
+							 sizeof(encoder_buffer));
+  communicationQueue =  xQueueCreate(20, sizeof(commData_t));
+  xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
+  xTaskCreate(adcTask,"adcTask",800,NULL,1,NULL);
+  xTaskCreate(encoderTask,"encoderTask",800,NULL,3,NULL);
   vTaskStartScheduler();
   for(;;);
   return 0;
