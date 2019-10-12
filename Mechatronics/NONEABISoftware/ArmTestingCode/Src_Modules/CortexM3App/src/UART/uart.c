@@ -6,42 +6,10 @@
 #include "ring.h"
 #include <string.h>
 
-#define USART0_SEND_BUFFER_LEN 256
-#define USART0_RECEIVE_BUFFER_LEN   256
-
-ring_t usart_send_ring;
-ring_t usart_receive_ring;
-
-char usart_send_buffer[USART0_SEND_BUFFER_LEN];
-char usart_receive_buffer[USART0_RECEIVE_BUFFER_LEN];
-
-#if ((USART0_SEND_BUFFER_LEN - 1) & USART0_SEND_BUFFER_LEN) == 0
-# if USART0_SEND_BUFFER_LEN > 256
-# warning USART0_SEND_BUFFER > 256
-# endif
-#else
-	#warning USART0_SEND_BUFFER NOT POWER OF 2
-#endif
-
-#if ((USART0_RECEIVE_BUFFER_LEN- 1) & USART0_RECEIVE_BUFFER_LEN) == 0
-# if USART0_RECEIVE_BUFFER_LEN > 256
-# warning USART0_RECEIVE_BUFFER > 256
-# endif
-#else
-	#warning USART0_RECEIVE_BUFFER NOT POWER OF 2
-#endif
-
-char receiveBuffer[10]; //elements inialized to 0
+char receiveBuffer[10] = {0}; //elements inialized to 0
 int idle = 0;
 
 void uart_init(){			
-
-  /*
-  ring_buffer_init(&usart_receive_ring, usart_receive_buffer, sizeof(usart_send_buffer[0]), sizeof(usart_send_buffer));
-
-  ring_buffer_init(&usart_send_ring, usart_send_buffer, sizeof(usart_send_buffer[0]),sizeof(usart_send_buffer));
-  */
-  
 
   /* Setup GPIO pin GPIO_USART1_RE_TX on GPIO port B for transmit. */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
@@ -58,12 +26,12 @@ void uart_init(){
   usart_set_parity(USART1, USART_PARITY_NONE);
   usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
   usart_set_mode(USART1, USART_MODE_TX_RX);
-
-  /* Enable USART1 Receive interrupt. */
-  //  USART_CR1(USART1) |= USART_CR1_IDLEIE;
   
   /* Finally enable the USART. */
   usart_enable(USART1);
+
+  /* Enable USART1 Receive interrupt. */
+  //  USART_CR1(USART1) |= USART_CR1_IDLEIE;
 
   //Write DMA
   usart_enable_tx_dma(USART1);
@@ -95,7 +63,6 @@ void uart_init(){
   
   dma_enable_channel(DMA1, DMA_CHANNEL5);
   //Receive DMA
-  
  
 }
 
@@ -108,22 +75,19 @@ void printString(const char myString[]) {
 
   while(!dma_get_interrupt_flag(DMA1, DMA_CHANNEL4, DMA_TCIF));
   dma_clear_interrupt_flags(DMA1, DMA_CHANNEL4, DMA_TCIF); 
+
 }
 
 void _putchar(char character){
-  while(ring_buffer_full(&usart_send_ring));//wait till there's space
-  ring_buffer_put(&usart_send_ring, &character);
-  USART_CR1(USART1) |= USART_CR1_TXEIE;
+
 }
 
 int serialAvailable(void){
-  return  (!ring_buffer_empty(&usart_receive_ring))? 1:0;
+  return 0;
 }
 
 char get_char(void){
   char c = 0;
- 
-  ring_buffer_get(&usart_receive_ring, &c);
  
   return c;
 }

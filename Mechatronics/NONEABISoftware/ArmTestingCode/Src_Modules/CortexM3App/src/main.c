@@ -1,3 +1,4 @@
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -58,6 +59,7 @@ read_adc(uint8_t channel) {
 }
 
 void configurePeriphereals(void){
+
   rcc_periph_clock_enable(RCC_AFIO);    // I2C UART ADC
   rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 ADC
   rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM2 UART
@@ -140,10 +142,8 @@ void configurePeriphereals(void){
   adc_set_single_conversion_mode(ADC1);// Continous mode disabled
   adc_enable_temperature_sensor();
 
-  /*
 
-  */
-  
+
   adc_power_on(ADC1);
   adc_reset_calibration(ADC1);
   adc_calibrate_async(ADC1);
@@ -174,20 +174,24 @@ void configurePeriphereals(void){
   
   nvic_enable_irq(NVIC_TIM1_CC_IRQ);
   nvic_enable_irq(NVIC_TIM1_UP_IRQ);
-  nvic_enable_irq(NVIC_USART1_IRQ);
+  //  nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(1 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(1 << 4));
   nvic_set_priority(NVIC_USART1_IRQ,(0 << 4));
+
 }
 
 static void
 communicationTask(void *args __attribute__((unused))) {
 
+  /*
+As for current implementation no i2c response completely blocks uart communication
+   */
 
+  /*
   lcd_init(LCD_DISP_ON);
   lcd_puts("Hello my dear");
-
-  char buffer[20];
+  */
 
   BaseType_t xStatus;
   commData_t dataStruct;
@@ -195,9 +199,11 @@ communicationTask(void *args __attribute__((unused))) {
   uint16_t adc1Value = 0;      
   int16_t encCounter = 0;
 
-  for (;;) {
+  char buffer[1];
 
-    printString("Hola!\n");
+  for (;;) {
+    printString("No");
+    printString("moformo\n");
 
     xStatus = xQueueReceive(communicationQueue, &dataStruct,0);
     if(xStatus == pdPASS){
@@ -208,6 +214,7 @@ communicationTask(void *args __attribute__((unused))) {
       }
     }        
 
+    /*
     sprintf(buffer,"%d ", -encCounter);
     lcd_gotoxy(0,2);
     lcd_puts(buffer);
@@ -215,33 +222,25 @@ communicationTask(void *args __attribute__((unused))) {
     sprintf(buffer,"%u ", adc1Value);
     lcd_gotoxy(0,4);
     lcd_puts(buffer);    
-
-
-    /*
-    printf("%d %d \n", voltageSupply , adc0Voltage);
-    vTaskDelay(pdMS_TO_TICKS(1000));
     */
 
-    /*
+
+
+
+
     static int i = 0;
     while(receiveBuffer[i]){
-
-      
-      sprintf(buffer, "%u", receiveBuffer[i]);
-      //printString(buffer);
-      lcd_gotoxy(0,3);
-      lcd_puts(buffer);
+      //printString receives string, convert char to string
+      //through sprintf to use printString
+      /*
+      sprintf(buffer, "%c", receiveBuffer[i]);
+      printString(buffer);
+      */
       receiveBuffer[i] = 0;
       i = (i+1) % 10;
     }
-    */
 
-    /*
-    sprintf(buffer, "%u",usart_recv(USART1));
-    //printString(buffer);
-    lcd_gotoxy(0,3);
-    lcd_puts(buffer);
-    */
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 
@@ -328,9 +327,18 @@ int main(void)
 							 sizeof(encoder_buffer));
   communicationQueue =  xQueueCreate(20, sizeof(commData_t));
   xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
+  /*
   xTaskCreate(adcTask,"adcTask",800,NULL,1,NULL);
   xTaskCreate(encoderTask,"encoderTask",800,NULL,3,NULL);
+  */
   vTaskStartScheduler();
+
   for(;;);
+
   return 0;
 }
+
+
+
+
+
