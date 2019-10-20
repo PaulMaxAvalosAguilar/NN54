@@ -59,29 +59,7 @@ static volatile uint32_t capturedTime = 0;
 static volatile encoderValues encInterruptValues;
 static volatile uint32_t overflowCounter=0 ;
 
-void configurePeriphereals(void);
-
-static uint16_t
-read_adc(uint8_t channel) {
-
-	adc_set_sample_time(ADC1,channel,ADC_SMPR_SMP_239DOT5CYC);
-	adc_set_regular_sequence(ADC1,1,&channel);
-	adc_start_conversion_direct(ADC1);
-	while ( !adc_eoc(ADC1) )
-		taskYIELD();
-	return adc_read_regular(ADC1);
-}
-
-static void sendToLCD(LCDMessage_t messageType, uint8_t position,
-		      uint32_t displayValue){
-  lcdData_t dataToSend;
-  dataToSend.messageType = messageType;
-  dataToSend.position = position;
-  dataToSend.displayValue = displayValue;
-  xQueueSendToBack(lcdQueue,&dataToSend,0);
-}
-
-void configurePeriphereals(void){
+static void configurePeriphereals(void){
 
   rcc_periph_clock_enable(RCC_AFIO);    // I2C UART ADC
   rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 ADC
@@ -202,6 +180,26 @@ void configurePeriphereals(void){
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(1 << 4));
   nvic_set_priority(NVIC_USART1_IRQ,(0 << 4));
 
+}
+
+static uint16_t
+read_adc(uint8_t channel) {
+
+	adc_set_sample_time(ADC1,channel,ADC_SMPR_SMP_239DOT5CYC);
+	adc_set_regular_sequence(ADC1,1,&channel);
+	adc_start_conversion_direct(ADC1);
+	while ( !adc_eoc(ADC1) )
+		taskYIELD();
+	return adc_read_regular(ADC1);
+}
+
+static void sendToLCD(LCDMessage_t messageType, uint8_t position,
+		      uint32_t displayValue){
+  lcdData_t dataToSend;
+  dataToSend.messageType = messageType;
+  dataToSend.position = position;
+  dataToSend.displayValue = displayValue;
+  xQueueSendToBack(lcdQueue,&dataToSend,0);
 }
 
 static void
