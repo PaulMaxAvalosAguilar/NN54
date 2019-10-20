@@ -1,4 +1,3 @@
-
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -16,16 +15,31 @@
 #include <string.h>
 
 QueueHandle_t communicationQueue;
+QueueHandle_t lcdQueue;
 
+//communicationTask -------------------------
 typedef enum DataSource_t{
-	     adcSender,
-	     encoderSender
+			  adcSender,
+			  encoderSender
 }DataSource_t;
 
 typedef struct commData_t{
   DataSource_t eDataSource;
   uint16_t uValue;
 } commData_t;
+//communicatioTask --------------------------
+
+//lcdTask -----------------------------------
+typedef enum LCDMessage_t{
+			  welcome
+}LCDMessage_t;
+
+typedef struct lcdData_t{
+  LCDMessage_t messageType;
+  uint8_t position;
+  uint32_t displayValue;  
+}lcdData_t;
+//lcdTask -----------------------------------
 
 typedef struct encoderValues{
   int16_t encoderCounter;
@@ -56,6 +70,15 @@ read_adc(uint8_t channel) {
 	while ( !adc_eoc(ADC1) )
 		taskYIELD();
 	return adc_read_regular(ADC1);
+}
+
+static void sendToLCD(LCDMessage_t messageType, uint8_t position,
+		      uint32_t displayValue){
+  lcdData_t dataToSend;
+  dataToSend.messageType = messageType;
+  dataToSend.position = position;
+  dataToSend.displayValue = displayValue;
+  xQueueSendToBack(lcdQueue,&dataToSend,0);
 }
 
 void configurePeriphereals(void){
@@ -183,16 +206,6 @@ void configurePeriphereals(void){
 
 static void
 communicationTask(void *args __attribute__((unused))) {
-
-  /*
-As for current implementation no i2c response completely blocks uart communication
-   */
-
-  /*
-  lcd_init(LCD_DISP_ON);
-  lcd_puts("Hello my dear");
-  */
-
   BaseType_t xStatus;
   commData_t dataStruct;
 
@@ -201,9 +214,10 @@ As for current implementation no i2c response completely blocks uart communicati
 
   char buffer[1];
 
+  sendToLCD(welcome, 2, 0);
+  
   for (;;) {
-    printString("No");
-    printString("moformo\n");
+    printString("You are a genius\n");
 
     xStatus = xQueueReceive(communicationQueue, &dataStruct,0);
     if(xStatus == pdPASS){
@@ -225,9 +239,6 @@ As for current implementation no i2c response completely blocks uart communicati
     */
 
 
-
-
-
     static int i = 0;
     while(receiveBuffer[i]){
       //printString receives string, convert char to string
@@ -244,13 +255,23 @@ As for current implementation no i2c response completely blocks uart communicati
   }
 }
 
+static void lcdTask(void *args __attribute__((unused))){
+  lcdData_t receivedData;
+
+  lcd_init(LCD_DISP_ON);
+  
+  for(;;){
+    xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
+    if(receivedData.messageType == welcome){
+      lcd_gotoxy(0,receivedData.position);
+      lcd_puts("Hello");
+    }
+  }
+}
+
 static void
 adcTask(void *args __attribute__((unused))) {
-  //1.20 - 4095             INVERSE RULE OF 3
-  //V+   - ADC_CHANNEL_VREF
-    
-  //V+ - 4095              DIRECT RULE OF 3
-  // x  - ADC_CHANNEL1
+
   uint16_t voltageSupply = 0;
   uint16_t adc1Voltage = 0;
 
@@ -260,6 +281,12 @@ adcTask(void *args __attribute__((unused))) {
   adc_start_conversion_direct(ADC1);
   
   for(;;){
+    //1.20 - 4095             INVERSE RULE OF 3
+    //V+   - ADC_CHANNEL_VREF
+    
+    //V+ - 4095              DIRECT RULE OF 3
+    // x  - ADC_CHANNEL1
+    
     voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
     adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
 
@@ -326,7 +353,9 @@ int main(void)
   ring_buffer_init(&encoder_ring, encoder_buffer, sizeof(encoder_buffer[0]),
 							 sizeof(encoder_buffer));
   communicationQueue =  xQueueCreate(20, sizeof(commData_t));
+  lcdQueue = xQueueCreate(20, sizeof(lcdData_t));
   xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
+  xTaskCreate(lcdTask,"lcdTask",200, NULL, 1, NULL);
   /*
   xTaskCreate(adcTask,"adcTask",800,NULL,1,NULL);
   xTaskCreate(encoderTask,"encoderTask",800,NULL,3,NULL);

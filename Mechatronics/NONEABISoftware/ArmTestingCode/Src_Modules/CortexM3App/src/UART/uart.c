@@ -5,6 +5,8 @@
 #include "uart.h"
 #include "ring.h"
 #include <string.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
 char receiveBuffer[10] = {0}; //elements inialized to 0
 int idle = 0;
@@ -73,7 +75,9 @@ void printString(const char myString[]) {
   dma_set_memory_address(DMA1, DMA_CHANNEL4, (uint32_t)myString);
   dma_enable_channel(DMA1, DMA_CHANNEL4);
 
-  while(!dma_get_interrupt_flag(DMA1, DMA_CHANNEL4, DMA_TCIF));
+  while(!dma_get_interrupt_flag(DMA1, DMA_CHANNEL4, DMA_TCIF)){
+    taskYIELD();
+  }
   dma_clear_interrupt_flags(DMA1, DMA_CHANNEL4, DMA_TCIF); 
 
 }
