@@ -1,6 +1,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "semphr.h"
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
@@ -41,10 +42,12 @@ typedef struct lcdData_t{
 }lcdData_t;
 //lcdTask -----------------------------------
 
+//encoderTask -------------------------------
 typedef struct encoderValues{
   int16_t encoderCounter;
   uint32_t inputCapture;
 } encoderValues;
+//encoderTask -------------------------------
 
 #define ENCODER_BUFFER_LEN 256
 ring_t encoder_ring;
@@ -127,7 +130,8 @@ static void configurePeriphereals(void){
   //I2C
 
   //UART
-  uart_init();
+  uart_configure();
+
   //UART
 
   //ADC
@@ -175,10 +179,10 @@ static void configurePeriphereals(void){
   
   nvic_enable_irq(NVIC_TIM1_CC_IRQ);
   nvic_enable_irq(NVIC_TIM1_UP_IRQ);
-  //  nvic_enable_irq(NVIC_USART1_IRQ);
-  nvic_set_priority(NVIC_TIM1_CC_IRQ,(1 << 4));
-  nvic_set_priority(NVIC_TIM1_UP_IRQ,(1 << 4));
-  nvic_set_priority(NVIC_USART1_IRQ,(0 << 4));
+  nvic_enable_irq(NVIC_USART1_IRQ);
+  nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
+  nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
+  nvic_set_priority(NVIC_USART1_IRQ,(1 << 4));
 
 }
 
@@ -210,12 +214,12 @@ communicationTask(void *args __attribute__((unused))) {
   uint16_t adc1Value = 0;      
   int16_t encCounter = 0;
 
-  char buffer[1];
+  char buffer[30];
 
   sendToLCD(welcome, 2, 0);
   
   for (;;) {
-    printString("You are a genius\n");
+    printString("Testing\n");
 
     xStatus = xQueueReceive(communicationQueue, &dataStruct,0);
     if(xStatus == pdPASS){
@@ -237,17 +241,13 @@ communicationTask(void *args __attribute__((unused))) {
     */
 
 
-    static int i = 0;
-    while(receiveBuffer[i]){
-      //printString receives string, convert char to string
-      //through sprintf to use printString
-      /*
-      sprintf(buffer, "%c", receiveBuffer[i]);
+
+    while(serialAvailable()){
+      char received_char = get_char();
+      sprintf(buffer,"%c",received_char);
       printString(buffer);
-      */
-      receiveBuffer[i] = 0;
-      i = (i+1) % 10;
     }
+
 
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
@@ -267,8 +267,7 @@ static void lcdTask(void *args __attribute__((unused))){
   }
 }
 
-static void
-adcTask(void *args __attribute__((unused))) {
+static void adcTask(void *args __attribute__((unused))) {
 
   uint16_t voltageSupply = 0;
   uint16_t adc1Voltage = 0;
@@ -296,6 +295,8 @@ adcTask(void *args __attribute__((unused))) {
   }
 }
 
+
+
 static void encoderTask(void *args __attribute__((unused))){
 
   int16_t encCounter = 0;
@@ -316,7 +317,6 @@ static void encoderTask(void *args __attribute__((unused))){
     vTaskDelay(pdMS_TO_TICKS(30));
   }
 }
-
 void tim1_cc_isr(){
 
   tim2Counter = (uint16_t)TIM2_CNT - (int16_t)32767;
@@ -342,6 +342,7 @@ void tim1_up_isr(){
   overflowCounter++;  
 }
 
+
 int main(void)
 {
   rcc_clock_setup_in_hse_8mhz_out_72mhz();// For "blue pill"
@@ -352,10 +353,13 @@ int main(void)
 							 sizeof(encoder_buffer));
   communicationQueue =  xQueueCreate(20, sizeof(commData_t));
   lcdQueue = xQueueCreate(20, sizeof(lcdData_t));
+
+  
   xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
   xTaskCreate(lcdTask,"lcdTask",200, NULL, 1, NULL);
+  xTaskCreate(adcTask,"adcTask",200,NULL,1,NULL);
+  xTaskCreate(uartRxTask, "uartRxTask", 300,NULL, 2, NULL);
   /*
-  xTaskCreate(adcTask,"adcTask",800,NULL,1,NULL);
   xTaskCreate(encoderTask,"encoderTask",800,NULL,3,NULL);
   */
   vTaskStartScheduler();

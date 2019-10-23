@@ -1,3 +1,5 @@
+#include "FreeRTOS.h"
+#include "semphr.h"
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/nvic.h>
@@ -5,14 +7,25 @@
 #include "uart.h"
 #include "ring.h"
 #include <string.h>
-#include "FreeRTOS.h"
 #include "task.h"
 
-char receiveBuffer[10] = {0}; //elements inialized to 0
-int idle = 0;
+#define UART_RX_BUFFER_LEN 256
+ring_t usart_rx_ring;
+char usart_rx_buffer[UART_RX_BUFFER_LEN];
+#if ((UART_RX_BUFFER_LEN - 1) & UART_RX_BUFFER_LEN) == 0
+#else
+	#warning UART_RX_BUFFER NOT POWER OF 2
+#endif
 
-void uart_init(){			
+char receiveBuffer[UART_RX_BUFFER_LEN] = {0}; //elements inialized to 0
+SemaphoreHandle_t idleSmphr;
 
+void uart_configure(){			
+
+  //Configure ring buffer
+  ring_buffer_init(&usart_rx_ring, usart_rx_buffer, sizeof(usart_rx_buffer[0]),
+		   sizeof(usart_rx_buffer));
+  
   /* Setup GPIO pin GPIO_USART1_RE_TX on GPIO port B for transmit. */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
 		GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO6);
@@ -29,11 +42,6 @@ void uart_init(){
   usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
   usart_set_mode(USART1, USART_MODE_TX_RX);
   
-  /* Finally enable the USART. */
-  usart_enable(USART1);
-
-  /* Enable USART1 Receive interrupt. */
-  //  USART_CR1(USART1) |= USART_CR1_IDLEIE;
 
   //Write DMA
   usart_enable_tx_dma(USART1);
@@ -61,12 +69,18 @@ void uart_init(){
   dma_set_memory_address(DMA1, DMA_CHANNEL5, (uint32_t)receiveBuffer);
   dma_set_peripheral_address(DMA1, DMA_CHANNEL5, (uint32_t)&USART1_DR);
 
-  dma_set_number_of_data(DMA1, DMA_CHANNEL5, 10);
+  dma_set_number_of_data(DMA1, DMA_CHANNEL5, UART_RX_BUFFER_LEN);
   
   dma_enable_channel(DMA1, DMA_CHANNEL5);
   //Receive DMA
- 
+
+
+  idleSmphr = xSemaphoreCreateBinary();
+  USART_CR1(USART1) |= USART_CR1_IDLEIE;  //Enable USART1 Receive interrupt.
+  usart_enable(USART1);//Enable USART 
 }
+
+
 
 void printString(const char myString[]) {
 
@@ -75,33 +89,48 @@ void printString(const char myString[]) {
   dma_set_memory_address(DMA1, DMA_CHANNEL4, (uint32_t)myString);
   dma_enable_channel(DMA1, DMA_CHANNEL4);
 
-  while(!dma_get_interrupt_flag(DMA1, DMA_CHANNEL4, DMA_TCIF)){
-    taskYIELD();
-  }
+  while(!dma_get_interrupt_flag(DMA1, DMA_CHANNEL4, DMA_TCIF));
   dma_clear_interrupt_flags(DMA1, DMA_CHANNEL4, DMA_TCIF); 
 
 }
 
-void _putchar(char character){
-
-}
-
 int serialAvailable(void){
-  return 0;
+  return  (!ring_buffer_empty(&usart_rx_ring))? 1:0;
 }
 
 char get_char(void){
   char c = 0;
- 
+  
+  ring_buffer_get(&usart_rx_ring, &c);
+  
   return c;
+}
+
+void uartRxTask(void *args __attribute__((unused))){
+  
+  int i = 0;
+
+  for(;;){
+    xSemaphoreTake(idleSmphr,portMAX_DELAY);
+
+    while(receiveBuffer[i]){
+      ring_buffer_put(&usart_rx_ring,&receiveBuffer[i]);
+      receiveBuffer[i] = 0;
+      i = (i+1) % 256;
+    }
+  }
 }
 
 void usart1_isr(void)
 {
   if (((USART_CR1(USART1) & USART_CR1_IDLEIE) != 0) &&
       ((USART_SR(USART1) & USART_SR_IDLE) != 0)) {
-    usart_recv(USART1);
-    idle = 1;
+    usart_recv(USART1);//Interrupt clears at reading rx register
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(idleSmphr,&xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    
   }
 }
 
