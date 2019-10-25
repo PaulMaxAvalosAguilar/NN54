@@ -43,23 +43,23 @@ typedef struct lcdData_t{
 //lcdTask -----------------------------------
 
 //encoderTask -------------------------------
-typedef struct encoderValues{
+typedef struct encoderValues_t{
   int16_t encoderCounter;
   uint32_t inputCapture;
-} encoderValues;
+} encoderValues_t;
 //encoderTask -------------------------------
 
 #define ENCODER_BUFFER_LEN 256
 ring_t encoder_ring;
-encoderValues encoder_buffer[ENCODER_BUFFER_LEN];
+encoderValues_t encoder_buffer[ENCODER_BUFFER_LEN];
 #if ((ENCODER_BUFFER_LEN - 1) & ENCODER_BUFFER_LEN) == 0
 #else
 	#warning ENCODER_BUFFER NOT POWER OF 2
 #endif
 
+static volatile encoderValues_t encInterruptValues;//Only accessed form tim1_cc_isr
 static volatile int16_t tim2Counter = 0;
 static volatile uint32_t capturedTime = 0;
-static volatile encoderValues encInterruptValues;
 static volatile uint32_t overflowCounter=0 ;
 
 static void configurePeriphereals(void){
@@ -197,13 +197,45 @@ read_adc(uint8_t channel) {
 	return adc_read_regular(ADC1);
 }
 
-static void sendToLCD(LCDMessage_t messageType, uint8_t position,
+static void sendToCommunicationQueue(DataSource_t eDataSource, uint16_t uValue){
+  commData_t dataStruct;
+  dataStruct.eDataSource = eDataSource;
+  dataStruct.uValue = uValue;
+
+  xQueueSendToBack(communicationQueue, &dataStruct, 0);
+  
+}
+
+static void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
 		      uint32_t displayValue){
   lcdData_t dataToSend;
   dataToSend.messageType = messageType;
   dataToSend.position = position;
   dataToSend.displayValue = displayValue;
   xQueueSendToBack(lcdQueue,&dataToSend,0);
+}
+
+static void LCDputsBlinkFree(const char *g, int ypos){
+  int i = 0;
+  char text[22];//max used characters used plus null terminator
+  int blankchars;
+
+  while(*(g + i)){
+    if(i >20) break;
+    text[i] = *(g +i);
+    i++;
+  }
+
+  blankchars = 21 -i;
+  while(blankchars){
+    text[i] = ' ';
+    blankchars--;
+    i++;
+  }
+  text[i] = '\0';
+  lcd_gotoxy(0, ypos);
+  lcd_puts(text);
+  
 }
 
 static void
@@ -216,7 +248,7 @@ communicationTask(void *args __attribute__((unused))) {
 
   char buffer[30];
 
-  sendToLCD(welcome, 2, 0);
+  sendToLCDQueue(welcome,2,0);
   
   for (;;) {
     printString("Testing\n");
@@ -272,9 +304,6 @@ static void adcTask(void *args __attribute__((unused))) {
   uint16_t voltageSupply = 0;
   uint16_t adc1Voltage = 0;
 
-  commData_t dataStruct;
-  dataStruct.eDataSource = adcSender;
-
   adc_start_conversion_direct(ADC1);
   
   for(;;){
@@ -287,9 +316,7 @@ static void adcTask(void *args __attribute__((unused))) {
     voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
     adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
 
-
-    dataStruct.uValue = adc1Voltage;
-    xQueueSendToBack(communicationQueue, &dataStruct, 0);
+    sendToCommunicationQueue(adcSender,adc1Voltage);
     
     vTaskDelay(pdMS_TO_TICKS(2000));
   }
@@ -302,17 +329,14 @@ static void encoderTask(void *args __attribute__((unused))){
   int16_t encCounter = 0;
   uint32_t inputCapture = 0;
 
-  encoderValues receiveEncValues;
-  commData_t dataStruct;
-  dataStruct.eDataSource = encoderSender;
+  encoderValues_t receiveEncValues;
     
   for(;;){
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
       encCounter = receiveEncValues.encoderCounter;
       inputCapture = receiveEncValues.inputCapture;
 
-      dataStruct.uValue = encCounter;
-      xQueueSendToBack(communicationQueue, &dataStruct,0);
+      sendToCommunicationQueue(encoderSender, encCounter);
     }
     vTaskDelay(pdMS_TO_TICKS(30));
   }
@@ -334,7 +358,7 @@ void tim1_cc_isr(){
   encInterruptValues.encoderCounter = tim2Counter;
   encInterruptValues.inputCapture = capturedTime;
 
-  ring_buffer_put(&encoder_ring, (encoderValues*)&encInterruptValues);
+  ring_buffer_put(&encoder_ring, (encoderValues_t*)&encInterruptValues);
 }
 
 void tim1_up_isr(){
@@ -348,6 +372,7 @@ int main(void)
   rcc_clock_setup_in_hse_8mhz_out_72mhz();// For "blue pill"
   configurePeriphereals();
 
+  
 
   ring_buffer_init(&encoder_ring, encoder_buffer, sizeof(encoder_buffer[0]),
 							 sizeof(encoder_buffer));

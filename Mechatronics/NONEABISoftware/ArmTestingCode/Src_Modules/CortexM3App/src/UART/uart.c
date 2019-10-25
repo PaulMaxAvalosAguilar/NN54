@@ -106,6 +106,26 @@ char get_char(void){
   return c;
 }
 
+void tryReadCharLineUSART(charLineBuffer_t *charLineBuffer){
+
+  int i = 0;
+  char c;
+  char *buffer = charLineBuffer->buf;
+
+  while((c = get_char()) != '\n'){
+
+    //if characters were found
+    if(c != 0){
+      //Add characters to buffer;
+      buffer[i] = c;
+      i++;
+    }
+  }
+
+  buffer[i] = c;//Write string termination chacter (\n)
+  charLineBuffer->terminatorcharposition = i;
+}
+
 void uartRxTask(void *args __attribute__((unused))){
   
   int i = 0;
@@ -133,4 +153,3 @@ void usart1_isr(void)
     
   }
 }
-

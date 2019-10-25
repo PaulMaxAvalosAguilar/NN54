@@ -22,6 +22,7 @@ DYNLIBS     := $(wildcard $(LIBSDIR)/*.$(DLEXT))
 
 include Makefile.config
 
+
 #COMPILE PART
 $(TARGETDIR)/$(TARGET).$(BINEXT): $(TARGETDIR)/$(TARGET).$(ELFEXT)
 	rm -f $@
