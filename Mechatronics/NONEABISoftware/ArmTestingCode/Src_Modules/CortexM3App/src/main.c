@@ -365,6 +365,7 @@ static void encoderTask(void *args __attribute__((unused))){
     vTaskDelay(pdMS_TO_TICKS(30));
   }
 }
+
 void tim1_cc_isr(){
 
   tim2Counter = (uint16_t)TIM2_CNT - (int16_t)32767;
