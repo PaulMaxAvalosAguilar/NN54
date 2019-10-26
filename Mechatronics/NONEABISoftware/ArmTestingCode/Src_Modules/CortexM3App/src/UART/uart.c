@@ -106,7 +106,7 @@ char get_char(void){
   return c;
 }
 
-void tryReadCharLineUSART(charLineBuffer_t *charLineBuffer){
+void forceReadCharLineUsart(charLineBuffer_t *charLineBuffer){
 
   int i = 0;
   char c;

@@ -10,7 +10,7 @@ void uart_configure(void);
 void printString(const char myString[]);
 int serialAvailable(void);
 char get_char(void);
-void tryReadCharLineUSART(charLineBuffer_t *charLineBuffer);
+void forceReadCharLineUsart(charLineBuffer_t *charLineBuffer);
 void uartRxTask(void *args);
 
 

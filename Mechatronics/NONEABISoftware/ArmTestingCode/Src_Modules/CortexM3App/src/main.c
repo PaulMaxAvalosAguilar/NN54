@@ -32,7 +32,10 @@ typedef struct commData_t{
 
 //lcdTask -----------------------------------
 typedef enum LCDMessage_t{
-			  welcome
+			  turnOnMessage,
+			  connectedStatus,
+			  batteryLevel,
+			  chargingStatus
 }LCDMessage_t;
 
 typedef struct lcdData_t{
@@ -203,7 +206,6 @@ static void sendToCommunicationQueue(DataSource_t eDataSource, uint16_t uValue){
   dataStruct.uValue = uValue;
 
   xQueueSendToBack(communicationQueue, &dataStruct, 0);
-  
 }
 
 static void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
@@ -212,10 +214,11 @@ static void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
   dataToSend.messageType = messageType;
   dataToSend.position = position;
   dataToSend.displayValue = displayValue;
+
   xQueueSendToBack(lcdQueue,&dataToSend,0);
 }
 
-static void LCDputsBlinkFree(const char *g, int ypos){
+static void lcdPutsBlinkFree(const char *g, int ypos){
   int i = 0;
   char text[22];//max used characters used plus null terminator
   int blankchars;
@@ -238,17 +241,17 @@ static void LCDputsBlinkFree(const char *g, int ypos){
   
 }
 
-static void
-communicationTask(void *args __attribute__((unused))) {
+static void communicationTask(void *args __attribute__((unused))) {
   BaseType_t xStatus;
   commData_t dataStruct;
 
   uint16_t adc1Value = 0;      
   int16_t encCounter = 0;
 
-  char buffer[30];
-
-  sendToLCDQueue(welcome,2,0);
+  char buffer[3];
+  charLineBuffer_t charLineBuffer;
+  
+  sendToLCDQueue(turnOnMessage,2,0);
   
   for (;;) {
     printString("Testing\n");
@@ -274,10 +277,16 @@ communicationTask(void *args __attribute__((unused))) {
 
 
 
-    while(serialAvailable()){
-      char received_char = get_char();
-      sprintf(buffer,"%c",received_char);
+    if(serialAvailable()){
+      forceReadCharLineUsart(&charLineBuffer);
+    }
+
+    int i = 0;
+    char *bufferP = charLineBuffer.buf;
+    while(i < charLineBuffer.terminatorcharposition){
+      sprintf(buffer,"%c",bufferP[i]);
       printString(buffer);
+      i++;
     }
 
 
@@ -287,14 +296,29 @@ communicationTask(void *args __attribute__((unused))) {
 
 static void lcdTask(void *args __attribute__((unused))){
   lcdData_t receivedData;
-
+  char buffer[22];
   lcd_init(LCD_DISP_ON);
   
   for(;;){
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
-    if(receivedData.messageType == welcome){
-      lcd_gotoxy(0,receivedData.position);
-      lcd_puts("Hello");
+    if(receivedData.messageType == turnOnMessage){
+      lcdPutsBlinkFree("Hello",receivedData.position);
+      
+    }else if(receivedData.messageType == connectedStatus){
+      lcdPutsBlinkFree(receivedData.displayValue?
+		       "Connected":"Disconnected",
+		       receivedData.position);
+      
+    }else if(receivedData.messageType == batteryLevel){
+      sprintf(buffer,"Battery: %lu", receivedData.displayValue);
+      lcdPutsBlinkFree(buffer,receivedData.position);
+      
+    }else if(receivedData.messageType == chargingStatus){
+      lcdPutsBlinkFree(receivedData.displayValue?
+		       "Charging":
+		       "Not Charging",
+		       receivedData.position);
+      
     }
   }
 }
