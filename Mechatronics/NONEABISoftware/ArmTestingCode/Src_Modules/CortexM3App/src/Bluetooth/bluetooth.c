@@ -39,6 +39,14 @@ typedef enum{
 characteristicStatus_t characteristicStatus;
 charLineBuffer_t *charLineBufferPtr;
 
+typedef enum LCDMessage_t{
+			  turnOnMessage,
+			  connectedStatus
+}LCDMessage_t;
+
+extern void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
+			   uint32_t displayValue);
+
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
 
   int notifyCheckingIsNull= 1;
@@ -117,6 +125,10 @@ void advertise(){
 
 void unBond(){
   runLockingCOMMAND(NULL,"U\n");
+}
+
+void unBondAdvertise(void){
+  runLockingCOMMAND(NULL,"U\nA\n");
 }
 
 void sendLS(){
@@ -330,20 +342,18 @@ void genericLineParsing(charLineBuffer_t *clb){
   
   //INTERPRET
   if(strstr(stdLine, "Connection End") != NULL){
-    //    OLED_puts("Connection End",3);    
+    sendToLCDQueue(connectedStatus,1,0);
     characteristicStatus.isNotifying = 0;
 
     if(characteristicStatus.notificationEnabled){
       turnOffSubscription();
     }
     
-    unBond();
-    advertise();
+    unBondAdvertise();
   
   }else if(strstr(stdLine,"Connected") != NULL){
-    //    OLED_puts("Connected",3);
+    sendToLCDQueue(connectedStatus,1,1);
   }else if(strstr(stdLine, "Bonded") != NULL){
-    //    OLED_puts("Bonded",3);
       
   }else if(parseUUIDLine(stdLine)){
     
@@ -352,7 +362,7 @@ void genericLineParsing(charLineBuffer_t *clb){
   }else if(strstr(stdLine, "CMD")!= NULL){
     bluetoothConfig(1);
     sendLS();
-    //    OLED_puts("SDT ENCODER VBT",1);
+    sendToLCDQueue(turnOnMessage,0,0);
     advertise();
 	  
   }

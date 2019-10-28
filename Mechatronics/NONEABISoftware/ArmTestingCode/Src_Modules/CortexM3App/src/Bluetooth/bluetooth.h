@@ -12,6 +12,7 @@
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...);
 void advertise(void);
 void unBond(void);
+void unBondAdvertise(void);
 void sendLS(void);
 void cleanPrivateService(void);
 void setFactoryReset(uint8_t arg);

@@ -208,7 +208,7 @@ static void sendToCommunicationQueue(DataSource_t eDataSource, uint16_t uValue){
   xQueueSendToBack(communicationQueue, &dataStruct, 0);
 }
 
-static void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
+void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
 		      uint32_t displayValue){
   lcdData_t dataToSend;
   dataToSend.messageType = messageType;
@@ -300,7 +300,7 @@ static void lcdTask(void *args __attribute__((unused))){
   for(;;){
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
     if(receivedData.messageType == turnOnMessage){
-      lcdPutsBlinkFree("Hello",receivedData.position);
+      lcdPutsBlinkFree("SDT ENCODER",receivedData.position);
       
     }else if(receivedData.messageType == connectedStatus){
       lcdPutsBlinkFree(receivedData.displayValue?
