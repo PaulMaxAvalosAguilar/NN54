@@ -1,7 +1,7 @@
 TEMPLATE = app
 
 QT += qml quick bluetooth svg charts
-CONFIG += c++11
+CONFIG += c++11 embed_manifest_exe
 
 SOURCES += main.cpp \
     deviceinfo.cpp \

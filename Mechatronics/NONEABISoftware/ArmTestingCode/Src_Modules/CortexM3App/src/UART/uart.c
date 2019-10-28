@@ -19,6 +19,7 @@ char usart_rx_buffer[UART_RX_BUFFER_LEN];
 
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0}; //elements inialized to 0
 SemaphoreHandle_t idleSmphr;
+charLineBuffer_t charLineBuffer;
 
 void uart_configure(){			
 
@@ -106,11 +107,11 @@ char get_char(void){
   return c;
 }
 
-void forceReadCharLineUsart(charLineBuffer_t *charLineBuffer){
+charLineBuffer_t *forceReadCharLineUsart(){
 
   int i = 0;
   char c;
-  char *buffer = charLineBuffer->buf;
+  char *buffer = charLineBuffer.buf;
 
   while((c = get_char()) != '\n'){
 
@@ -123,7 +124,9 @@ void forceReadCharLineUsart(charLineBuffer_t *charLineBuffer){
   }
 
   buffer[i] = c;//Write string termination chacter (\n)
-  charLineBuffer->terminatorcharposition = i;
+  charLineBuffer.terminatorcharposition = i;
+
+  return &charLineBuffer;
 }
 
 void uartRxTask(void *args __attribute__((unused))){

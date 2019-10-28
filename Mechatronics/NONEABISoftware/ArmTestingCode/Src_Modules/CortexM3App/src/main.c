@@ -249,7 +249,7 @@ static void communicationTask(void *args __attribute__((unused))) {
   int16_t encCounter = 0;
 
   char buffer[3];
-  charLineBuffer_t charLineBuffer;
+  charLineBuffer_t *charLineBuffer;
   
   sendToLCDQueue(turnOnMessage,2,0);
   
@@ -278,17 +278,15 @@ static void communicationTask(void *args __attribute__((unused))) {
 
 
     if(serialAvailable()){
-      forceReadCharLineUsart(&charLineBuffer);
+      charLineBuffer = forceReadCharLineUsart();
+      int i = 0;
+      char *bufferP = charLineBuffer->buf;
+      while(i < charLineBuffer->terminatorcharposition){
+	sprintf(buffer,"%c",bufferP[i]);
+	printString(buffer);
+	i++;
+      }
     }
-
-    int i = 0;
-    char *bufferP = charLineBuffer.buf;
-    while(i < charLineBuffer.terminatorcharposition){
-      sprintf(buffer,"%c",bufferP[i]);
-      printString(buffer);
-      i++;
-    }
-
 
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
