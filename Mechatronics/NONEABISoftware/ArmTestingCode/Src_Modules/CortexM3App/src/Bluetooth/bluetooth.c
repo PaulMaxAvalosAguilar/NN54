@@ -1,8 +1,10 @@
+#include <libopencm3/stm32/gpio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "bluetooth.h"
 #include "uart.h"
 #include "printf.h"
+#include "queueSending.h"
 
 //PRIVATE SERVICE CHARACTERISTIC UUID (no more than 1 in rn4020)
 const char private_service_UUID[] = "11223344556677889900AABBCCDDEEFF";
@@ -18,15 +20,6 @@ const char characteristic_UUID[] = "010203040506070809000A0B0C0D0FFF";
 //PRIVATE CHARACTERISTICS ALIAS
 #define CORRUPTION CHARACTERISTIC_0MATCH
 
-//PRIVATE HANDLES
-typedef struct{
-  uint8_t handleFound;
-  uint16_t handle;
-  uint8_t notificationEnabled;
-  uint8_t isNotifying;
-} characteristicStatus_t;
-
-
 typedef enum{
   CMD,
   CONNECTED,
@@ -36,16 +29,39 @@ typedef enum{
   AOKORERR
 }actions;
 
-characteristicStatus_t characteristicStatus;
+characteristicStatus_t  characteristicStatus;
 charLineBuffer_t *charLineBufferPtr;
+char printBuffer[100];
 
-typedef enum LCDMessage_t{
-			  turnOnMessage,
-			  connectedStatus
-}LCDMessage_t;
+//-------------- BLUETOOTH COMMANDS---------------
+//Only pair characters can be send (one byte in hex) with
+//writing characteristics functions other will be ignored
+void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...);
+void advertise(void);
+void unBond(void);
+void unBondAdvertise(void);
+void sendLS(void);
+void cleanPrivateService(void);
+void setFactoryReset(uint8_t arg);
+void setFeatures(uint32_t arg);
+void setSupportedServices(uint32_t arg);
+void setPrivateService(const char *arg);
+void setPrivateCharacteristic(const char *service,
+			      uint8_t properties,
+			      uint8_t dataSize,
+			      uint8_t securityFlag);
+void setName(char *string);//No >  6 bytes when using private serviceo
+void turnOffSubscription(void);
 
-extern void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
-			   uint32_t displayValue);
+
+//-------------- USART PARSING FUNCTIONS----------
+int parseWCLine(const char* line);
+int parseUUIDLine(const char* line);
+void unlockWaitingLineParsing(charLineBuffer_t *,
+			      int* waitingState, int *errorDetection);
+
+//-------------- RN4020 configuration
+void bluetoothConfig(int configuration);
 
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
 
@@ -79,12 +95,15 @@ void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
     charLineBufferPtr = forceReadCharLineUsart();
     genericLineParsing(charLineBufferPtr);
   }
-  
+
+
+
   //Send Command
   va_list args;
   va_start(args, format);
-  vprintf(format, args);
+  vsnprintf(printBuffer,100,format,args);
   va_end(args);
+  printString(printBuffer);
   //Send Command
 
   int waitingMax = 2;
@@ -181,6 +200,16 @@ void setName( char *string){
   runLockingCOMMAND(NULL,"SN,%s\n", string);
 }
 
+
+
+void turnOffSubscription(void){
+  uint16_t subscriptionHandle =
+    characteristicStatus.handle + 1;
+  runLockingCOMMAND(NULL
+		    ,"SHW,%04X,0000\n",
+		    subscriptionHandle);
+}
+
 void writeOneOneByteCharacteristic(uint8_t value0){
 
   runLockingCOMMAND(&characteristicStatus.isNotifying
@@ -221,14 +250,6 @@ void writeTenTwoBytesCharacteristic(uint16_t value0,
 		    value8,
 		    value9
 		    );
-}
-
-void turnOffSubscription(void){
-  uint16_t subscriptionHandle =
-    characteristicStatus.handle + 1;
-  runLockingCOMMAND(NULL
-		    ,"SHW,%04X,0000\n",
-		    subscriptionHandle);
 }
 
 int parseWCLine(const char* line){
@@ -362,7 +383,7 @@ void genericLineParsing(charLineBuffer_t *clb){
   }else if(strstr(stdLine, "CMD")!= NULL){
     bluetoothConfig(1);
     sendLS();
-    sendToLCDQueue(turnOnMessage,0,0);
+    //    sendToLCDQueue(turnOnMessage,0,0);
     advertise();
 	  
   }
@@ -373,13 +394,14 @@ void genericLineParsing(charLineBuffer_t *clb){
 }
 
 void bluetoothConfig(int configuration){
+
   if(configuration == 1){
 
     setFactoryReset(1);//Should go first
     cleanPrivateService();//Should go after Factory reset for services to show
     setFeatures(RN4020_FEATURE_PERIFERAL | RN4020_FEATURE_DO_NOT_SAVE_BONDING
 		| RN4020_FEATURE_SERVER_ONLY); //SERVER ONLY REDUCES OVERHEAD
-    setSupportedServices(RN4020_SERVICE_BATTERY | RN4020_SERVICE_USER_DEFINED );
+    setSupportedServices(RN4020_SERVICE_USER_DEFINED );
 
     //SET PRIVATE SERVICE (JUST ONE IN RN4020)
     setPrivateService(private_service_UUID);

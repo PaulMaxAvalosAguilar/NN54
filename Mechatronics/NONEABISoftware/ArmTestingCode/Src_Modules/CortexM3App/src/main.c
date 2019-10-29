@@ -13,37 +13,9 @@
 #include "lcd.h"
 #include "uart.h"
 #include "ring.h"
+#include "queueSending.h"
+#include "bluetooth.h"
 #include <string.h>
-
-QueueHandle_t communicationQueue;
-QueueHandle_t lcdQueue;
-
-//communicationTask -------------------------
-typedef enum DataSource_t{
-			  adcSender,
-			  encoderSender
-}DataSource_t;
-
-typedef struct commData_t{
-  DataSource_t eDataSource;
-  uint16_t uValue;
-} commData_t;
-//communicatioTask --------------------------
-
-//lcdTask -----------------------------------
-typedef enum LCDMessage_t{
-			  turnOnMessage,
-			  connectedStatus,
-			  batteryLevel,
-			  chargingStatus
-}LCDMessage_t;
-
-typedef struct lcdData_t{
-  LCDMessage_t messageType;
-  uint8_t position;
-  uint32_t displayValue;  
-}lcdData_t;
-//lcdTask -----------------------------------
 
 //encoderTask -------------------------------
 typedef struct encoderValues_t{
@@ -134,8 +106,12 @@ static void configurePeriphereals(void){
 
   //UART
   uart_configure();
-
   //UART
+
+  //Bluetooth
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_10_MHZ,
+		GPIO_CNF_OUTPUT_PUSHPULL, GPIO5);
+  //Bluetooth
 
   //ADC
   gpio_set_mode(GPIOA,
@@ -159,13 +135,7 @@ static void configurePeriphereals(void){
   //ADC
 
 
-  //Bluetooth
 
-  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_10_MHZ,
-		  GPIO_CNF_OUTPUT_PUSHPULL, GPIO5);
-  gpio_clear(GPIOB, GPIO5);
-
-  //Bluetooth
 
   //Encoder Sensors Powering up
   gpio_set_mode(GPIOA,
@@ -200,23 +170,6 @@ read_adc(uint8_t channel) {
 	return adc_read_regular(ADC1);
 }
 
-static void sendToCommunicationQueue(DataSource_t eDataSource, uint16_t uValue){
-  commData_t dataStruct;
-  dataStruct.eDataSource = eDataSource;
-  dataStruct.uValue = uValue;
-
-  xQueueSendToBack(communicationQueue, &dataStruct, 0);
-}
-
-void sendToLCDQueue(LCDMessage_t messageType, uint8_t position,
-		      uint32_t displayValue){
-  lcdData_t dataToSend;
-  dataToSend.messageType = messageType;
-  dataToSend.position = position;
-  dataToSend.displayValue = displayValue;
-
-  xQueueSendToBack(lcdQueue,&dataToSend,0);
-}
 
 static void lcdPutsBlinkFree(const char *g, int ypos){
   int i = 0;
@@ -245,40 +198,28 @@ static void communicationTask(void *args __attribute__((unused))) {
   BaseType_t xStatus;
   commData_t dataStruct;
 
-  uint16_t adc1Value = 0;      
-  int16_t encCounter = 0;
-
   char buffer[3];
   charLineBuffer_t *charLineBuffer;
-  
-  sendToLCDQueue(turnOnMessage,2,0);
+
+  printString("InitializingBluetooth\n");  
+  gpio_set(GPIOB, GPIO5);
+  sendToLCDQueue(turnOnMessage,0,0);
   
   for (;;) {
-    printString("Testing\n");
-
     xStatus = xQueueReceive(communicationQueue, &dataStruct,0);
     if(xStatus == pdPASS){
       if(dataStruct.eDataSource == adcSender){
-	adc1Value = dataStruct.uValue;
+	sendToLCDQueue(batteryLevel,1,dataStruct.uValue);
       }else if(dataStruct.eDataSource == encoderSender){
-	encCounter = dataStruct.uValue;
+
       }
     }        
 
-    /*
-    sprintf(buffer,"%d ", -encCounter);
-    lcd_gotoxy(0,2);
-    lcd_puts(buffer);
-
-    sprintf(buffer,"%u ", adc1Value);
-    lcd_gotoxy(0,4);
-    lcd_puts(buffer);    
-    */
-
-
-
     if(serialAvailable()){
       charLineBuffer = forceReadCharLineUsart();
+      genericLineParsing(charLineBuffer);
+
+
       int i = 0;
       char *bufferP = charLineBuffer->buf;
       while(i < charLineBuffer->terminatorcharposition){
@@ -286,6 +227,11 @@ static void communicationTask(void *args __attribute__((unused))) {
 	printString(buffer);
 	i++;
       }
+
+    }
+
+    if(characteristicStatus.handleFound){
+
     }
 
     vTaskDelay(pdMS_TO_TICKS(1000));
@@ -394,8 +340,6 @@ int main(void)
 {
   rcc_clock_setup_in_hse_8mhz_out_72mhz();// For "blue pill"
   configurePeriphereals();
-
-  
 
   ring_buffer_init(&encoder_ring, encoder_buffer, sizeof(encoder_buffer[0]),
 							 sizeof(encoder_buffer));

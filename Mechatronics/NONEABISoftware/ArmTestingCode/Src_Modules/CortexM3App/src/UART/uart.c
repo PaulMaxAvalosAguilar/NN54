@@ -6,6 +6,7 @@
 #include <libopencm3/stm32/dma.h>
 #include "uart.h"
 #include "ring.h"
+#include "printf.h"
 #include <string.h>
 #include "task.h"
 
@@ -132,12 +133,16 @@ charLineBuffer_t *forceReadCharLineUsart(){
 void uartRxTask(void *args __attribute__((unused))){
   
   int i = 0;
+  char bufferP[3];
+  char c = 0;
 
   for(;;){
     xSemaphoreTake(idleSmphr,portMAX_DELAY);
 
     while(receiveBuffer[i]){
-      ring_buffer_put(&usart_rx_ring,&receiveBuffer[i]);
+       c = receiveBuffer[i];
+      ring_buffer_put(&usart_rx_ring,&c);
+
       receiveBuffer[i] = 0;
       i = (i+1) % 256;
     }
