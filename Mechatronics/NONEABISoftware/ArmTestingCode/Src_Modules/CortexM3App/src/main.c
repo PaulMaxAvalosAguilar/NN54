@@ -201,15 +201,18 @@ static void communicationTask(void *args __attribute__((unused))) {
   char buffer[3];
   charLineBuffer_t *charLineBuffer;
 
-  printString("InitializingBluetooth\n");  
+  #ifndef BLUETOOTHUARTONLY
+  printString("InitializingBluetooth\n");  //Clear for bluetooth Config
+  #endif
+  
   gpio_set(GPIOB, GPIO5);
-  sendToLCDQueue(turnOnMessage,0,0);
+  sendToLCDQueue(turnOnMessage,0);
   
   for (;;) {
     xStatus = xQueueReceive(communicationQueue, &dataStruct,0);
     if(xStatus == pdPASS){
       if(dataStruct.eDataSource == adcSender){
-	sendToLCDQueue(batteryLevel,1,dataStruct.uValue);
+	sendToLCDQueue(batteryLevel,dataStruct.uValue);
       }else if(dataStruct.eDataSource == encoderSender){
 
       }
@@ -219,7 +222,8 @@ static void communicationTask(void *args __attribute__((unused))) {
       charLineBuffer = forceReadCharLineUsart();
       genericLineParsing(charLineBuffer);
 
-
+      /*
+      //Proves info is being received
       int i = 0;
       char *bufferP = charLineBuffer->buf;
       while(i < charLineBuffer->terminatorcharposition){
@@ -227,14 +231,14 @@ static void communicationTask(void *args __attribute__((unused))) {
 	printString(buffer);
 	i++;
       }
-
+      */
     }
 
     if(characteristicStatus.handleFound){
 
     }
 
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    //    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 
@@ -246,22 +250,25 @@ static void lcdTask(void *args __attribute__((unused))){
   for(;;){
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
     if(receivedData.messageType == turnOnMessage){
-      lcdPutsBlinkFree("SDT ENCODER",receivedData.position);
+      lcdPutsBlinkFree(" SDT ENCODER",0);
       
+    }else if(receivedData.messageType == bleConfig){
+      lcdPutsBlinkFree(" SDT ENCODER     BLE",0);
+
     }else if(receivedData.messageType == connectedStatus){
       lcdPutsBlinkFree(receivedData.displayValue?
 		       "Connected":"Disconnected",
-		       receivedData.position);
+		       2);
       
     }else if(receivedData.messageType == batteryLevel){
-      sprintf(buffer,"Battery: %lu", receivedData.displayValue);
-      lcdPutsBlinkFree(buffer,receivedData.position);
+      sprintf(buffer,"    Battery: %lu", receivedData.displayValue);
+      lcdPutsBlinkFree(buffer,7);
       
     }else if(receivedData.messageType == chargingStatus){
       lcdPutsBlinkFree(receivedData.displayValue?
 		       "Charging":
 		       "Not Charging",
-		       receivedData.position);
+		       4);
       
     }
   }

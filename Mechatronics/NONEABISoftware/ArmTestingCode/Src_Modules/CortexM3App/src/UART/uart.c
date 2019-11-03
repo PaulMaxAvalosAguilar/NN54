@@ -34,7 +34,8 @@ void uart_configure(){
 
   /* Setup GPIO pin GPIO_USART1_RE_RX on GPIO port B for receive. */
   gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT, GPIO7);
+		GPIO_CNF_INPUT_PULL_UPDOWN , GPIO7);
+  gpio_clear(GPIOB, GPIO7);
 
   /* Setup UART parameters. */
   usart_set_baudrate(USART1, 115200);
@@ -79,7 +80,10 @@ void uart_configure(){
 
   idleSmphr = xSemaphoreCreateBinary();
   USART_CR1(USART1) |= USART_CR1_IDLEIE;  //Enable USART1 Receive interrupt.
-  usart_enable(USART1);//Enable USART 
+
+  #ifndef BLUETOOTHUARTONLY
+  usart_enable(USART1);//Enable USART
+  #endif
 }
 
 
@@ -140,7 +144,7 @@ void uartRxTask(void *args __attribute__((unused))){
     xSemaphoreTake(idleSmphr,portMAX_DELAY);
 
     while(receiveBuffer[i]){
-       c = receiveBuffer[i];
+      char c = receiveBuffer[i];
       ring_buffer_put(&usart_rx_ring,&c);
 
       receiveBuffer[i] = 0;

@@ -39,7 +39,6 @@ char printBuffer[100];
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...);
 void advertise(void);
 void unBond(void);
-void unBondAdvertise(void);
 void sendLS(void);
 void cleanPrivateService(void);
 void setFactoryReset(uint8_t arg);
@@ -146,8 +145,8 @@ void unBond(){
   runLockingCOMMAND(NULL,"U\n");
 }
 
-void unBondAdvertise(void){
-  runLockingCOMMAND(NULL,"U\nA\n");
+void stopAdvertising(){
+ runLockingCOMMAND(NULL,"Y\n");
 }
 
 void sendLS(){
@@ -363,17 +362,18 @@ void genericLineParsing(charLineBuffer_t *clb){
   
   //INTERPRET
   if(strstr(stdLine, "Connection End") != NULL){
-    sendToLCDQueue(connectedStatus,1,0);
+    sendToLCDQueue(connectedStatus,0);
     characteristicStatus.isNotifying = 0;
 
     if(characteristicStatus.notificationEnabled){
       turnOffSubscription();
     }
-    
-    unBondAdvertise();
+
+    unBond();
+    advertise();
   
   }else if(strstr(stdLine,"Connected") != NULL){
-    sendToLCDQueue(connectedStatus,1,1);
+    sendToLCDQueue(connectedStatus,1);
   }else if(strstr(stdLine, "Bonded") != NULL){
       
   }else if(parseUUIDLine(stdLine)){
@@ -381,14 +381,15 @@ void genericLineParsing(charLineBuffer_t *clb){
   }else if(parseWCLine(stdLine)){
     
   }else if(strstr(stdLine, "CMD")!= NULL){
+    sendToLCDQueue(bleConfig,0);
     bluetoothConfig(1);
     sendLS();
-    //    sendToLCDQueue(turnOnMessage,0,0);
+    stopAdvertising();
     advertise();
+
 	  
   }
 
-  
   //Return to line as null terminator
   buffer[*terminator] = '\n';
 }
@@ -400,6 +401,7 @@ void bluetoothConfig(int configuration){
     setFactoryReset(1);//Should go first
     cleanPrivateService();//Should go after Factory reset for services to show
     setFeatures(RN4020_FEATURE_PERIFERAL | RN4020_FEATURE_DO_NOT_SAVE_BONDING
+		| RN4020_FEATURE_NO_DIRECT_ADVERTISE
 		| RN4020_FEATURE_SERVER_ONLY); //SERVER ONLY REDUCES OVERHEAD
     setSupportedServices(RN4020_SERVICE_USER_DEFINED );
 

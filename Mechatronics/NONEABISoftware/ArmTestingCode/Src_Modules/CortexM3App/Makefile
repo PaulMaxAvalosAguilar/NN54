@@ -1,10 +1,10 @@
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
 #---------------------------------------------------------------------------------
-BUILDDIR    := $(TOP_DIR)/$(BUILDDIRECTORY)/$(VERSION)
-TARGETDIR   := $(TOP_DIR)/$(TARGETDIRECTORY)/$(VERSION)
-LIBSDIR     := $(TOP_DIR)/$(LIBDIRECTORY)/$(VERSION)
-HEADERDIR   := $(TOP_DIR)/$(HEADERSDIRECTORY)
+BUILDDIR    := ../../$(BUILDDIRECTORY)/$(VERSION)
+TARGETDIR   := ../../$(TARGETDIRECTORY)/$(VERSION)
+LIBSDIR     := ../../$(LIBDIRECTORY)/$(VERSION)
+HEADERDIR   := ../../$(HEADERSDIRECTORY)
 
 CCSOURCES   := $(shell find $(SRCDIR) -type f -name *.$(CCEXT))
 CPPSOURCES  := $(shell find $(SRCDIR) -type f -name *.$(CPPEXT))

@@ -11,6 +11,7 @@ void uart_configure(void);
 void printString(const char myString[]);
 int serialAvailable(void);
 char get_char(void);
+void readDMA(void);
 charLineBuffer_t *forceReadCharLineUsart(void);
 void uartRxTask(void *args);
 
