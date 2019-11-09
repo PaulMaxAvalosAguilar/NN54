@@ -385,9 +385,7 @@ void genericLineParsing(charLineBuffer_t *clb){
     bluetoothConfig(1);
     sendLS();
     stopAdvertising();
-    advertise();
-
-	  
+    advertise();	  
   }
 
   //Return to line as null terminator

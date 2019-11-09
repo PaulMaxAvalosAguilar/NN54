@@ -144,11 +144,11 @@ void uartRxTask(void *args __attribute__((unused))){
     xSemaphoreTake(idleSmphr,portMAX_DELAY);
 
     while(receiveBuffer[i]){
-      char c = receiveBuffer[i];
+      c = receiveBuffer[i];
       ring_buffer_put(&usart_rx_ring,&c);
 
       receiveBuffer[i] = 0;
-      i = (i+1) % 256;
+      i = (i+1) % UART_RX_BUFFER_LEN;
     }
   }
 }
