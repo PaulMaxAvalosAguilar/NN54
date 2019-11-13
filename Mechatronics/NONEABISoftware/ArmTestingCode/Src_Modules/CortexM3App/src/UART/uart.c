@@ -43,6 +43,7 @@ void uart_configure(){
   usart_set_stopbits(USART1, USART_STOPBITS_1);
   usart_set_parity(USART1, USART_PARITY_NONE);
   usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
+  //  usart_set_flow_control(USART1,USART_FLOWCONTROL_RTS_CTS);
   usart_set_mode(USART1, USART_MODE_TX_RX);
   
 
