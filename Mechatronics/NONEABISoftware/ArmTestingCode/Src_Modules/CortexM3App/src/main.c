@@ -211,10 +211,10 @@ static void communicationTask(void *args __attribute__((unused))) {
   
   for (;;) {
 
-    xHandle = xQueueSelectFromSet(communicationQueueSet,portMAX_DELAY);
+    xHandle = xQueueSelectFromSet(communicationQueueSet,portMAX_DELAY);//Should go first
 
     if( xHandle == ( QueueSetMemberHandle_t ) communicationQueue){
-      xQueueReceive(communicationQueue, &dataStruct,0);
+      xQueueReceive(communicationQueue, &dataStruct,0);//Should go first
       
       if(dataStruct.eDataSource == adcSender){
 	sendToLCDQueue(batteryLevel,dataStruct.uValue);
@@ -223,7 +223,7 @@ static void communicationTask(void *args __attribute__((unused))) {
       }
       
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
-      xSemaphoreTake(communicationSemaphore,0);
+      xSemaphoreTake(communicationSemaphore,0);//Should go first
       while(serialAvailable()){
 	charLineBuffer = forceReadCharLineUsart();
 	genericLineParsing(charLineBuffer);

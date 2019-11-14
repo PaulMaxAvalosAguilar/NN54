@@ -142,7 +142,7 @@ void uartRxTask(void *args __attribute__((unused))){
   char c = 0;
 
   for(;;){
-    xSemaphoreTake(idleSmphr,portMAX_DELAY);
+    xSemaphoreTake(idleSmphr,portMAX_DELAY); //Should go first
 
     while(receiveBuffer[i]){
       c = receiveBuffer[i];
