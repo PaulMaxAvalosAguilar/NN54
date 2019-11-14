@@ -65,6 +65,7 @@
 #define configIDLE_SHOULD_YIELD		1
 #define configUSE_MUTEXES		0
 #define configCHECK_FOR_STACK_OVERFLOW	0
+#define configUSE_QUEUE_SETS            1
 
 
 /* Set the following definitions to 1 to include the API function, or zero

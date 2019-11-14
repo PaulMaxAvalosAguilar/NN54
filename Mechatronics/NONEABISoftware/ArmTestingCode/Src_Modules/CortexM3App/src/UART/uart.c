@@ -1,5 +1,3 @@
-#include "FreeRTOS.h"
-#include "semphr.h"
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/nvic.h>
@@ -20,6 +18,7 @@ char usart_rx_buffer[UART_RX_BUFFER_LEN];
 
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0}; //elements inialized to 0
 SemaphoreHandle_t idleSmphr;
+SemaphoreHandle_t communicationSemaphore;
 charLineBuffer_t charLineBuffer;
 
 void uart_configure(){			
@@ -80,6 +79,7 @@ void uart_configure(){
 
 
   idleSmphr = xSemaphoreCreateBinary();
+  communicationSemaphore = xSemaphoreCreateBinary();
   USART_CR1(USART1) |= USART_CR1_IDLEIE;  //Enable USART1 Receive interrupt.
 
   #ifndef BLUETOOTHUARTONLY
@@ -151,6 +151,8 @@ void uartRxTask(void *args __attribute__((unused))){
       receiveBuffer[i] = 0;
       i = (i+1) % UART_RX_BUFFER_LEN;
     }
+
+    xSemaphoreGive(communicationSemaphore);
   }
 }
 

@@ -195,11 +195,12 @@ static void lcdPutsBlinkFree(const char *g, int ypos){
 }
 
 static void communicationTask(void *args __attribute__((unused))) {
-  BaseType_t xStatus;
+
   commData_t dataStruct;
 
   char buffer[3];
   charLineBuffer_t *charLineBuffer;
+  QueueSetMemberHandle_t xHandle;
 
   #ifndef BLUETOOTHUARTONLY
   printString("InitializingBluetooth\n");  //Clear for bluetooth Config
@@ -209,29 +210,24 @@ static void communicationTask(void *args __attribute__((unused))) {
   sendToLCDQueue(turnOnMessage,0);
   
   for (;;) {
-    xStatus = xQueueReceive(communicationQueue, &dataStruct,0);
-    if(xStatus == pdPASS){
+
+    xHandle = xQueueSelectFromSet(communicationQueueSet,portMAX_DELAY);
+
+    if( xHandle == ( QueueSetMemberHandle_t ) communicationQueue){
+      xQueueReceive(communicationQueue, &dataStruct,0);
+      
       if(dataStruct.eDataSource == adcSender){
 	sendToLCDQueue(batteryLevel,dataStruct.uValue);
       }else if(dataStruct.eDataSource == encoderSender){
 
       }
-    }        
-
-    if(serialAvailable()){
-      charLineBuffer = forceReadCharLineUsart();
-      genericLineParsing(charLineBuffer);
-
-      /*
-      //Proves info is being received
-      int i = 0;
-      char *bufferP = charLineBuffer->buf;
-      while(i < charLineBuffer->terminatorcharposition){
-	sprintf(buffer,"%c",bufferP[i]);
-	printString(buffer);
-	i++;
+      
+    }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
+      xSemaphoreTake(communicationSemaphore,0);
+      while(serialAvailable()){
+	charLineBuffer = forceReadCharLineUsart();
+	genericLineParsing(charLineBuffer);
       }
-      */
     }
 
     if(characteristicStatus.handleFound){
@@ -350,9 +346,13 @@ int main(void)
 
   ring_buffer_init(&encoder_ring, encoder_buffer, sizeof(encoder_buffer[0]),
 							 sizeof(encoder_buffer));
-  communicationQueue =  xQueueCreate(20, sizeof(commData_t));
-  lcdQueue = xQueueCreate(20, sizeof(lcdData_t));
 
+  communicationQueue =  xQueueCreate(COMMUNICATION_QUEUE_SIZE, sizeof(commData_t));
+  lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
+
+  communicationQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
+  xQueueAddToSet( communicationQueue, communicationQueueSet);
+  xQueueAddToSet( communicationSemaphore, communicationQueueSet);
   
   xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
   xTaskCreate(lcdTask,"lcdTask",200, NULL, 1, NULL);
