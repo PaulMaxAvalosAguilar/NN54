@@ -32,7 +32,8 @@ typedef enum LCDMessage_t{
 			  bleConfig,
 			  connectedStatus,
 			  batteryLevel,
-			  chargingStatus
+			  chargingStatus,
+			  encoder
 }LCDMessage_t;
 
 typedef struct lcdData_t{

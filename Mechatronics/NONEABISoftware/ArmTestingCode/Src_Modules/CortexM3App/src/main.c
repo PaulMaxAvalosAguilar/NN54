@@ -219,7 +219,7 @@ static void communicationTask(void *args __attribute__((unused))) {
       if(dataStruct.eDataSource == adcSender){
 	sendToLCDQueue(batteryLevel,dataStruct.uValue);
       }else if(dataStruct.eDataSource == encoderSender){
-
+	sendToLCDQueue(encoder, dataStruct.uValue);
       }
       
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
@@ -266,6 +266,9 @@ static void lcdTask(void *args __attribute__((unused))){
 		       "Not Charging",
 		       4);
       
+    }else if(receivedData.messageType == encoder){
+      sprintf(buffer, "%ld", receivedData.displayValue);
+      lcdPutsBlinkFree(buffer,5);
     }
   }
 }
@@ -358,9 +361,8 @@ int main(void)
   xTaskCreate(lcdTask,"lcdTask",200, NULL, 1, NULL);
   xTaskCreate(adcTask,"adcTask",200,NULL,1,NULL);
   xTaskCreate(uartRxTask, "uartRxTask", 300,NULL, 2, NULL);
-  /*
-  xTaskCreate(encoderTask,"encoderTask",800,NULL,3,NULL);
-  */
+  xTaskCreate(encoderTask,"encoderTask",300,NULL,3,NULL);
+
   vTaskStartScheduler();
 
   for(;;);
