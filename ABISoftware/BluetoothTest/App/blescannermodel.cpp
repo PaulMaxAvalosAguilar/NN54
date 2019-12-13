@@ -50,7 +50,7 @@ BleScannerModel::BleScannerModel(QObject *parent):
     m_scannerState("Waiting scanning"),
     scanning(false)
 {
-    bleAgent->setLowEnergyDiscoveryTimeout(1500);
+    bleAgent->setLowEnergyDiscoveryTimeout(2500);
 
     connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &BleScannerModel::addDevice);
     connect(bleAgent, QOverload<QBluetoothDeviceDiscoveryAgent::Error>::of(&QBluetoothDeviceDiscoveryAgent::error),

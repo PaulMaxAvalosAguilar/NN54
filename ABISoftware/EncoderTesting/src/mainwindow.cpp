@@ -57,6 +57,8 @@
 #include <QLabel>
 #include <QMessageBox>
 
+#include <QDebug>
+
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -150,6 +152,7 @@ void MainWindow::readData()
 {
     while(m_serial->canReadLine()){
         QByteArray data = m_serial->readLine(256);
+        qDebug()<< data ;
         m_testConsole->parseLine(data);
     }
 }

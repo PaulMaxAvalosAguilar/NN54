@@ -9,10 +9,12 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     devicename(""),
     deviceaddress(""),
     computedValue(),
+    encService("11223344-5566-7788-9900-AABBCCDDEEFF"),
+    encCharacteristic("01020304-0506-0708-0900-0A0B0C0D0FFF"),
     controller(),
     foundBatteryService(false),
-    batteryService(),
-    battLevelCharacteristic(),
+    encoderService(),
+    encoderCharacteristic(),
     batteryDescriptor()
 {
 }
@@ -137,8 +139,8 @@ void ConnectionHandling::deviceDisconnected()
 
 void ConnectionHandling::addLowEnergyService(const QBluetoothUuid &uuid)
 {
-    if (uuid == QBluetoothUuid(QBluetoothUuid::BatteryService)) {
-        qDebug()<<"Battery service discovered.";
+    if (uuid == QBluetoothUuid(encService)) {
+        qDebug()<<"Encoder service discovered.";
         foundBatteryService = true;
     }
 }
@@ -151,23 +153,23 @@ void ConnectionHandling::errorReceived(QLowEnergyController::Error)
 void ConnectionHandling::serviceScanDone()
 {
     if(foundBatteryService == true){
-        batteryService.reset(
+        encoderService.reset(
                     controller->createServiceObject(
-                        QBluetoothUuid(QBluetoothUuid::BatteryService)));
+                        QBluetoothUuid(encService)));
     }
 
     //Checking whether service creation was successful or not
-    if(batteryService.get() != nullptr){
-        connect(batteryService.get(), &QLowEnergyService::stateChanged,
+    if(encoderService.get() != nullptr){
+        connect(encoderService.get(), &QLowEnergyService::stateChanged,
                 this, &ConnectionHandling::serviceStateChanged);
-        connect(batteryService.get(), &QLowEnergyService::characteristicChanged,
+        connect(encoderService.get(), &QLowEnergyService::characteristicChanged,
                 this, &ConnectionHandling::updateHeartRateValue);
-        connect(batteryService.get(), &QLowEnergyService::descriptorWritten,
+        connect(encoderService.get(), &QLowEnergyService::descriptorWritten,
                 this, &ConnectionHandling::confirmedDescriptorWritten);
-        batteryService->discoverDetails();
-        qDebug()<<"Battery service created.";
+        qDebug()<<"Encoder service created.";
+        encoderService->discoverDetails();
     }else{
-        qDebug()<<"Battery service not created.";
+        qDebug()<<"Encoder service not created.";
     }
 }
 
@@ -180,17 +182,17 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
     case QLowEnergyService::ServiceDiscovered:
     {
 
-        battLevelCharacteristic = batteryService->characteristic(QBluetoothUuid(QBluetoothUuid::BatteryLevel));
-        if (!battLevelCharacteristic.isValid()) {
-            qDebug()<<"No battery level characteristic";
+        encoderCharacteristic = encoderService->characteristic(QBluetoothUuid(encCharacteristic));
+        if (!encoderCharacteristic.isValid()) {
+            qDebug()<<"Encoder characteristic not created";
             break;
         }
 
         batteryDescriptor =
-                battLevelCharacteristic.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
-        if (battLevelCharacteristic.isValid())
+                encoderCharacteristic.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
+        if (encoderCharacteristic.isValid())
             qDebug()<<"Activating notifications";
-            batteryService->writeDescriptor(batteryDescriptor, QByteArray::fromHex("0100"));
+            encoderService->writeDescriptor(batteryDescriptor, QByteArray::fromHex("0100"));
 
         break;
     }
@@ -203,11 +205,12 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
 void ConnectionHandling::updateHeartRateValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
     qDebug()<< "ValueChanged";
-    if (c.uuid() == battLevelCharacteristic.uuid()){
+    if (c.uuid() == encoderCharacteristic.uuid()){
 
         QString hexValue = value.toHex();
+        qDebug()<<hexValue.toInt(nullptr,16);
 
-        qDebug()<<hexValue.toUInt(nullptr,16);
+        encoderService->writeCharacteristic(encoderCharacteristic,"FF");
 
     }
 }

@@ -39,6 +39,7 @@ char printBuffer[100];
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...);
 void advertise(void);
 void unBond(void);
+void stopAdvertising(void);
 void sendLS(void);
 void cleanPrivateService(void);
 void setFactoryReset(uint8_t arg);
@@ -408,7 +409,8 @@ void bluetoothConfig(int configuration){
 
     //CONFIGURE ENCODER
     setPrivateCharacteristic(characteristic_UUID,
-			     RN4020_PRIVATE_CHARACTERISTIC_PROPERTY_NOTIFY,
+			     RN4020_PRIVATE_CHARACTERISTIC_PROPERTY_NOTIFY |
+			     RN4020_PRIVATE_CHARACTERISTIC_PROPERTY_WRITE,
 			     20,
 			     RN4020_PRIVATE_CHARACTERISTIC_SECURITY_NONE 
 			     );

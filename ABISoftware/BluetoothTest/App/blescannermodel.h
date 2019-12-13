@@ -60,9 +60,12 @@ private:
      bool isIndexValid(const QModelIndex& index) const;
 
 private:
+
+    //QML properties related
+
     QBluetoothDeviceDiscoveryAgent *bleAgent;
     std::unique_ptr<std::vector<std::unique_ptr<DeviceInfo>>> devicesInfo;
-    std::unique_ptr<ConnectionHandling> connHandling;
+    std::unique_ptr<ConnectionHandling> connHandling;//Qml Propertie
     QString m_scannerState;
     bool scanning;
 };

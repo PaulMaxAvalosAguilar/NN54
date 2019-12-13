@@ -22,7 +22,7 @@ typedef enum DataSource_t{
 
 typedef struct commData_t{
   DataSource_t eDataSource;
-  uint16_t uValue;
+  int16_t uValue;
 } commData_t;
 //communicatioTask --------------------------
 

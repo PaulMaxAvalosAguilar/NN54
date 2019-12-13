@@ -88,10 +88,12 @@ private:
     QString deviceaddress;
     QPoint computedValue;
     //QML Properties related*
+    QString encService;
+    QString encCharacteristic;
     std::unique_ptr<QLowEnergyController> controller;
     bool foundBatteryService;
-    std::unique_ptr<QLowEnergyService> batteryService;
-    QLowEnergyCharacteristic battLevelCharacteristic;
+    std::unique_ptr<QLowEnergyService> encoderService;
+    QLowEnergyCharacteristic encoderCharacteristic;
     QLowEnergyDescriptor batteryDescriptor;
 };
 

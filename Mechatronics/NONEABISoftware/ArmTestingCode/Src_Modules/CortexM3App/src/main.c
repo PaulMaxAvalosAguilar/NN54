@@ -220,6 +220,11 @@ static void communicationTask(void *args __attribute__((unused))) {
 	sendToLCDQueue(batteryLevel,dataStruct.uValue);
       }else if(dataStruct.eDataSource == encoderSender){
 	sendToLCDQueue(encoder, dataStruct.uValue);
+	writeOneOneByteCharacteristic(dataStruct.uValue);
+      }
+
+      if(characteristicStatus.handleFound){
+
       }
       
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
@@ -230,11 +235,7 @@ static void communicationTask(void *args __attribute__((unused))) {
       }
     }
 
-    if(characteristicStatus.handleFound){
 
-    }
-
-    //    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 
@@ -253,7 +254,7 @@ static void lcdTask(void *args __attribute__((unused))){
 
     }else if(receivedData.messageType == connectedStatus){
       lcdPutsBlinkFree(receivedData.displayValue?
-		       "Connected":"Disconnected",
+		       "Connected":"         ",
 		       2);
       
     }else if(receivedData.messageType == batteryLevel){
