@@ -26,7 +26,7 @@ include Makefile.config
 $(TARGETDIR)/$(TARGET): $(CCOBJECTS) $(CPPOBJECTS)  $(STATLIBS) $(DYNLIBS)
 	@mkdir -p $(dir $@)
 	$(LD) -o $@ $(CCOBJECTS) $(CPPOBJECTS) $(LDFLAGS)
-	$(SIZE) $(TARGETDIR)/$(TARGET)
+
 
 -include $(CCDEPENDS)
 -include $(CPPDEPENDS)
