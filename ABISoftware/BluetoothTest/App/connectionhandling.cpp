@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QLowEnergyController>
 
+enum messageType{Start=1, Stop=2, ADC=3};
+
 ConnectionHandling::ConnectionHandling(QObject *parent):
     QObject(parent),
     connected(false),
@@ -210,8 +212,14 @@ void ConnectionHandling::updateHeartRateValue(const QLowEnergyCharacteristic &c,
         QString hexValue = value.toHex();
         qDebug()<<hexValue.toInt(nullptr,16);
 
-        encoderService->writeCharacteristic(encoderCharacteristic,"FF");
+/*
+        char c = Start;
 
+        QByteArray a;
+        a.append(c);
+
+        encoderService->writeCharacteristic(encoderCharacteristic, a);
+*/
     }
 }
 

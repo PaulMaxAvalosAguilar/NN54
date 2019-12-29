@@ -3,37 +3,97 @@ import QtQuick.Window 2.2
 import QtQuick.Controls 2.2
 import QtCharts 2.0
 
-Window {
+ApplicationWindow {
     id:window
     visible: true
-    width: Screen.desktopAvailableWidth
-    height: Screen.desktopAvailableHeight
+    visibility: Qt.WindowFullScreen
     title: "Encoder App"
 
-    property int footerHeight: footer.height
+    property var currentView: homePageView
 
-    StackView {
-        id: stack
-
+    Rectangle{
+        id: headerRectangle
+        height: headerLabel.height
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: footer.top
-        anchors.top: parent.top
-        initialItem: HomePage{
+        color: "#dd248d"
+        border.color: "#256fdd"
 
+        ToolButton{
+            id: backImgbutton
+            height: parent.height
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.top: parent.top
+            width: window.width * .05
+            Image{
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+                source: "qrc:/Images/flecha-hacia-la-izquierda.svg"
+            }
+
+            onClicked: {
+                headerLabel.text = "Encoder App"
+                changeView(homePageView)
+            }
+        }
+
+        ToolButton{
+            id: drawImgbutton
+            anchors.left: backImgbutton.right
+            anchors.verticalCenter: parent.verticalCenter
+            height: parent.height
+            width: window.width * .05
+            Image{
+                height: parent.height
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+                source: "qrc:/Images/baseline-menu-24px.svg"
+            }
+
+            onClicked: drawer.open()
+        }
+
+        Label{
+            id: headerLabel
+            text:"Encoder App"
+            anchors.left: parent.left
+            anchors.right: parent.right
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize:  30
         }
     }
 
     Rectangle{
-        id: footer
+        anchors.top: headerRectangle.bottom
+        anchors.bottom: footerRectangle.top
+        width: window.width
 
+        HomePage{
+            id:homePageView
+            visible: true
+        }
+
+        BleScanner{
+            id:bleScannerView
+            visible: false
+        }
+
+        Encoder{
+            id: encoderView
+            visible: false
+        }
+    }
+
+    Rectangle{
+        id: footerRectangle
         color: "#00ff1b"
-        height: applicationFooterText.height
+        height: footerLabel.height
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         Label{
-            id: applicationFooterText
+            id: footerLabel
             font.pointSize: 13
             anchors.left: parent.left
             anchors.right: parent.right
@@ -45,7 +105,7 @@ Window {
     Drawer {
         id: drawer
         width: 0.5 * window.width
-        height: window.height - footer.height
+        height: window.height - footerRectangle.height
 
         Rectangle{
             id: openAppRect
@@ -79,24 +139,24 @@ Window {
                 highlighted: ListView.isCurrentItem
                 onClicked: {
                     drawer.close()
-                    open(model.text)
+                    headerLabel.text = model.text
+                    changeView(model.identification)
                 }
             }
 
             model: ListModel {
-                ListElement {
-                    text: "Ble-Scanner"
-                }
-
-                ListElement {
-                    text: "Chart-Viewer"
+                Component.onCompleted: {
+                    append({text: "BLE Scanner", identification: bleScannerView});
+                    append({text: "Encoder", identification: encoderView})
                 }
             }
         }
     }
 
-    function open(name){
-        stack.push("qrc:/" + name + ".qml")
+    function changeView(newView){
+        currentView.visible = false
+        newView.visible = true
+        currentView = newView
     }
 }
 

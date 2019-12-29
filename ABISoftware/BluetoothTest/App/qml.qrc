@@ -1,10 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>Ble-Scanner.qml</file>
+        <file>BleScanner.qml</file>
         <file>HomePage.qml</file>
         <file>Images/baseline-menu-24px.svg</file>
-        <file>Images/back.svg</file>
-        <file>Chart-Viewer.qml</file>
+        <file>ChartViewer.qml</file>
+        <file>Images/flecha-hacia-la-izquierda.svg</file>
+        <file>Encoder.qml</file>
     </qresource>
 </RCC>
