@@ -1,3 +1,5 @@
+#include "FreeRTOS.h"
+#include "semphr.h"
 #include <libopencm3/stm32/gpio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,6 +31,7 @@ typedef enum{
   AOKORERR
 }actions;
 
+uint8_t bluetoothConnected;
 characteristicStatus_t  characteristicStatus;
 charLineBuffer_t *charLineBufferPtr;
 char printBuffer[100];
@@ -55,6 +58,7 @@ void turnOffSubscription(void);
 
 
 //-------------- USART PARSING FUNCTIONS----------
+int parseWVLine(const char* line);
 int parseWCLine(const char* line);
 int parseUUIDLine(const char* line);
 void unlockWaitingLineParsing(charLineBuffer_t *,
@@ -252,6 +256,41 @@ void writeTenTwoBytesCharacteristic(uint16_t value0,
 		    );
 }
 
+void setBLEConnected(uint8_t boolean){
+  taskENTER_CRITICAL();
+  bluetoothConnected = boolean;
+  taskEXIT_CRITICAL();
+}
+
+uint8_t getBLEConnected(){
+  uint8_t bleConnectionStatus;
+  
+  taskENTER_CRITICAL();
+  bleConnectionStatus = bluetoothConnected;
+  taskEXIT_CRITICAL();
+
+  return bleConnectionStatus;
+}
+
+int parseWVLine(const char* line){
+  if(strncmp(line,"WV,",3) != 0){
+    return 0;
+  }
+
+  char cmessageType[3];
+  strncpy(cmessageType, line+8,2);
+  cmessageType[2] = '\n';
+
+  uint8_t messageType = strtol(cmessageType, NULL, 16);
+  
+
+  if(messageType == 3){
+    sendToLCDQueue(encoder,3000);
+  }
+
+  return 1;
+}
+
 int parseWCLine(const char* line){
 
   //Check if received line contains a WC message
@@ -364,6 +403,10 @@ void genericLineParsing(charLineBuffer_t *clb){
   //INTERPRET
   if(strstr(stdLine, "Connection End") != NULL){
     sendToLCDQueue(connectedStatus,0);
+
+    setBLEConnected(0);
+    xSemaphoreGive(adcSemaphore);
+    
     characteristicStatus.isNotifying = 0;
 
     if(characteristicStatus.notificationEnabled){
@@ -375,8 +418,11 @@ void genericLineParsing(charLineBuffer_t *clb){
   
   }else if(strstr(stdLine,"Connected") != NULL){
     sendToLCDQueue(connectedStatus,1);
+    setBLEConnected(1);
   }else if(strstr(stdLine, "Bonded") != NULL){
       
+  }else if(parseWVLine(stdLine)){
+
   }else if(parseUUIDLine(stdLine)){
     
   }else if(parseWCLine(stdLine)){

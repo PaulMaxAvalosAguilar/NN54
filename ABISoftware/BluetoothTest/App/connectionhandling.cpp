@@ -123,6 +123,17 @@ void ConnectionHandling::disconnect()
     controller->disconnectFromDevice();
 }
 
+void ConnectionHandling::startEncoder()
+{
+    if(connected){
+        char c = ADC;
+
+        QByteArray a;
+        a.append(c);
+        encoderService->writeCharacteristic(encoderCharacteristic, a);
+    }
+}
+
 void ConnectionHandling::deviceConnected()
 {
     qDebug()<<"Device is connected";
@@ -165,7 +176,7 @@ void ConnectionHandling::serviceScanDone()
         connect(encoderService.get(), &QLowEnergyService::stateChanged,
                 this, &ConnectionHandling::serviceStateChanged);
         connect(encoderService.get(), &QLowEnergyService::characteristicChanged,
-                this, &ConnectionHandling::updateHeartRateValue);
+                this, &ConnectionHandling::updateEncoderValue);
         connect(encoderService.get(), &QLowEnergyService::descriptorWritten,
                 this, &ConnectionHandling::confirmedDescriptorWritten);
         qDebug()<<"Encoder service created.";
@@ -204,7 +215,7 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
     }
 }
 
-void ConnectionHandling::updateHeartRateValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
+void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
     qDebug()<< "ValueChanged";
     if (c.uuid() == encoderCharacteristic.uuid()){
@@ -212,14 +223,6 @@ void ConnectionHandling::updateHeartRateValue(const QLowEnergyCharacteristic &c,
         QString hexValue = value.toHex();
         qDebug()<<hexValue.toInt(nullptr,16);
 
-/*
-        char c = Start;
-
-        QByteArray a;
-        a.append(c);
-
-        encoderService->writeCharacteristic(encoderCharacteristic, a);
-*/
     }
 }
 

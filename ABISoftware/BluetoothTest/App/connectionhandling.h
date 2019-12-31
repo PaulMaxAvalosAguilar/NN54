@@ -62,6 +62,7 @@ signals:
 
 public slots:
     void disconnect();
+    void startEncoder();
 
 private slots:
 
@@ -74,7 +75,7 @@ private slots:
 
     //QLowEnergyService related
     void serviceStateChanged(QLowEnergyService::ServiceState s);
-    void updateHeartRateValue(const QLowEnergyCharacteristic &c,
+    void updateEncoderValue(const QLowEnergyCharacteristic &c,
                               const QByteArray &value);
     void confirmedDescriptorWritten(const QLowEnergyDescriptor &d,
                                   const QByteArray &value);

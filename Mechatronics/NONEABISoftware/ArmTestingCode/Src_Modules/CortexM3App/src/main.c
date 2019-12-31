@@ -282,6 +282,14 @@ static void adcTask(void *args __attribute__((unused))) {
   adc_start_conversion_direct(ADC1);
   
   for(;;){
+
+
+    if(getBLEConnected()){
+      xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
+    }else{
+      vTaskDelay(pdMS_TO_TICKS(2000));
+    }
+    
     //1.20 - 4095             INVERSE RULE OF 3
     //V+   - ADC_CHANNEL_VREF
     
@@ -293,7 +301,7 @@ static void adcTask(void *args __attribute__((unused))) {
 
     sendToCommunicationQueue(adcSender,adc1Voltage);
     
-    vTaskDelay(pdMS_TO_TICKS(2000));
+
   }
 }
 
@@ -353,6 +361,8 @@ int main(void)
 
   communicationQueue =  xQueueCreate(COMMUNICATION_QUEUE_SIZE, sizeof(commData_t));
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
+
+  adcSemaphore = xSemaphoreCreateBinary();
 
   communicationQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
   xQueueAddToSet( communicationQueue, communicationQueueSet);

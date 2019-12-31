@@ -15,11 +15,19 @@ Page{
 
         Rectangle{
             id: firstRect
-            color: "#ff00ff"
             height: scrollingArea.height
             width: scrollingArea.width
 
-
+            RoundButton{
+                anchors.centerIn: parent
+                height: window.height/8
+                width: height
+                text: "Start"
+                font.pointSize: window.height/60
+                onClicked: {
+                    connhandling.startEncoder()
+                }
+            }
         }
     }
 }
