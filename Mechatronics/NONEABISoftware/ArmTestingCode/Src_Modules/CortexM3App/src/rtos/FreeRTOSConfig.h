@@ -50,12 +50,12 @@
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
-
+#define configUSE_TICKLESS_IDLE         1
 #define configUSE_IDLE_HOOK		0
 #define configUSE_TICK_HOOK		0
 #define configCPU_CLOCK_HZ		( ( unsigned long ) 72000000 )	
 #define configSYSTICK_CLOCK_HZ		( configCPU_CLOCK_HZ / 8 ) /* vTaskDelay() fix */
-#define configTICK_RATE_HZ		( ( TickType_t ) 250 )
+#define configTICK_RATE_HZ		( 250 )
 #define configMAX_PRIORITIES		( 5 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( 10 * 1024 ) )
@@ -67,6 +67,8 @@
 #define configCHECK_FOR_STACK_OVERFLOW	0
 #define configUSE_QUEUE_SETS            1
 
+
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP  (3000 * configTICK_RATE_HZ)/1000
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
@@ -93,4 +95,8 @@ configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
 
+void myConfigPRE_SLEEP_PROCESSING(void);
+#define configPRE_SLEEP_PROCESSING(x); myConfigPRE_SLEEP_PROCESSING() 
+
 #endif /* FREERTOS_CONFIG_H */
+

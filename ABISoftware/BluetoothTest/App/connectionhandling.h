@@ -7,6 +7,7 @@
 #include <QLowEnergyService>
 #include <QLowEnergyCharacteristic>
 #include <QLowEnergyDescriptor>
+#include <QTimer>
 #include <memory>
 #include <string>
 #include <QPoint>
@@ -62,7 +63,7 @@ signals:
 
 public slots:
     void disconnect();
-    void startEncoder();
+    void sendADC();
 
 private slots:
 
@@ -89,6 +90,7 @@ private:
     QString deviceaddress;
     QPoint computedValue;
     //QML Properties related*
+
     QString encService;
     QString encCharacteristic;
     std::unique_ptr<QLowEnergyController> controller;
@@ -96,6 +98,10 @@ private:
     std::unique_ptr<QLowEnergyService> encoderService;
     QLowEnergyCharacteristic encoderCharacteristic;
     QLowEnergyDescriptor batteryDescriptor;
+
+    //Timer Related
+    std::unique_ptr<QTimer> timer;
+    //Timer Related
 };
 
 #endif // CONNECTIONHANDLING_H

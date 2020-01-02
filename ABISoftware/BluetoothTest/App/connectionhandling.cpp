@@ -17,8 +17,10 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     foundBatteryService(false),
     encoderService(),
     encoderCharacteristic(),
-    batteryDescriptor()
+    batteryDescriptor(),
+    timer(new QTimer)
 {
+    connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
 }
 
 ConnectionHandling::~ConnectionHandling()
@@ -123,7 +125,7 @@ void ConnectionHandling::disconnect()
     controller->disconnectFromDevice();
 }
 
-void ConnectionHandling::startEncoder()
+void ConnectionHandling::sendADC()
 {
     if(connected){
         char c = ADC;
@@ -147,6 +149,7 @@ void ConnectionHandling::deviceDisconnected()
     qDebug()<<"Device is disconnected";
     setConnecting(false);
     setConnected(false);    
+    timer->stop();
     emit controllerDisconnected();
 }
 
@@ -203,9 +206,11 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
 
         batteryDescriptor =
                 encoderCharacteristic.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
-        if (encoderCharacteristic.isValid())
+        if (batteryDescriptor.isValid()){
             qDebug()<<"Activating notifications";
             encoderService->writeDescriptor(batteryDescriptor, QByteArray::fromHex("0100"));
+            timer->start(10000);
+        }
 
         break;
     }

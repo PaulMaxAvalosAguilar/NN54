@@ -69,11 +69,11 @@ static void configurePeriphereals(void){
   TIM1_CCER |= (TIM_CCER_CC4P);//Falling Edge
   TIM1_CCER |= (TIM_CCER_CC4E);//Enable capture on CaptureChannel 4
 
-  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC3IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
+  //  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
+  //  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
+  //  timer_enable_irq(TIM1, TIM_DIER_CC3IE);//Interrupts
+  //  timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
+  //  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
   
   TIM1_PSC = 72;
   TIM1_CR1 |= TIM_CR1_CEN;  
@@ -135,8 +135,6 @@ static void configurePeriphereals(void){
   //ADC
 
 
-
-
   //Encoder Sensors Powering up
   gpio_set_mode(GPIOA,
 		GPIO_MODE_OUTPUT_10_MHZ,
@@ -150,8 +148,8 @@ static void configurePeriphereals(void){
 		     AFIO_MAPR_TIM2_REMAP_PARTIAL_REMAP1 |
 		     AFIO_MAPR_USART1_REMAP  ); //USART PB6 + PB7
   
-  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
-  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
+  //  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
+  //  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
@@ -350,6 +348,10 @@ void tim1_up_isr(){
   overflowCounter++;  
 }
 
+void myConfigPRE_SLEEP_PROCESSING(){
+  lcdPutsBlinkFree("SLEEP", 4);
+}
+
 
 int main(void)
 {
@@ -369,10 +371,10 @@ int main(void)
   xQueueAddToSet( communicationSemaphore, communicationQueueSet);
   
   xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
-  xTaskCreate(lcdTask,"lcdTask",200, NULL, 1, NULL);
-  xTaskCreate(adcTask,"adcTask",200,NULL,1,NULL);
-  xTaskCreate(uartRxTask, "uartRxTask", 300,NULL, 2, NULL);
-  xTaskCreate(encoderTask,"encoderTask",300,NULL,3,NULL);
+  xTaskCreate(lcdTask,"lcdTask",200, NULL, 2, NULL);
+  xTaskCreate(adcTask,"adcTask",200,NULL,2,NULL);
+  xTaskCreate(uartRxTask, "uartRxTask", 300,NULL, 3, NULL);
+  //  xTaskCreate(encoderTask,"encoderTask",300,NULL,4,NULL);
 
   vTaskStartScheduler();
 

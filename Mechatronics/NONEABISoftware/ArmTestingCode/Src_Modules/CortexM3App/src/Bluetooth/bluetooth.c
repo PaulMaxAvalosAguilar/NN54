@@ -285,7 +285,7 @@ int parseWVLine(const char* line){
   
 
   if(messageType == 3){
-    sendToLCDQueue(encoder,3000);
+    xSemaphoreGive(adcSemaphore);
   }
 
   return 1;
