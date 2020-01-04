@@ -18,14 +18,18 @@ Page{
             height: scrollingArea.height
             width: scrollingArea.width
 
+
             RoundButton{
+
+                property var started: 0
                 anchors.centerIn: parent
                 height: window.height/8
                 width: height
-                text: "Start"
+                text: started? "Stop": "Start"
                 font.pointSize: window.height/60
                 onClicked: {
-                    connhandling.startEncoder()
+                    started? connhandling.sendStop() : connhandling.sendStart()
+                    started? started = 0 : started = 1
                 }
             }
         }

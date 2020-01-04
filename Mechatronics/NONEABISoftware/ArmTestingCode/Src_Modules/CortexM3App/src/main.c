@@ -44,8 +44,6 @@ static void configurePeriphereals(void){
   rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM2 UART
   rcc_periph_clock_enable(RCC_GPIOC);	// I2C TIM2
   rcc_periph_clock_enable(RCC_I2C1);	// I2C
-  rcc_periph_clock_enable(RCC_TIM1);    // TIM1
-  rcc_periph_clock_enable(RCC_TIM2);    // TIM2
   rcc_periph_clock_enable(RCC_USART1);  // UART
   rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN); //ADC
   rcc_periph_clock_enable(RCC_DMA1);    // DMA
@@ -69,11 +67,11 @@ static void configurePeriphereals(void){
   TIM1_CCER |= (TIM_CCER_CC4P);//Falling Edge
   TIM1_CCER |= (TIM_CCER_CC4E);//Enable capture on CaptureChannel 4
 
-  //  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
-  //  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
-  //  timer_enable_irq(TIM1, TIM_DIER_CC3IE);//Interrupts
-  //  timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
-  //  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC3IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
   
   TIM1_PSC = 72;
   TIM1_CR1 |= TIM_CR1_CEN;  
@@ -148,8 +146,7 @@ static void configurePeriphereals(void){
 		     AFIO_MAPR_TIM2_REMAP_PARTIAL_REMAP1 |
 		     AFIO_MAPR_USART1_REMAP  ); //USART PB6 + PB7
   
-  //  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
-  //  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
+
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
@@ -313,13 +310,20 @@ static void encoderTask(void *args __attribute__((unused))){
   encoderValues_t receiveEncValues;
     
   for(;;){
+
+    if(getENCODERStarted()){
+
+    }else{
+      xSemaphoreTake(encoderSemaphore, portMAX_DELAY);
+    }
+    
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
       encCounter = receiveEncValues.encoderCounter;
       inputCapture = receiveEncValues.inputCapture;
 
       sendToCommunicationQueue(encoderSender, encCounter);
     }
-    vTaskDelay(pdMS_TO_TICKS(30));
+    vTaskDelay(pdMS_TO_TICKS(40));
   }
 }
 
@@ -352,6 +356,11 @@ void myConfigPRE_SLEEP_PROCESSING(){
   lcdPutsBlinkFree("SLEEP", 4);
 }
 
+void myConfigPOST_SLEEP_PROCESSING(){
+
+  //  if(nvic_get_pending_irq(NVIC_TIM1_CC_IRQ))
+    lcdPutsBlinkFree("----------------------------", 4);
+}
 
 int main(void)
 {
@@ -365,6 +374,7 @@ int main(void)
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
 
   adcSemaphore = xSemaphoreCreateBinary();
+  encoderSemaphore = xSemaphoreCreateBinary();
 
   communicationQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
   xQueueAddToSet( communicationQueue, communicationQueueSet);
@@ -374,7 +384,7 @@ int main(void)
   xTaskCreate(lcdTask,"lcdTask",200, NULL, 2, NULL);
   xTaskCreate(adcTask,"adcTask",200,NULL,2,NULL);
   xTaskCreate(uartRxTask, "uartRxTask", 300,NULL, 3, NULL);
-  //  xTaskCreate(encoderTask,"encoderTask",300,NULL,4,NULL);
+  xTaskCreate(encoderTask,"encoderTask",300,NULL,4,NULL);
 
   vTaskStartScheduler();
 

@@ -136,6 +136,28 @@ void ConnectionHandling::sendADC()
     }
 }
 
+void ConnectionHandling::sendStart()
+{
+    if(connected){
+        char c = Start;
+
+        QByteArray a;
+        a.append(c);
+        encoderService->writeCharacteristic(encoderCharacteristic, a);
+    }
+}
+
+void ConnectionHandling::sendStop()
+{
+    if(connected){
+        char c = Stop;
+
+        QByteArray a;
+        a.append(c);
+        encoderService->writeCharacteristic(encoderCharacteristic, a);
+    }
+}
+
 void ConnectionHandling::deviceConnected()
 {
     qDebug()<<"Device is connected";

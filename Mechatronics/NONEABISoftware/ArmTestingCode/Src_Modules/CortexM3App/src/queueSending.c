@@ -1,6 +1,7 @@
 #include "queueSending.h"
 
 SemaphoreHandle_t adcSemaphore;
+SemaphoreHandle_t encoderSemaphore;
 
 QueueHandle_t communicationQueue;
 QueueHandle_t lcdQueue;

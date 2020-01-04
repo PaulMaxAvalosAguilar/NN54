@@ -103,7 +103,8 @@ Page{
                     text: "Disconnect"
                     enabled: connhandling.connected
                     onClicked: {
-                        connhandling.disconnect()
+                        connhandling.disconnect()                        
+                        blescannermodel.clearList()
                     }
                 }
             }

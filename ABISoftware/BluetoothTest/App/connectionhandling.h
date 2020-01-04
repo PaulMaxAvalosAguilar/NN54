@@ -64,6 +64,8 @@ signals:
 public slots:
     void disconnect();
     void sendADC();
+    void sendStart();
+    void sendStop();
 
 private slots:
 

@@ -6,8 +6,6 @@
 #include "RN4020definitions.h"
 
 
-extern uint8_t bluetoothConnected;
-
 //PRIVATE HANDLES
 typedef struct{
   uint8_t handleFound;
@@ -30,6 +28,8 @@ void writeTenTwoBytesCharacteristic(uint16_t value0,
 				    uint16_t value9);
 void setBLEConnected(uint8_t boolean);
 uint8_t getBLEConnected(void);
+void setENCODERStarted(uint8_t boolean);
+uint8_t getENCODERStarted(void);
 
 
 //-------------- USART PARSING FUNCTIONS----------

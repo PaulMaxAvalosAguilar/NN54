@@ -1,6 +1,8 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
 #include <string.h>
 #include <stdlib.h>
 #include "bluetooth.h"
@@ -32,6 +34,7 @@ typedef enum{
 }actions;
 
 uint8_t bluetoothConnected;
+uint8_t encoderStarted;
 characteristicStatus_t  characteristicStatus;
 charLineBuffer_t *charLineBufferPtr;
 char printBuffer[100];
@@ -55,6 +58,8 @@ void setPrivateCharacteristic(const char *service,
 			      uint8_t securityFlag);
 void setName(char *string);//No >  6 bytes when using private serviceo
 void turnOffSubscription(void);
+void startTimers(void);
+void stopTimers(void);
 
 
 //-------------- USART PARSING FUNCTIONS----------
@@ -272,6 +277,35 @@ uint8_t getBLEConnected(){
   return bleConnectionStatus;
 }
 
+void setENCODERStarted(uint8_t boolean){
+  taskENTER_CRITICAL();
+  encoderStarted = boolean;
+  taskEXIT_CRITICAL();
+}
+
+uint8_t getENCODERStarted(void){
+  uint8_t encoderStartedStatus;
+  taskENTER_CRITICAL();
+  encoderStartedStatus = encoderStarted;
+  taskEXIT_CRITICAL();
+  return encoderStartedStatus;
+}
+
+void startTimers(){
+    setENCODERStarted(1);
+    rcc_periph_clock_enable(RCC_TIM1);    // TIM1
+    rcc_periph_clock_enable(RCC_TIM2);    // TIM2
+    nvic_enable_irq(NVIC_TIM1_CC_IRQ);
+    nvic_enable_irq(NVIC_TIM1_UP_IRQ);
+    xSemaphoreGive(encoderSemaphore);
+}
+
+void stopTimers(){
+    setENCODERStarted(0);
+    nvic_disable_irq(NVIC_TIM1_CC_IRQ);
+    nvic_disable_irq(NVIC_TIM1_UP_IRQ);
+}
+
 int parseWVLine(const char* line){
   if(strncmp(line,"WV,",3) != 0){
     return 0;
@@ -284,7 +318,11 @@ int parseWVLine(const char* line){
   uint8_t messageType = strtol(cmessageType, NULL, 16);
   
 
-  if(messageType == 3){
+  if(messageType == 1){
+    startTimers();
+  }else if(messageType ==2){
+    stopTimers();
+  }else if(messageType == 3){
     xSemaphoreGive(adcSemaphore);
   }
 
@@ -406,6 +444,8 @@ void genericLineParsing(charLineBuffer_t *clb){
 
     setBLEConnected(0);
     xSemaphoreGive(adcSemaphore);
+
+    stopTimers();
     
     characteristicStatus.isNotifying = 0;
 

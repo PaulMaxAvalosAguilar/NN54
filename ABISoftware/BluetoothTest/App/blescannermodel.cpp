@@ -151,6 +151,11 @@ void BleScannerModel::connectToDevice(int index)
                                   deviceinfo.getAddress());
 }
 
+void BleScannerModel::clearList()
+{
+    clear();
+}
+
 void BleScannerModel::addDevice(const QBluetoothDeviceInfo &info)
 {
     if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {

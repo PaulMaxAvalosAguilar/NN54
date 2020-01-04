@@ -12,6 +12,7 @@
 #define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + BINARY_SEMAPHORE_SIZE
 
 extern SemaphoreHandle_t adcSemaphore;
+extern SemaphoreHandle_t encoderSemaphore;
 
 extern QueueHandle_t communicationQueue;
 extern QueueHandle_t lcdQueue;
