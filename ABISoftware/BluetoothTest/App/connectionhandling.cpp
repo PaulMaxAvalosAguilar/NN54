@@ -2,8 +2,6 @@
 #include <QDebug>
 #include <QLowEnergyController>
 
-enum messageType{Start=1, Stop=2, ADC=3};
-
 ConnectionHandling::ConnectionHandling(QObject *parent):
     QObject(parent),
     connected(false),
@@ -128,33 +126,39 @@ void ConnectionHandling::disconnect()
 void ConnectionHandling::sendADC()
 {
     if(connected){
-        char c = ADC;
+        char a = 0;
+        char b = 3;
 
-        QByteArray a;
-        a.append(c);
-        encoderService->writeCharacteristic(encoderCharacteristic, a);
+        QByteArray c;
+        c.append(a);
+        c.append(b);
+        encoderService->writeCharacteristic(encoderCharacteristic, c);
     }
 }
 
 void ConnectionHandling::sendStart()
 {
     if(connected){
-        char c = Start;
+        char a = 0;
+        char b = 1;
 
-        QByteArray a;
-        a.append(c);
-        encoderService->writeCharacteristic(encoderCharacteristic, a);
+        QByteArray c;
+        c.append(a);
+        c.append(b);
+        encoderService->writeCharacteristic(encoderCharacteristic, c);
     }
 }
 
 void ConnectionHandling::sendStop()
 {
     if(connected){
-        char c = Stop;
+        char a = 0;
+        char b = 2;
 
-        QByteArray a;
-        a.append(c);
-        encoderService->writeCharacteristic(encoderCharacteristic, a);
+        QByteArray c;
+        c.append(a);
+        c.append(b);
+        encoderService->writeCharacteristic(encoderCharacteristic, c);
     }
 }
 
@@ -244,12 +248,26 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
 
 void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    qDebug()<< "ValueChanged";
+    static QString firstParsedValue;
+    static uint8_t firstValue;
+    static uint8_t firsValueByteSize = 1;
+
     if (c.uuid() == encoderCharacteristic.uuid()){
 
         QString hexValue = value.toHex();
-        qDebug()<<hexValue.toInt(nullptr,16);
+        auto stringIterator = hexValue.begin();
+        for(auto iterator = stringIterator; iterator < stringIterator + (firsValueByteSize*2);
+            iterator++){
+            firstParsedValue.append(*iterator);
+        }
 
+        firstValue = firstParsedValue.toInt(nullptr,16);
+
+        if(firstValue == 0){
+
+        }else{
+            qDebug()<<hexValue.toInt(nullptr,16);
+        }
     }
 }
 

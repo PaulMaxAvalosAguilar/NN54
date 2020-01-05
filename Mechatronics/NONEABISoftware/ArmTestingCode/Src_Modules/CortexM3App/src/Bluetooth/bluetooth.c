@@ -312,7 +312,7 @@ int parseWVLine(const char* line){
   }
 
   char cmessageType[3];
-  strncpy(cmessageType, line+8,2);
+  strncpy(cmessageType, line+10,2);
   cmessageType[2] = '\n';
 
   uint8_t messageType = strtol(cmessageType, NULL, 16);

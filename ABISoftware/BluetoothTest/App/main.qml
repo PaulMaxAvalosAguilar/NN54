@@ -10,6 +10,7 @@ ApplicationWindow {
     title: "Encoder App"
 
     property var currentView: homePageView
+    property var connectedState: bleScannerView.connected
 
     Rectangle{
         id: headerRectangle
@@ -41,6 +42,7 @@ ApplicationWindow {
         ToolButton{
             id: drawImgbutton
             anchors.left: backImgbutton.right
+            anchors.leftMargin: parent.width/60
             anchors.verticalCenter: parent.verticalCenter
             height: parent.height
             width: window.width * .05
