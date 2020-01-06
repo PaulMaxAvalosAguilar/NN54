@@ -70,7 +70,7 @@ Page{
                     border.color: "black"
                     Label{
                         id:delegateText
-                        text: blename +" "+bleaddress
+                        text: blename +" "+bleaddress + " " + blerssi
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.centerIn: parent

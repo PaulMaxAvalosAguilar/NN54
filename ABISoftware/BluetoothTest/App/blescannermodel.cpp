@@ -29,6 +29,20 @@ bool BleScannerModel::removeRows(const QModelIndex &index, int count, const QMod
     return true;
 }
 
+bool BleScannerModel::update(const QModelIndex &index, const qint16 &value)
+{
+    if (!isIndexValid(index)) {
+        return false;
+    }
+
+    DeviceInfo &device = *devicesInfo->at(index.row());
+    device.setRSSI(value);
+    emit dataChanged(index,index);
+    qDebug() <<"Updating";
+
+    return true;
+}
+
 void BleScannerModel::append(const DeviceInfo &device)
 {
     qDebug()<<"Calling appending";
@@ -53,6 +67,7 @@ BleScannerModel::BleScannerModel(QObject *parent):
     bleAgent->setLowEnergyDiscoveryTimeout(2500);
 
     connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &BleScannerModel::addDevice);
+    connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::deviceUpdated,this, &BleScannerModel::updateDevice);
     connect(bleAgent, QOverload<QBluetoothDeviceDiscoveryAgent::Error>::of(&QBluetoothDeviceDiscoveryAgent::error),
             this, &BleScannerModel::deviceScanError);
     connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::finished, this, &BleScannerModel::deviceScanFinished);
@@ -82,6 +97,8 @@ QVariant BleScannerModel::data(const QModelIndex &index, int role) const
         return deviceinfo.getName();
     case BleAdressRole:
         return deviceinfo.getAddress();
+    case BleRssiRole:
+        return deviceinfo.getRssi();
     }
 
     return QVariant();
@@ -92,20 +109,19 @@ QHash<int, QByteArray> BleScannerModel::roleNames() const
     QHash<int, QByteArray> roleNames;
     roleNames[Roles::BleNameRole] = "blename";
     roleNames[Roles::BleAdressRole] = "bleaddress";
-    roleNames[Roles::BleRssi] = "blerssi";
+    roleNames[Roles::BleRssiRole] = "blerssi";
     return roleNames;
 }
 
 bool BleScannerModel::isIndexValid(const QModelIndex &index) const
 {
     if (index.row() < 0
-                || index.row() >= rowCount()
-                || !index.isValid()) {
-            return false;
-        }
+            || index.row() >= rowCount()
+            || !index.isValid()) {
+        return false;
+    }
     return true;
 }
-
 
 QString BleScannerModel::scannerState() const
 {
@@ -145,10 +161,15 @@ void BleScannerModel::startDiscovery()
 
 void BleScannerModel::connectToDevice(int index)
 {
-    DeviceInfo &deviceinfo = *devicesInfo->at(index);    
-    connHandling->connectToDevice(deviceinfo.getDevice(),
-                                  deviceinfo.getName(),
-                                  deviceinfo.getAddress());
+
+    DeviceInfo &deviceinfo = *devicesInfo->at(index);
+    if(deviceinfo.getDevice().isValid()){
+        connHandling->connectToDevice(deviceinfo.getDevice(),
+                                      deviceinfo.getName(),
+                                      deviceinfo.getAddress());
+    }else{
+        qDebug()<< "invalid device";
+    }
 }
 
 void BleScannerModel::clearList()
@@ -162,6 +183,21 @@ void BleScannerModel::addDevice(const QBluetoothDeviceInfo &info)
         DeviceInfo d(info);
         append(d);
         qDebug()<< "Added device "<<d.getAddress();
+    }
+}
+
+void BleScannerModel::updateDevice(const QBluetoothDeviceInfo &info,
+                                   QBluetoothDeviceInfo::Fields updatedFields)
+{
+
+    if(updatedFields & QBluetoothDeviceInfo::Field::RSSI){
+
+        for(int i = 0; i < devicesInfo->size(); i++){
+            if((*devicesInfo->at(i)).getAddress() == info.address().toString()){
+                update(index(i, 0),info.rssi());
+                qDebug() << i << "Updating"<< info.address() << " " << info.rssi();
+            }
+        }
     }
 }
 

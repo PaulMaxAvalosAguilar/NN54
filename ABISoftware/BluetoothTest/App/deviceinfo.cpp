@@ -41,3 +41,13 @@ void DeviceInfo::setDevice(const QBluetoothDeviceInfo &dev)
 {
     device = QBluetoothDeviceInfo(dev);
 }
+
+void DeviceInfo::setRSSI(qint16 rssi)
+{
+    device.setRssi(rssi);
+}
+
+
+
+
+

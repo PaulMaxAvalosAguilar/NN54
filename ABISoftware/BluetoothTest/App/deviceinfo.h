@@ -3,7 +3,7 @@
 
 #include <qbluetoothdeviceinfo.h>
 #include <qbluetoothaddress.h>
-#include "deviceinfo.h"
+
 
 class DeviceInfo
 {
@@ -16,6 +16,7 @@ public:
     QString getRssi() const;
     QBluetoothDeviceInfo getDevice();
     void setDevice(const QBluetoothDeviceInfo &dev);
+    void setRSSI(qint16 rssi);
 
 private:
     QBluetoothDeviceInfo device;

@@ -15,8 +15,9 @@ class BleScannerModel : public QAbstractListModel
     Q_PROPERTY(QString scannerState READ scannerState WRITE setScannerState NOTIFY scannerStateChanged)
     Q_PROPERTY(bool scanning READ getScanning WRITE setScanning NOTIFY scanningChanged)
 
-    Q_INVOKABLE void create(const QModelIndex &index, const DeviceInfo &device);
-    Q_INVOKABLE bool removeRows(const QModelIndex &index, int count, const QModelIndex &parent);
+    void create(const QModelIndex &index, const DeviceInfo &device);
+    bool removeRows(const QModelIndex &index, int count, const QModelIndex &parent);
+    bool update(const QModelIndex& index, const qint16 &value);
 
     Q_INVOKABLE void append(const DeviceInfo &device);
     Q_INVOKABLE void clear();
@@ -25,7 +26,7 @@ public:
     enum Roles{
         BleNameRole = Qt::UserRole +1,
         BleAdressRole,
-        BleRssi,
+        BleRssiRole,
     };
 
     BleScannerModel(QObject *parent= 0);
@@ -54,11 +55,14 @@ public slots:
 private slots:
     // QBluetoothDeviceDiscoveryAgent related
     void addDevice(const QBluetoothDeviceInfo&);
+    void updateDevice(const QBluetoothDeviceInfo &info,
+                      QBluetoothDeviceInfo::Fields updatedFields);
     void deviceScanError(QBluetoothDeviceDiscoveryAgent::Error error);
     void deviceScanFinished();
 
 private:
      bool isIndexValid(const QModelIndex& index) const;
+
 
 private:
 
@@ -66,7 +70,7 @@ private:
 
     QBluetoothDeviceDiscoveryAgent *bleAgent;
     std::unique_ptr<std::vector<std::unique_ptr<DeviceInfo>>> devicesInfo;
-    std::unique_ptr<ConnectionHandling> connHandling;//Qml Propertie
+    std::unique_ptr<ConnectionHandling> connHandling;//Qml Property
     QString m_scannerState;
     bool scanning;
 };
