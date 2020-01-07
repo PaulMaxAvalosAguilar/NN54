@@ -4,17 +4,6 @@ import QtQuick.Layouts 1.1
 
 Page{
 
-    property var connected: connhandling.connected
-    property var scanning: blescannermodel.scanning
-    onConnectedChanged: {
-        blescannermodel.clearList()
-        connected? scannButton.enabled = false: scannButton.enabled = true
-    }
-
-    onScanningChanged: {
-        scanning? scannButton.enabled = false : scannButton.enabled = true
-    }
-
     ScrollView {
         id: scrollingArea
         anchors.fill: parent
@@ -79,6 +68,7 @@ Page{
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            blescannermodel.stopDiscovery()
                             blescannermodel.connectToDevice(index)
                         }
                     }                    
@@ -100,10 +90,9 @@ Page{
                 anchors.bottom: scannerLabel.top
                 Button{
                     id: scannButton
-                    text: "Scan!"
+                    text: blescannermodel.scanning? "Stop":"Start"
                     onClicked: {
-                        blescannermodel.scanning = true
-                        blescannermodel.startDiscovery()
+                        blescannermodel.scanning? blescannermodel.stopDiscovery() : blescannermodel.startDiscovery()
                     }
                 }
 

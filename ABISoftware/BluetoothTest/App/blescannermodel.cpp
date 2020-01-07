@@ -64,7 +64,7 @@ BleScannerModel::BleScannerModel(QObject *parent):
     m_scannerState("Waiting scanning"),
     scanning(false)
 {
-    bleAgent->setLowEnergyDiscoveryTimeout(2500);
+    bleAgent->setLowEnergyDiscoveryTimeout(0);
 
     connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &BleScannerModel::addDevice);
     connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::deviceUpdated,this, &BleScannerModel::updateDevice);
@@ -157,6 +157,18 @@ void BleScannerModel::startDiscovery()
     clear();
     setScannerState("Scann in progress");
     bleAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+    setScanning(true);
+}
+
+void BleScannerModel::stopDiscovery()
+{
+    qDebug()<<"Stopped discovery";
+    bleAgent->stop();
+
+    setScannerState("Done! Scan Again!");
+
+    qDebug()<<"Scann finished";
+    setScanning(false);
 }
 
 void BleScannerModel::connectToDevice(int index)
@@ -170,11 +182,6 @@ void BleScannerModel::connectToDevice(int index)
     }else{
         qDebug()<< "invalid device";
     }
-}
-
-void BleScannerModel::clearList()
-{
-    clear();
 }
 
 void BleScannerModel::addDevice(const QBluetoothDeviceInfo &info)
@@ -191,11 +198,9 @@ void BleScannerModel::updateDevice(const QBluetoothDeviceInfo &info,
 {
 
     if(updatedFields & QBluetoothDeviceInfo::Field::RSSI){
-
         for(int i = 0; i < devicesInfo->size(); i++){
             if((*devicesInfo->at(i)).getAddress() == info.address().toString()){
                 update(index(i, 0),info.rssi());
-                qDebug() << i << "Updating"<< info.address() << " " << info.rssi();
             }
         }
     }
@@ -218,13 +223,7 @@ void BleScannerModel::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error erro
 
 void BleScannerModel::deviceScanFinished()
 {
-    if (devicesInfo->empty())
-        setScannerState("No devices found...");
-    else
-        setScannerState("Done! Scan Again!");
 
-    qDebug()<<"Scann finished";
-    setScanning(false);
 }
 
 

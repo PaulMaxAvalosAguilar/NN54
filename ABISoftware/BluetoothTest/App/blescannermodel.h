@@ -49,8 +49,8 @@ signals:
 
 public slots:
     void startDiscovery();
+    void stopDiscovery();
     void connectToDevice(int index);
-    void clearList();
 
 private slots:
     // QBluetoothDeviceDiscoveryAgent related
