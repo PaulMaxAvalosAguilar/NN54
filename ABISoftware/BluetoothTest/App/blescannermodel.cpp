@@ -38,7 +38,6 @@ bool BleScannerModel::update(const QModelIndex &index, const qint16 &value)
     DeviceInfo &device = *devicesInfo->at(index.row());
     device.setRSSI(value);
     emit dataChanged(index,index);
-    qDebug() <<"Updating";
 
     return true;
 }
@@ -175,7 +174,8 @@ void BleScannerModel::connectToDevice(int index)
 {
 
     DeviceInfo &deviceinfo = *devicesInfo->at(index);
-    if(deviceinfo.getDevice().isValid()){
+    if(deviceinfo.getDevice().isValid() &&
+            !connHandling->getConnected()){
         connHandling->connectToDevice(deviceinfo.getDevice(),
                                       deviceinfo.getName(),
                                       deviceinfo.getAddress());
@@ -188,7 +188,9 @@ void BleScannerModel::addDevice(const QBluetoothDeviceInfo &info)
 {
     if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
         DeviceInfo d(info);
-        append(d);
+        if(d.getName() == "VBT"){
+            append(d);
+        }
         qDebug()<< "Added device "<<d.getAddress();
     }
 }

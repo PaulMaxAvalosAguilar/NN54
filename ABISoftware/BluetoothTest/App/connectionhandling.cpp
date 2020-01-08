@@ -252,6 +252,8 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
     static uint8_t firstValue;
     static uint8_t firsValueByteSize = 1;
 
+    qDebug()<< "Received value";
+
     if (c.uuid() == encoderCharacteristic.uuid()){
 
         QString hexValue = value.toHex();
@@ -262,11 +264,12 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
         }
 
         firstValue = firstParsedValue.toInt(nullptr,16);
+        qDebug()<< hexValue.toInt(nullptr,16);
 
         if(firstValue == 0){
 
         }else{
-            qDebug()<<hexValue.toInt(nullptr,16);
+            qDebug()<<firstValue;
         }
     }
 }

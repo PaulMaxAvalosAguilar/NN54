@@ -39,6 +39,8 @@ static volatile uint32_t overflowCounter=0 ;
 
 static void configurePeriphereals(void){
 
+
+
   rcc_periph_clock_enable(RCC_AFIO);    // I2C UART ADC
   rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 ADC
   rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM2 UART
@@ -47,52 +49,6 @@ static void configurePeriphereals(void){
   rcc_periph_clock_enable(RCC_USART1);  // UART
   rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN); //ADC
   rcc_periph_clock_enable(RCC_DMA1);    // DMA
-
-  //32bit Timer
-  
-  //TIM1 
-  TIM1_CCMR1 |= (TIM_CCMR1_CC1S_IN_TI1);//TI1 for CaptureChannel 1
-  TIM1_CCER &= ~(TIM_CCER_CC1P);//Rising Edge
-  TIM1_CCER |= (TIM_CCER_CC1E);//Enable capture on CaptureChannel1
-
-  TIM1_CCMR1 |= (TIM_CCMR1_CC2S_IN_TI1);//TI1 for CaptureChannel 2
-  TIM1_CCER |= (TIM_CCER_CC2P);//Falling Edge
-  TIM1_CCER |= (TIM_CCER_CC2E);//Enable capture on CaptureChannel2
-  
-  TIM1_CCMR2 |= (TIM_CCMR2_CC3S_IN_TI3);//TI3 for CaptureChannel 3
-  TIM1_CCER &= ~(TIM_CCER_CC3P);//Rising Edge
-  TIM1_CCER |= (TIM_CCER_CC3E);//Enable capture on CaptureChannel 3  
-
-  TIM1_CCMR2 |= (TIM_CCMR2_CC4S_IN_TI3);//TI3 for CaptureChannel 4
-  TIM1_CCER |= (TIM_CCER_CC4P);//Falling Edge
-  TIM1_CCER |= (TIM_CCER_CC4E);//Enable capture on CaptureChannel 4
-
-  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC3IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
-  
-  TIM1_PSC = 72;
-  TIM1_CR1 |= TIM_CR1_CEN;  
-  //TIM1
-
-  //TIM2
-  gpio_set_mode(GPIOA,
-		GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT,
-		GPIO15);  
-  gpio_set_mode(GPIOB,
-		GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT,
-		GPIO3);
-  TIM2_ARR = 0xFFFF;
-  TIM2_CCMR1 |= (TIM_CCMR1_CC2S_IN_TI2 | TIM_CCMR1_CC1S_IN_TI1);
-  TIM2_CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC2P);
-  TIM2_SMCR |= TIM_SMCR_SMS_EM3;
-  TIM2_CNT = 32767;
-  TIM2_CR1 = TIM_CR1_CEN;
-  //TIM2  
 
   //I2C
   gpio_set_mode(GPIOB,
@@ -132,13 +88,12 @@ static void configurePeriphereals(void){
   while ( adc_is_calibrating(ADC1) );
   //ADC
 
-
   //Encoder Sensors Powering up
   gpio_set_mode(GPIOA,
 		GPIO_MODE_OUTPUT_10_MHZ,
 		GPIO_CNF_OUTPUT_PUSHPULL,
 		GPIO4);
-  gpio_clear(GPIOA, GPIO4);
+
   //Encoder Sensors Powering up
 
   gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
@@ -197,11 +152,7 @@ static void communicationTask(void *args __attribute__((unused))) {
   charLineBuffer_t *charLineBuffer;
   QueueSetMemberHandle_t xHandle;
 
-  #ifndef BLUETOOTHUARTONLY
-  printString("InitializingBluetooth\n");  //Clear for bluetooth Config
-  #endif
-  
-  gpio_set(GPIOB, GPIO5);
+  gpio_set(GPIOB, GPIO5);//initializing rn4020
   sendToLCDQueue(turnOnMessage,0);
   
   for (;;) {
@@ -213,14 +164,13 @@ static void communicationTask(void *args __attribute__((unused))) {
       
       if(dataStruct.eDataSource == adcSender){
 	sendToLCDQueue(batteryLevel,dataStruct.uValue);
+
       }else if(dataStruct.eDataSource == encoderSender){
 	sendToLCDQueue(encoder, dataStruct.uValue);
 	writeOneOneByteCharacteristic(dataStruct.uValue);
       }
 
-      if(characteristicStatus.handleFound){
 
-      }
       
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
       xSemaphoreTake(communicationSemaphore,0);//Should go first

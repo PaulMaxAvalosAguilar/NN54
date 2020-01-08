@@ -8,7 +8,7 @@
 
 #define LCD_QUEUE_SIZE                20
 #define BINARY_SEMAPHORE_SIZE         1
-#define COMMUNICATION_QUEUE_SIZE      20
+#define COMMUNICATION_QUEUE_SIZE      40
 #define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + BINARY_SEMAPHORE_SIZE
 
 extern SemaphoreHandle_t adcSemaphore;

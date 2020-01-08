@@ -91,6 +91,7 @@ Page{
                 Button{
                     id: scannButton
                     text: blescannermodel.scanning? "Stop":"Start"
+                    enabled: connhandling.connected? false: true
                     onClicked: {
                         blescannermodel.scanning? blescannermodel.stopDiscovery() : blescannermodel.startDiscovery()
                     }
