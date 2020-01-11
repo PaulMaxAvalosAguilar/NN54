@@ -42,18 +42,7 @@ bool BleScannerModel::update(const QModelIndex &index, const qint16 &value)
     return true;
 }
 
-void BleScannerModel::append(const DeviceInfo &device)
-{
-    qDebug()<<"Calling appending";
-    create(index(rowCount(),0),device);
-}
 
-void BleScannerModel::clear()
-{
-    emit beginResetModel();
-    devicesInfo->clear();
-    emit endResetModel();
-}
 
 BleScannerModel::BleScannerModel(QObject *parent):
     QAbstractListModel(parent),
@@ -64,6 +53,7 @@ BleScannerModel::BleScannerModel(QObject *parent):
     scanning(false)
 {
     bleAgent->setLowEnergyDiscoveryTimeout(0);
+    setScannerState("Start Scan");
 
     connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &BleScannerModel::addDevice);
     connect(bleAgent, &QBluetoothDeviceDiscoveryAgent::deviceUpdated,this, &BleScannerModel::updateDevice);
@@ -150,11 +140,25 @@ std::unique_ptr<ConnectionHandling> &BleScannerModel::getConnHandling()
     return connHandling;
 }
 
+void BleScannerModel::append(const DeviceInfo &device)
+{
+    qDebug()<<"Calling appending";
+    create(index(rowCount(),0),device);
+}
+
+void BleScannerModel::clear()
+{
+    emit beginResetModel();
+    setScannerState("Start Scan");
+    devicesInfo->clear();
+    emit endResetModel();
+}
+
 void BleScannerModel::startDiscovery()
 {
     qDebug()<<"\nStarted discovery";
     clear();
-    setScannerState("Scann in progress");
+    setScannerState("Scan in progress");
     bleAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
     setScanning(true);
 }
@@ -164,9 +168,9 @@ void BleScannerModel::stopDiscovery()
     qDebug()<<"Stopped discovery";
     bleAgent->stop();
 
-    setScannerState("Done! Scan Again!");
+    setScannerState("Last scan list showing");
 
-    qDebug()<<"Scann finished";
+    qDebug()<<"Scan finished";
     setScanning(false);
 }
 
@@ -189,9 +193,9 @@ void BleScannerModel::addDevice(const QBluetoothDeviceInfo &info)
     if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
         DeviceInfo d(info);
         if(d.getName() == "VBT"){
+            qDebug()<< "Added device "<<d.getAddress();
             append(d);
-        }
-        qDebug()<< "Added device "<<d.getAddress();
+        }        
     }
 }
 

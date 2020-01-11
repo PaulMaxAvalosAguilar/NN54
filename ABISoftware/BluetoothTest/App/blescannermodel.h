@@ -19,9 +19,6 @@ class BleScannerModel : public QAbstractListModel
     bool removeRows(const QModelIndex &index, int count, const QModelIndex &parent);
     bool update(const QModelIndex& index, const qint16 &value);
 
-    Q_INVOKABLE void append(const DeviceInfo &device);
-    Q_INVOKABLE void clear();
-
 public:
     enum Roles{
         BleNameRole = Qt::UserRole +1,
@@ -48,6 +45,9 @@ signals:
     void scanningChanged();
 
 public slots:
+    void append(const DeviceInfo &device);
+    void clear();
+
     void startDiscovery();
     void stopDiscovery();
     void connectToDevice(int index);

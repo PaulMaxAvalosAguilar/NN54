@@ -7,7 +7,7 @@ QueueHandle_t communicationQueue;
 QueueHandle_t lcdQueue;
 QueueSetHandle_t communicationQueueSet;
 
-void sendToCommunicationQueue(DataSource_t eDataSource, uint16_t uValue){
+void sendToCommunicationQueue(DataSource_t eDataSource, uint32_t uValue){
   commData_t dataStruct;
   dataStruct.eDataSource = eDataSource;
   dataStruct.uValue = uValue;

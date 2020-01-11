@@ -8,7 +8,7 @@
 
 #define LCD_QUEUE_SIZE                20
 #define BINARY_SEMAPHORE_SIZE         1
-#define COMMUNICATION_QUEUE_SIZE      40
+#define COMMUNICATION_QUEUE_SIZE      20
 #define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + BINARY_SEMAPHORE_SIZE
 
 extern SemaphoreHandle_t adcSemaphore;
@@ -26,7 +26,7 @@ typedef enum DataSource_t{
 
 typedef struct commData_t{
   DataSource_t eDataSource;
-  int16_t uValue;
+  uint32_t uValue;
 } commData_t;
 //communicatioTask --------------------------
 
@@ -46,7 +46,7 @@ typedef struct lcdData_t{
 }lcdData_t;
 //lcdTask -----------------------------------
 
-void sendToCommunicationQueue(DataSource_t eDataSource, uint16_t uValue);
+void sendToCommunicationQueue(DataSource_t eDataSource, uint32_t uValue);
 void sendToLCDQueue(LCDMessage_t messageType,
 		    uint32_t displayValue);
 

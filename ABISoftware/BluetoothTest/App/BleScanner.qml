@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.1
 
 Page{
 
+
     ScrollView {
         id: scrollingArea
         anchors.fill: parent
@@ -38,7 +39,7 @@ Page{
             }
 
             ListView{
-                id: listView
+                id: listView                
                 width: parent.width - (parent.width * 0.5)
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: busyIndication.top
@@ -88,6 +89,7 @@ Page{
                 id: buttonsLayout
                 anchors.horizontalCenter: firstRect.horizontalCenter
                 anchors.bottom: scannerLabel.top
+
                 Button{
                     id: scannButton
                     text: blescannermodel.scanning? "Stop":"Start"
@@ -102,6 +104,7 @@ Page{
                     text: "Disconnect"
                     enabled: connhandling.connected
                     onClicked: {
+                        blescannermodel.clear()
                         connhandling.disconnect()
                     }
                 }

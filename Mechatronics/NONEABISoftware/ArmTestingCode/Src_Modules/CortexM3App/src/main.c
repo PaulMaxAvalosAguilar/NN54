@@ -19,7 +19,7 @@
 
 //encoderTask -------------------------------
 typedef struct encoderValues_t{
-  int16_t encoderCounter;
+  uint16_t encoderCounter;
   uint32_t inputCapture;
 } encoderValues_t;
 //encoderTask -------------------------------
@@ -33,13 +33,11 @@ encoderValues_t encoder_buffer[ENCODER_BUFFER_LEN];
 #endif
 
 static volatile encoderValues_t encInterruptValues;//Only accessed form tim1_cc_isr
-static volatile int16_t tim2Counter = 0;
+static volatile uint16_t tim2Counter = 0;
 static volatile uint32_t capturedTime = 0;
 static volatile uint32_t overflowCounter=0 ;
 
 static void configurePeriphereals(void){
-
-
 
   rcc_periph_clock_enable(RCC_AFIO);    // I2C UART ADC
   rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 ADC
@@ -213,7 +211,7 @@ static void lcdTask(void *args __attribute__((unused))){
 		       4);
       
     }else if(receivedData.messageType == encoder){
-      sprintf(buffer, "%ld", receivedData.displayValue);
+      sprintf(buffer, "%lu", receivedData.displayValue);
       lcdPutsBlinkFree(buffer,5);
     }
   }
@@ -254,32 +252,66 @@ static void adcTask(void *args __attribute__((unused))) {
 
 static void encoderTask(void *args __attribute__((unused))){
 
-  int16_t encCounter = 0;
-  uint32_t inputCapture = 0;
-
   encoderValues_t receiveEncValues;
-    
+
+  uint16_t lastPosition = 32767;
+  uint16_t elapsedPosition = 0;
+  uint32_t elapsedDistance = 0;
+  uint32_t lastTime = 0;
+  uint32_t elapsedTime = 0;
+  int8_t direction = 0;
+  
+  uint32_t pulsesReceived = 0;
+  uint16_t meanPropulsiveVel = 0;
+  uint16_t peakVel = 0;
+
   for(;;){
 
     if(getENCODERStarted()){
 
     }else{
       xSemaphoreTake(encoderSemaphore, portMAX_DELAY);
+      lastPosition = 32767;
+      lastTime = 0;
+      
+      pulsesReceived = 0;
+      
     }
     
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
-      encCounter = receiveEncValues.encoderCounter;
-      inputCapture = receiveEncValues.inputCapture;
+      
+      direction = receiveEncValues.encoderCounter -lastPosition;
 
-      sendToCommunicationQueue(encoderSender, encCounter);
+      if(receiveEncValues.encoderCounter > lastPosition){
+	direction = 1;
+	elapsedPosition = receiveEncValues.encoderCounter - lastPosition;
+      }else{
+	direction = 0;
+      }
+      lastPosition = receiveEncValues.encoderCounter;
+      
+      if(direction){
+
+	elapsedTime = receiveEncValues.inputCapture - lastTime;
+	lastTime = receiveEncValues.inputCapture;
+
+	elapsedDistance = 4084 * elapsedPosition;	
+        //meanPropulsiveVel = (elapsedDistance * 100) / elapsedTime;
+
+	sendToCommunicationQueue(encoderSender,
+				 elapsedDistance);
+      }
+
+
     }
-    vTaskDelay(pdMS_TO_TICKS(40));
+    vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
 
 void tim1_cc_isr(){
 
-  tim2Counter = (uint16_t)TIM2_CNT - (int16_t)32767;
+  //  tim2Counter = (uint16_t)TIM2_CNT - (int16_t)32767;
+  tim2Counter = (uint16_t)TIM2_CNT;
   
   if(TIM1_SR & TIM_SR_CC1IF){
     capturedTime = (overflowCounter << 16) | TIM1_CCR1;
@@ -303,13 +335,12 @@ void tim1_up_isr(){
 }
 
 void myConfigPRE_SLEEP_PROCESSING(){
-  lcdPutsBlinkFree("SLEEP", 4);
+  //  lcdPutsBlinkFree("SLEEP", 4);
 }
 
 void myConfigPOST_SLEEP_PROCESSING(){
 
-  //  if(nvic_get_pending_irq(NVIC_TIM1_CC_IRQ))
-    lcdPutsBlinkFree("----------------------------", 4);
+  //    lcdPutsBlinkFree("----------------------------", 4);
 }
 
 int main(void)

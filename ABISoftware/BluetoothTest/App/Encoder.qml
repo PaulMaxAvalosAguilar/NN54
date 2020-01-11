@@ -36,6 +36,7 @@ Page{
                 height: window.height/8
                 width: height
                 text: started? "Stop": "Start"
+                enabled: false
                 font.pointSize: window.height/60
                 onClicked: {
                     started? connhandling.sendStop() : connhandling.sendStart()

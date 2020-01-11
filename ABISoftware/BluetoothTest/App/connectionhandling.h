@@ -59,8 +59,6 @@ signals:
     void computedValueChanged();
     //QML Properties related*
 
-    void controllerDisconnected();
-
 public slots:
     void disconnect();
     void sendADC();

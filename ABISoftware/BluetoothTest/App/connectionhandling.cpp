@@ -23,6 +23,7 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
 
 ConnectionHandling::~ConnectionHandling()
 {
+    if(controller)
     controller->disconnectFromDevice();
 }
 
@@ -120,6 +121,7 @@ void ConnectionHandling::setComputedValue(const int y)
 void ConnectionHandling::disconnect()
 {
     qDebug()<< "Disconnecting from device";
+
     controller->disconnectFromDevice();
 }
 
@@ -176,7 +178,6 @@ void ConnectionHandling::deviceDisconnected()
     setConnecting(false);
     setConnected(false);    
     timer->stop();
-    emit controllerDisconnected();
 }
 
 void ConnectionHandling::addLowEnergyService(const QBluetoothUuid &uuid)
@@ -189,7 +190,7 @@ void ConnectionHandling::addLowEnergyService(const QBluetoothUuid &uuid)
 
 void ConnectionHandling::errorReceived(QLowEnergyController::Error)
 {
-
+    qDebug()<< "error";
 }
 
 void ConnectionHandling::serviceScanDone()
@@ -248,11 +249,9 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
 
 void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    static QString firstParsedValue;
-    static uint8_t firstValue;
-    static uint8_t firsValueByteSize = 1;
-
-    qDebug()<< "Received value";
+    QString firstParsedValue;
+    uint8_t firstValue;
+    uint8_t firsValueByteSize = 1;
 
     if (c.uuid() == encoderCharacteristic.uuid()){
 
@@ -264,7 +263,6 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
         }
 
         firstValue = firstParsedValue.toInt(nullptr,16);
-        qDebug()<< hexValue.toInt(nullptr,16);
 
         if(firstValue == 0){
 

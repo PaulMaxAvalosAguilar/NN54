@@ -40,6 +40,10 @@ characteristicStatus_t  characteristicStatus;
 charLineBuffer_t *charLineBufferPtr;
 char printBuffer[100];
 
+//EncoderValues
+
+
+
 //-------------- BLUETOOTH COMMANDS---------------
 //Only pair characters can be send (one byte in hex) with
 //writing characteristics functions other will be ignored
@@ -224,7 +228,7 @@ void writeOneOneByteCharacteristic(uint8_t value0){
 
     runLockingCOMMAND(&characteristicStatus.isNotifying
 		      ,"SHW,%04X,"
-		      "%04X\n",
+		      "%02X\n",
 		      characteristicStatus.handle,
 		      value0);
 }
@@ -323,6 +327,10 @@ void startTimers(){
     timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
     timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
 
+    TIM1_PSC = 72;
+    TIM1_CR1 |= TIM_CR1_CEN;  
+    //TIM1
+
     //TIM2
     gpio_set_mode(GPIOA,
 		  GPIO_MODE_INPUT,
@@ -339,10 +347,6 @@ void startTimers(){
     TIM2_CNT = 32767;
     TIM2_CR1 = TIM_CR1_CEN;
     //TIM2  
-
-    TIM1_PSC = 72;
-    TIM1_CR1 |= TIM_CR1_CEN;  
-    //TIM1
     
     nvic_enable_irq(NVIC_TIM1_CC_IRQ);
     nvic_enable_irq(NVIC_TIM1_UP_IRQ);
