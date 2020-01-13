@@ -38,15 +38,44 @@ static volatile uint16_t tim2Counter = 0;
 static volatile uint32_t capturedTime = 0;
 static volatile uint32_t overflowCounter=0 ;
 
-static uint8_t descendente(uint16_t a, uint16_t b){
+#define ENCODERINITIAL_VALUE 32767
+
+uint8_t descendente(uint16_t a, uint16_t b);
+uint8_t ascendente(uint16_t a, uint16_t b);
+uint8_t minDistTraveledDes(uint16_t counter, uint16_t minDistToTravel);
+uint8_t minDistTraveledAs(uint16_t counter, uint16_t minDistToTravel);
+uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel);
+uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel);
+
+uint8_t (*calculateDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
+uint8_t (*calculateMinDist[2])(uint16_t, uint16_t) = {minDistTraveledDes,
+						      minDistTraveledAs};
+uint8_t (*calculateReturnToInitial[2])(uint16_t, uint16_t) =
+  {returnToInitialDes,returnToInitialAs};
+
+uint8_t descendente(uint16_t a, uint16_t b){
   return a<b;
 }
 
-static uint8_t ascendente(uint16_t a, uint16_t b){
+uint8_t ascendente(uint16_t a, uint16_t b){
   return a>b;
 }
 
-uint8_t (*calculateDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
+uint8_t minDistTraveledDes(uint16_t counter, uint16_t minDistToTravel){
+  return (counter <= ENCODERINITIAL_VALUE - minDistToTravel);
+}
+
+uint8_t minDistTraveledAs(uint16_t counter, uint16_t minDistToTravel){
+  return (counter >= ENCODERINITIAL_VALUE + minDistToTravel);
+}
+
+uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel){
+  return (counter > ENCODERINITIAL_VALUE - minDistToTravel);
+}
+
+uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel){
+  return (counter < ENCODERINITIAL_VALUE + minDistToTravel);
+}
 
 static void configurePeriphereals(void){
 
@@ -264,25 +293,26 @@ static void encoderTask(void *args __attribute__((unused))){
 
   encoderValues_t receiveEncValues;
 
-  uint8_t minDistToTravel = 8;
+  uint16_t minDistToTravel = 8;
   uint8_t desiredDir = 1; //1 = Ascendent, 0 = Descendent
 
-  uint16_t lastPosition = 32767;
-  uint16_t elapsedPosition = 0;
+  uint16_t lastPosition = ENCODERINITIAL_VALUE;
+  int32_t elapsedPosition = 0;
   uint32_t elapsedDistance = 0;
   uint32_t lastTime = 0;
   uint32_t elapsedTime = 0;
   uint8_t desiredDirFollowed = 0;
 
   //Velocity Calulcation Variables
+  uint16_t maxCounter = 0;
   uint32_t currentVelocity = 0;
   uint32_t lastVelocity = 0;
   
   uint32_t meanVelCount = 0;
-  uint16_t meanVel = 0;
+  uint32_t meanVel = 0;
   uint32_t meanPropVelCount = 0;
-  uint16_t meanPropVel = 0;
-  uint16_t peakVel = 0;
+  uint32_t meanPropVel = 0;
+  uint32_t peakVel = 0;
 
   //Repetition algorithm variables
   uint8_t canCountRep = 0;
@@ -295,9 +325,10 @@ static void encoderTask(void *args __attribute__((unused))){
     }else{
       xSemaphoreTake(encoderSemaphore, portMAX_DELAY);
       //Reset initial Values
-      lastPosition = 32767;
+      lastPosition = ENCODERINITIAL_VALUE;
       lastTime = 0;
 
+      maxCounter = 0;
       lastVelocity = 0;
 
       meanVelCount = 0;
@@ -323,8 +354,14 @@ static void encoderTask(void *args __attribute__((unused))){
       
       if(desiredDirFollowed){
 
+	if(receiveEncValues.encoderCounter > maxCounter)
+	  maxCounter = receiveEncValues.encoderCounter;
+	
 	elapsedDistance = 4084 * elapsedPosition;
 	currentVelocity = (elapsedDistance * 100) / elapsedTime;
+
+	//Peak Velocity Calculation
+	if(currentVelocity > peakVel) peakVel = currentVelocity;
 
 	//Mean Velocity Calculation
 	meanVelCount++;
@@ -337,31 +374,34 @@ static void encoderTask(void *args __attribute__((unused))){
 
 	}
 	lastVelocity = currentVelocity;
-
       }
       //Velocity Algorithm
 
-      
-      //Repetition Algorithm
-      //Check if min distance has been traveled
-      if(receiveEncValues.encoderCounter >= (32767 + 8)){
+      if((*calculateMinDist[desiredDir])
+	(receiveEncValues.encoderCounter, minDistToTravel)){
 	minDistTraveled = 1;
       }
 
-      //Check if position has return to initial
-      if(minDistTraveled &&
-	 receiveEncValues.encoderCounter < (32767 +8)){
+      if(minDistTraveled && (*calculateReturnToInitial[desiredDir])
+	 (receiveEncValues.encoderCounter, minDistToTravel)){
 	canCountRep = 1;
       }
       
       //CountRep
       if(canCountRep){
-	sendToCommunicationQueue(encoderSender,
+	//	sendToCommunicationQueue(encoderSender,
+	//				 peakVel);
+	//	sendToCommunicationQueue(encoderSender,
+	//				 meanVel/meanVelCount);
+		sendToCommunicationQueue(encoderSender,
 				 meanPropVel/meanPropVelCount);
+	//	sendToCommunicationQueue(encoderSender,
+	//				 maxCounter);
 	minDistTraveled = 0;
 	canCountRep = 0;
 
 	//Reset Velocity Calculation Variables
+	maxCounter = 0;
 	lastVelocity = 0;
 	
 	meanVelCount = 0;
@@ -371,9 +411,6 @@ static void encoderTask(void *args __attribute__((unused))){
 	peakVel = 0;
       }
       //Repetition Algorithm
-
-
-
     }
     vTaskDelay(pdMS_TO_TICKS(50));
   }
