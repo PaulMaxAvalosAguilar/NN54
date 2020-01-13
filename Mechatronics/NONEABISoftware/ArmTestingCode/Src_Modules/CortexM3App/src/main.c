@@ -32,10 +32,21 @@ encoderValues_t encoder_buffer[ENCODER_BUFFER_LEN];
 	#warning ENCODER_BUFFER NOT POWER OF 2
 #endif
 
-static volatile encoderValues_t encInterruptValues;//Only accessed form tim1_cc_isr
+//Only accessed form tim1_cc_isr
+static volatile encoderValues_t encInterruptValues;
 static volatile uint16_t tim2Counter = 0;
 static volatile uint32_t capturedTime = 0;
 static volatile uint32_t overflowCounter=0 ;
+
+static uint8_t descendente(uint16_t a, uint16_t b){
+  return a<b;
+}
+
+static uint8_t ascendente(uint16_t a, uint16_t b){
+  return a>b;
+}
+
+uint8_t (*calculateDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
 
 static void configurePeriphereals(void){
 
@@ -146,7 +157,6 @@ static void communicationTask(void *args __attribute__((unused))) {
 
   commData_t dataStruct;
 
-  char buffer[3];
   charLineBuffer_t *charLineBuffer;
   QueueSetMemberHandle_t xHandle;
 
@@ -254,16 +264,29 @@ static void encoderTask(void *args __attribute__((unused))){
 
   encoderValues_t receiveEncValues;
 
+  uint8_t minDistToTravel = 8;
+  uint8_t desiredDir = 1; //1 = Ascendent, 0 = Descendent
+
   uint16_t lastPosition = 32767;
   uint16_t elapsedPosition = 0;
   uint32_t elapsedDistance = 0;
   uint32_t lastTime = 0;
   uint32_t elapsedTime = 0;
-  int8_t direction = 0;
+  uint8_t desiredDirFollowed = 0;
+
+  //Velocity Calulcation Variables
+  uint32_t currentVelocity = 0;
+  uint32_t lastVelocity = 0;
   
-  uint32_t pulsesReceived = 0;
-  uint16_t meanPropulsiveVel = 0;
+  uint32_t meanVelCount = 0;
+  uint16_t meanVel = 0;
+  uint32_t meanPropVelCount = 0;
+  uint16_t meanPropVel = 0;
   uint16_t peakVel = 0;
+
+  //Repetition algorithm variables
+  uint8_t canCountRep = 0;
+  uint8_t  minDistTraveled= 0;
 
   for(;;){
 
@@ -271,36 +294,84 @@ static void encoderTask(void *args __attribute__((unused))){
 
     }else{
       xSemaphoreTake(encoderSemaphore, portMAX_DELAY);
+      //Reset initial Values
       lastPosition = 32767;
       lastTime = 0;
-      
-      pulsesReceived = 0;
-      
+
+      lastVelocity = 0;
+
+      meanVelCount = 0;
+      meanVel = 0;
+      meanPropVelCount = 0;
+      meanPropVel = 0;
+      peakVel = 0;
     }
     
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
-      
-      direction = receiveEncValues.encoderCounter -lastPosition;
 
-      if(receiveEncValues.encoderCounter > lastPosition){
-	direction = 1;
+      //Velocity Algorithm
+      if( (*calculateDir[desiredDir])(receiveEncValues.encoderCounter,
+				      lastPosition) ){
+	desiredDirFollowed = 1;
 	elapsedPosition = receiveEncValues.encoderCounter - lastPosition;
       }else{
-	direction = 0;
+	desiredDirFollowed = 1;
       }
       lastPosition = receiveEncValues.encoderCounter;
+      elapsedTime = receiveEncValues.inputCapture - lastTime;
+      lastTime = receiveEncValues.inputCapture;
       
-      if(direction){
+      if(desiredDirFollowed){
 
-	elapsedTime = receiveEncValues.inputCapture - lastTime;
-	lastTime = receiveEncValues.inputCapture;
+	elapsedDistance = 4084 * elapsedPosition;
+	currentVelocity = (elapsedDistance * 100) / elapsedTime;
 
-	elapsedDistance = 4084 * elapsedPosition;	
-        //meanPropulsiveVel = (elapsedDistance * 100) / elapsedTime;
+	//Mean Velocity Calculation
+	meanVelCount++;
+        meanVel += currentVelocity;
 
-	sendToCommunicationQueue(encoderSender,
-				 elapsedDistance);
+	//Mean Propulsive Velocity Calculation
+	if(currentVelocity > lastVelocity){
+	  meanPropVelCount++;
+	  meanPropVel += currentVelocity;
+
+	}
+	lastVelocity = currentVelocity;
+
       }
+      //Velocity Algorithm
+
+      
+      //Repetition Algorithm
+      //Check if min distance has been traveled
+      if(receiveEncValues.encoderCounter >= (32767 + 8)){
+	minDistTraveled = 1;
+      }
+
+      //Check if position has return to initial
+      if(minDistTraveled &&
+	 receiveEncValues.encoderCounter < (32767 +8)){
+	canCountRep = 1;
+      }
+      
+      //CountRep
+      if(canCountRep){
+	sendToCommunicationQueue(encoderSender,
+				 meanPropVel/meanPropVelCount);
+	minDistTraveled = 0;
+	canCountRep = 0;
+
+	//Reset Velocity Calculation Variables
+	lastVelocity = 0;
+	
+	meanVelCount = 0;
+	meanVel = 0;
+	meanPropVelCount = 0;
+	meanPropVel = 0;
+	peakVel = 0;
+      }
+      //Repetition Algorithm
+
 
 
     }
@@ -373,8 +444,4 @@ int main(void)
 
   return 0;
 }
-
-
-
-
 
