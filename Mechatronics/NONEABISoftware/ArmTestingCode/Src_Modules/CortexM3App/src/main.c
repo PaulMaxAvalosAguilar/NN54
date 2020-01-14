@@ -294,22 +294,21 @@ static void encoderTask(void *args __attribute__((unused))){
   encoderValues_t receiveEncValues;
 
   uint16_t minDistToTravel = 8;
-  uint8_t desiredDir = 1; //1 = Ascendent, 0 = Descendent
+  uint8_t desiredCountDir = 1; //1 = Ascendent, 0 = Descendent
+  uint8_t desiredRepDir = 1; //1 = Ascendent, 0 = Descendent
 
   uint16_t lastPosition = ENCODERINITIAL_VALUE;
-  int32_t elapsedPosition = 0;
+  uint8_t elapsedPosition = 0;
   uint32_t elapsedDistance = 0;
   uint32_t lastTime = 0;
   uint32_t elapsedTime = 0;
   uint8_t desiredDirFollowed = 0;
 
   //Velocity Calulcation Variables
-  uint16_t maxCounter = 0;
-  uint32_t currentVelocity = 0;
+  uint16_t lastMaxCounter = 0;
   uint32_t lastVelocity = 0;
+  uint32_t currentVelocity = 0;
   
-  uint32_t meanVelCount = 0;
-  uint32_t meanVel = 0;
   uint32_t meanPropVelCount = 0;
   uint32_t meanPropVel = 0;
   uint32_t peakVel = 0;
@@ -328,11 +327,9 @@ static void encoderTask(void *args __attribute__((unused))){
       lastPosition = ENCODERINITIAL_VALUE;
       lastTime = 0;
 
-      maxCounter = 0;
+      lastMaxCounter = 0;
       lastVelocity = 0;
 
-      meanVelCount = 0;
-      meanVel = 0;
       meanPropVelCount = 0;
       meanPropVel = 0;
       peakVel = 0;
@@ -340,81 +337,93 @@ static void encoderTask(void *args __attribute__((unused))){
     
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
 
-      //Velocity Algorithm
-      if( (*calculateDir[desiredDir])(receiveEncValues.encoderCounter,
-				      lastPosition) ){
+      //VELOCITY ALGORITHM
+      //Direction Determination
+      if( (*calculateDir[desiredCountDir])(receiveEncValues.encoderCounter,
+					   lastPosition) ){
+	//Going desired direction for calculations
 	desiredDirFollowed = 1;
-	elapsedPosition = receiveEncValues.encoderCounter - lastPosition;
+	//Appropiate calculation for ascendant and descendant
+	if(desiredCountDir){
+	  //Going up
+	  elapsedPosition = receiveEncValues.encoderCounter - lastPosition;
+	  if(receiveEncValues.encoderCounter > lastMaxCounter){
+	    lastMaxCounter = receiveEncValues.encoderCounter;
+	  }
+	  //Going up
+	}else{
+	  //Going down
+	  elapsedPosition = lastPosition - receiveEncValues.encoderCounter; 
+	  if(receiveEncValues.encoderCounter < lastMaxCounter){
+	    lastMaxCounter = receiveEncValues.encoderCounter;
+	  }
+	  //Going down
+	}
+	//Appropiate calculation for ascendant and descendant
+	
       }else{
-	desiredDirFollowed = 1;
+	//NOT Going desired direction for calculations
+	desiredDirFollowed = 0;
       }
+      //Direction Determination
+      
       lastPosition = receiveEncValues.encoderCounter;
       elapsedTime = receiveEncValues.inputCapture - lastTime;
       lastTime = receiveEncValues.inputCapture;
       
       if(desiredDirFollowed){
-
-	if(receiveEncValues.encoderCounter > maxCounter)
-	  maxCounter = receiveEncValues.encoderCounter;
-	
 	elapsedDistance = 4084 * elapsedPosition;
 	currentVelocity = (elapsedDistance * 100) / elapsedTime;
 
 	//Peak Velocity Calculation
 	if(currentVelocity > peakVel) peakVel = currentVelocity;
 
-	//Mean Velocity Calculation
-	meanVelCount++;
-        meanVel += currentVelocity;
-
 	//Mean Propulsive Velocity Calculation
 	if(currentVelocity > lastVelocity){
 	  meanPropVelCount++;
 	  meanPropVel += currentVelocity;
-
 	}
 	lastVelocity = currentVelocity;
       }
-      //Velocity Algorithm
+      //VELOCITY ALGORITHM
 
-      if((*calculateMinDist[desiredDir])
+      //REPETITION ALGORITHM
+      if((*calculateMinDist[desiredRepDir])
 	(receiveEncValues.encoderCounter, minDistToTravel)){
 	minDistTraveled = 1;
       }
 
-      if(minDistTraveled && (*calculateReturnToInitial[desiredDir])
+      if(minDistTraveled && (*calculateReturnToInitial[desiredRepDir])
 	 (receiveEncValues.encoderCounter, minDistToTravel)){
 	canCountRep = 1;
       }
       
       //CountRep
       if(canCountRep){
-	//	sendToCommunicationQueue(encoderSender,
-	//				 peakVel);
-	//	sendToCommunicationQueue(encoderSender,
-	//				 meanVel/meanVelCount);
-		sendToCommunicationQueue(encoderSender,
-				 meanPropVel/meanPropVelCount);
-	//	sendToCommunicationQueue(encoderSender,
-	//				 maxCounter);
+
+	sendToCommunicationQueue(encoderSender,
+				 lastMaxCounter);
 	minDistTraveled = 0;
 	canCountRep = 0;
 
 	//Reset Velocity Calculation Variables
-	maxCounter = 0;
+	lastMaxCounter = 0;
 	lastVelocity = 0;
 	
-	meanVelCount = 0;
-	meanVel = 0;
 	meanPropVelCount = 0;
 	meanPropVel = 0;
 	peakVel = 0;
       }
-      //Repetition Algorithm
+      //REPETITION ALGORITHM
     }
     vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
+
+//	sendToCommunicationQueue(encoderSender,
+//				 peakVel);
+//		sendToCommunicationQueue(encoderSender,
+//				 meanPropVel/meanPropVelCount);
 
 void tim1_cc_isr(){
 
