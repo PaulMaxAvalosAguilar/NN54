@@ -7,10 +7,15 @@ QueueHandle_t communicationQueue;
 QueueHandle_t lcdQueue;
 QueueSetHandle_t communicationQueueSet;
 
-void sendToCommunicationQueue(DataSource_t eDataSource, uint32_t uValue){
+void sendToCommunicationQueue(DataSource_t eDataSource,
+			      uint16_t traveledDistanceOrADC,
+			      uint16_t meanPropulsiveVelocity,
+			      uint16_t peakVelocity){
   commData_t dataStruct;
   dataStruct.eDataSource = eDataSource;
-  dataStruct.uValue = uValue;
+  dataStruct.traveledDistanceOrADC = traveledDistanceOrADC;
+  dataStruct.meanPropulsiveVelocity = meanPropulsiveVelocity;
+  dataStruct.peakVelocity = peakVelocity;
 
   xQueueSendToBack(communicationQueue, &dataStruct, 0);
 }

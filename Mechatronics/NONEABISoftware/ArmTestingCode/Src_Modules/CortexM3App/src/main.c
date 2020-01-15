@@ -200,11 +200,14 @@ static void communicationTask(void *args __attribute__((unused))) {
       xQueueReceive(communicationQueue, &dataStruct,0);//Should go first
       
       if(dataStruct.eDataSource == adcSender){
-	sendToLCDQueue(batteryLevel,dataStruct.uValue);
+	sendToLCDQueue(batteryLevel,dataStruct.traveledDistanceOrADC);
 
       }else if(dataStruct.eDataSource == encoderSender){
-	sendToLCDQueue(encoder, dataStruct.uValue);
-	writeOneOneByteCharacteristic(dataStruct.uValue);
+	sendToLCDQueue(encoder, dataStruct.meanPropulsiveVelocity);
+	writeEncoderValues(dataStruct.traveledDistanceOrADC,
+			   dataStruct.meanPropulsiveVelocity,
+			   dataStruct.peakVelocity);
+
       }
 
 
@@ -281,9 +284,7 @@ static void adcTask(void *args __attribute__((unused))) {
     voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
     adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
 
-    sendToCommunicationQueue(adcSender,adc1Voltage);
-    
-
+    sendToCommunicationQueue(adcSender,adc1Voltage,0,0);
   }
 }
 
@@ -373,6 +374,7 @@ static void encoderTask(void *args __attribute__((unused))){
       
       if(desiredDirFollowed){
 	elapsedDistance = 4084 * elapsedPosition;
+	if(elapsedPosition >1) goto a;
 	currentVelocity = (elapsedDistance * 100) / elapsedTime;
 
 	//Peak Velocity Calculation
@@ -386,7 +388,7 @@ static void encoderTask(void *args __attribute__((unused))){
 	lastVelocity = currentVelocity;
       }
       //VELOCITY ALGORITHM
-
+    a:
       //REPETITION ALGORITHM
       if((*calculateMinDist[desiredRepDir])
 	(receiveEncValues.encoderCounter, minDistToTravel)){
@@ -402,7 +404,9 @@ static void encoderTask(void *args __attribute__((unused))){
       if(canCountRep){
 
 	sendToCommunicationQueue(encoderSender,
-				 lastMaxCounter);
+				 lastMaxCounter,
+				 meanPropVel/meanPropVelCount,
+				 peakVel);
 	minDistTraveled = 0;
 	canCountRep = 0;
 
@@ -419,11 +423,6 @@ static void encoderTask(void *args __attribute__((unused))){
     vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
-
-//	sendToCommunicationQueue(encoderSender,
-//				 peakVel);
-//		sendToCommunicationQueue(encoderSender,
-//				 meanPropVel/meanPropVelCount);
 
 void tim1_cc_isr(){
 

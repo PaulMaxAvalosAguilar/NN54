@@ -224,46 +224,19 @@ void turnOffSubscription(void){
 		    subscriptionHandle);
 }
 
-void writeOneOneByteCharacteristic(uint8_t value0){
+void writeEncoderValues(uint16_t value0,
+			 uint16_t value1,
+			 uint16_t value2){
 
-    runLockingCOMMAND(&characteristicStatus.isNotifying
-		      ,"SHW,%04X,"
-		      "%02X\n",
-		      characteristicStatus.handle,
-		      value0);
-}
-
-void writeTenTwoBytesCharacteristic(uint16_t value0,
-				    uint16_t value1, uint16_t value2,
-				    uint16_t value3, uint16_t value4,
-				    uint16_t value5, uint16_t value6,
-				    uint16_t value7, uint16_t value8,
-				    uint16_t value9){
-  
-  runLockingCOMMAND(&characteristicStatus.isNotifying,
-		    "SHW,%04X,"
-		    "%04x"
-		    "%04X"
-		    "%04X"
-		    "%04X"
-		    "%04X"
-		    "%04X"
-		    "%04X"
+  runLockingCOMMAND(&characteristicStatus.isNotifying
+		    ,"SHW,%04X,"
 		    "%04X"
 		    "%04X"
 		    "%04X\n",
 		    characteristicStatus.handle,
 		    value0,
 		    value1,
-		    value2,
-		    value3,
-		    value4,
-		    value5,
-		    value6,
-		    value7,
-		    value8,
-		    value9
-		    );
+		    value2);
 }
 
 void setBLEConnected(uint8_t boolean){

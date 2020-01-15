@@ -19,13 +19,9 @@ extern characteristicStatus_t characteristicStatus;
 //-------------- BLUETOOTH COMMANDS---------------
 //Only pair characters can be send (one byte in hex) with
 //writing characteristics functions other will be ignored
-void writeOneOneByteCharacteristic(uint8_t value0);
-void writeTenTwoBytesCharacteristic(uint16_t value0,
-				    uint16_t value1, uint16_t value2,
-				    uint16_t value3, uint16_t value4,
-				    uint16_t value5, uint16_t value6,
-				    uint16_t value7, uint16_t value8,
-				    uint16_t value9);
+void writeEncoderValues(uint16_t value0,
+			 uint16_t value1,
+			 uint16_t value2);
 void setBLEConnected(uint8_t boolean);
 uint8_t getBLEConnected(void);
 void setENCODERStarted(uint8_t boolean);

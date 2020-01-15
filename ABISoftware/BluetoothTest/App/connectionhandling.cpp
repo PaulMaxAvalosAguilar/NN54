@@ -249,26 +249,46 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
 
 void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    QString firstParsedValue;
-    uint8_t firstValue;
-    uint8_t firsValueByteSize = 1;
+    QString parsedValue;
+    uint16_t uvalue;
 
     if (c.uuid() == encoderCharacteristic.uuid()){
 
         QString hexValue = value.toHex();
-        auto stringIterator = hexValue.begin();
-        for(auto iterator = stringIterator; iterator < stringIterator + (firsValueByteSize*2);
+        for(auto iterator = hexValue.begin(); iterator < hexValue.begin() + 4;
             iterator++){
-            firstParsedValue.append(*iterator);
+            parsedValue.append(*iterator);
         }
 
-        firstValue = firstParsedValue.toInt(nullptr,16);
+        uvalue = parsedValue.toInt(nullptr,16);
+        qDebug()<< uvalue;
+        parsedValue.clear();
 
+        for(auto iterator = hexValue.begin()+4; iterator < hexValue.begin() + 8;
+            iterator++){
+            parsedValue.append(*iterator);
+        }
+
+        uvalue = parsedValue.toInt(nullptr,16);
+        qDebug()<< uvalue;
+        parsedValue.clear();
+
+        for(auto iterator = hexValue.begin()+8; iterator < hexValue.begin() + 12;
+            iterator++){
+            parsedValue.append(*iterator);
+        }
+
+        uvalue = parsedValue.toInt(nullptr,16);
+        qDebug()<< uvalue;
+        parsedValue.clear();
+
+        /*
         if(firstValue == 0){
 
         }else{
-            qDebug()<<firstValue;
+            //qDebug()<<firstValue;
         }
+        */
     }
 }
 

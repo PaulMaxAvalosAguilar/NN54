@@ -26,8 +26,11 @@ typedef enum DataSource_t{
 
 typedef struct commData_t{
   DataSource_t eDataSource;
-  uint32_t uValue;
+  uint16_t traveledDistanceOrADC;
+  uint16_t meanPropulsiveVelocity;
+  uint16_t peakVelocity;
 } commData_t;
+
 //communicatioTask --------------------------
 
 //lcdTask -----------------------------------
@@ -46,7 +49,10 @@ typedef struct lcdData_t{
 }lcdData_t;
 //lcdTask -----------------------------------
 
-void sendToCommunicationQueue(DataSource_t eDataSource, uint32_t uValue);
+void sendToCommunicationQueue(DataSource_t eDataSource,
+			      uint16_t traveledDistanceOrADC,
+			      uint16_t meanPropulsiveVelocity,
+			      uint16_t peakVelocity);
 void sendToLCDQueue(LCDMessage_t messageType,
 		    uint32_t displayValue);
 
