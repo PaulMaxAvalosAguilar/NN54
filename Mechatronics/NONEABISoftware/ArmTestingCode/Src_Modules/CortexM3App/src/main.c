@@ -47,10 +47,10 @@ uint8_t minDistTraveledAs(uint16_t counter, uint16_t minDistToTravel);
 uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel);
 uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel);
 
-uint8_t (*calculateDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
-uint8_t (*calculateMinDist[2])(uint16_t, uint16_t) = {minDistTraveledDes,
+uint8_t (*goingDesiredCountDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
+uint8_t (*hasTraveledMinDist[2])(uint16_t, uint16_t) = {minDistTraveledDes,
 						      minDistTraveledAs};
-uint8_t (*calculateReturnToInitial[2])(uint16_t, uint16_t) =
+uint8_t (*hasReturnedToInitial[2])(uint16_t, uint16_t) =
   {returnToInitialDes,returnToInitialAs};
 
 uint8_t descendente(uint16_t a, uint16_t b){
@@ -294,7 +294,7 @@ static void encoderTask(void *args __attribute__((unused))){
 
   encoderValues_t receiveEncValues;
 
-  uint16_t minDistToTravel = 8;
+  uint16_t minDistToTravel = 0;
   uint8_t desiredCountDir = 1; //1 = Ascendent, 0 = Descendent
   uint8_t desiredRepDir = 1; //1 = Ascendent, 0 = Descendent
 
@@ -324,6 +324,11 @@ static void encoderTask(void *args __attribute__((unused))){
 
     }else{
       xSemaphoreTake(encoderSemaphore, portMAX_DELAY);
+
+      minDistToTravel = getMinDistToTravel();
+      desiredCountDir = getDesiredCountDir();
+      desiredRepDir = getDesiredRepDir();
+      
       //Reset initial Values
       lastPosition = ENCODERINITIAL_VALUE;
       lastTime = 0;
@@ -339,34 +344,23 @@ static void encoderTask(void *args __attribute__((unused))){
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
 
       //VELOCITY ALGORITHM
-      //Direction Determination
-      if( (*calculateDir[desiredCountDir])(receiveEncValues.encoderCounter,
+      if( (*goingDesiredCountDir[desiredCountDir])(receiveEncValues.encoderCounter,
 					   lastPosition) ){
-	//Going desired direction for calculations
 	desiredDirFollowed = 1;
-	//Appropiate calculation for ascendant and descendant
 	if(desiredCountDir){
-	  //Going up
 	  elapsedPosition = receiveEncValues.encoderCounter - lastPosition;
 	  if(receiveEncValues.encoderCounter > lastMaxCounter){
 	    lastMaxCounter = receiveEncValues.encoderCounter;
 	  }
-	  //Going up
 	}else{
-	  //Going down
 	  elapsedPosition = lastPosition - receiveEncValues.encoderCounter; 
 	  if(receiveEncValues.encoderCounter < lastMaxCounter){
 	    lastMaxCounter = receiveEncValues.encoderCounter;
 	  }
-	  //Going down
 	}
-	//Appropiate calculation for ascendant and descendant
-	
       }else{
-	//NOT Going desired direction for calculations
 	desiredDirFollowed = 0;
       }
-      //Direction Determination
       
       lastPosition = receiveEncValues.encoderCounter;
       elapsedTime = receiveEncValues.inputCapture - lastTime;
@@ -388,21 +382,20 @@ static void encoderTask(void *args __attribute__((unused))){
 	lastVelocity = currentVelocity;
       }
       //VELOCITY ALGORITHM
+
     a:
       //REPETITION ALGORITHM
-      if((*calculateMinDist[desiredRepDir])
+      if((*hasTraveledMinDist[desiredRepDir])
 	(receiveEncValues.encoderCounter, minDistToTravel)){
 	minDistTraveled = 1;
       }
 
-      if(minDistTraveled && (*calculateReturnToInitial[desiredRepDir])
+      if(minDistTraveled && (*hasReturnedToInitial[desiredRepDir])
 	 (receiveEncValues.encoderCounter, minDistToTravel)){
 	canCountRep = 1;
       }
       
-      //CountRep
       if(canCountRep){
-
 	sendToCommunicationQueue(encoderSender,
 				 lastMaxCounter,
 				 meanPropVel/meanPropVelCount,

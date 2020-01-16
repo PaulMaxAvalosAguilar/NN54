@@ -144,10 +144,18 @@ void ConnectionHandling::sendStart()
         char a = 0;
         char b = 1;
 
+
+        char f = (65000>>8);
+
         QByteArray c;
         c.append(a);
         c.append(b);
+        c.append(static_cast<char>(8));
+        c.append(static_cast<char>(8 >> 8));
+        c.append(1);
+        c.append(1);
         encoderService->writeCharacteristic(encoderCharacteristic, c);
+
     }
 }
 
@@ -255,40 +263,40 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
     if (c.uuid() == encoderCharacteristic.uuid()){
 
         QString hexValue = value.toHex();
-        for(auto iterator = hexValue.begin(); iterator < hexValue.begin() + 4;
+
+        for(auto iterator = hexValue.begin(); iterator < hexValue.begin() + 2;
             iterator++){
             parsedValue.append(*iterator);
         }
 
-        uvalue = parsedValue.toInt(nullptr,16);
-        qDebug()<< uvalue;
+        uvalue = parsedValue.toUInt(nullptr,16);
         parsedValue.clear();
 
-        for(auto iterator = hexValue.begin()+4; iterator < hexValue.begin() + 8;
-            iterator++){
-            parsedValue.append(*iterator);
+        if(uvalue == 255){
+            for(auto iterator = hexValue.begin()+2; iterator < hexValue.begin() + 6;
+                iterator++){
+                parsedValue.append(*iterator);
+            }
+            uvalue = parsedValue.toUInt(nullptr,16);
+            qDebug()<< uvalue;
+            parsedValue.clear();
+
+            for(auto iterator = hexValue.begin()+6; iterator < hexValue.begin() + 10;
+                iterator++){
+                parsedValue.append(*iterator);
+            }
+            uvalue = parsedValue.toUInt(nullptr,16);
+            qDebug()<< uvalue;
+            parsedValue.clear();
+
+            for(auto iterator = hexValue.begin()+10; iterator < hexValue.begin() + 14;
+                iterator++){
+                parsedValue.append(*iterator);
+            }
+            uvalue = parsedValue.toUInt(nullptr,16);
+            qDebug()<< uvalue;
+            parsedValue.clear();
         }
-
-        uvalue = parsedValue.toInt(nullptr,16);
-        qDebug()<< uvalue;
-        parsedValue.clear();
-
-        for(auto iterator = hexValue.begin()+8; iterator < hexValue.begin() + 12;
-            iterator++){
-            parsedValue.append(*iterator);
-        }
-
-        uvalue = parsedValue.toInt(nullptr,16);
-        qDebug()<< uvalue;
-        parsedValue.clear();
-
-        /*
-        if(firstValue == 0){
-
-        }else{
-            //qDebug()<<firstValue;
-        }
-        */
     }
 }
 

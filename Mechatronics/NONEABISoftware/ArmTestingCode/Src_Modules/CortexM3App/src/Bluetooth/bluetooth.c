@@ -36,13 +36,22 @@ typedef enum{
 
 uint8_t bluetoothConnected;
 uint8_t encoderStarted;
+typedef struct{
+  uint8_t handleFound;
+  uint16_t handle;
+  uint8_t notificationEnabled;
+  uint8_t isNotifying;
+} characteristicStatus_t;
 characteristicStatus_t  characteristicStatus;
+
 charLineBuffer_t *charLineBufferPtr;
 char printBuffer[100];
 
 //EncoderValues
-
-
+static uint16_t minDistToTravel = 0;
+static uint8_t desiredCountDir = 0;
+static uint8_t desiredRepDir = 0;
+//EncoderValues
 
 //-------------- BLUETOOTH COMMANDS---------------
 //Only pair characters can be send (one byte in hex) with
@@ -76,6 +85,78 @@ void unlockWaitingLineParsing(charLineBuffer_t *,
 
 //-------------- RN4020 configuration
 void bluetoothConfig(int configuration);
+
+
+void writeEncoderValues(uint16_t value0,
+			 uint16_t value1,
+			 uint16_t value2){
+
+  runLockingCOMMAND(&characteristicStatus.isNotifying
+		    ,"SHW,%04X,"
+		    "%02X"
+		    "%04X"
+		    "%04X"
+		    "%04X\n",
+		    characteristicStatus.handle,
+		    255,
+		    value0,
+		    value1,
+		    value2);
+}
+
+void setBLEConnected(uint8_t boolean){
+  taskENTER_CRITICAL();
+  bluetoothConnected = boolean;
+  taskEXIT_CRITICAL();
+}
+
+uint8_t getBLEConnected(){
+  uint8_t bleConnectionStatus;
+  
+  taskENTER_CRITICAL();
+  bleConnectionStatus = bluetoothConnected;
+  taskEXIT_CRITICAL();
+
+  return bleConnectionStatus;
+}
+
+void setENCODERStarted(uint8_t boolean){
+  taskENTER_CRITICAL();
+  encoderStarted = boolean;
+  taskEXIT_CRITICAL();
+}
+
+uint8_t getENCODERStarted(void){
+  uint8_t encoderStartedStatus;
+  taskENTER_CRITICAL();
+  encoderStartedStatus = encoderStarted;
+  taskEXIT_CRITICAL();
+  return encoderStartedStatus;
+}
+
+void setMinDistToTravel(uint16_t value){
+  minDistToTravel = value;
+}
+
+uint16_t getMinDistToTravel(){
+  return minDistToTravel;
+}
+
+void setDesiredCountDir(uint8_t value){
+  desiredCountDir = value;
+}
+
+uint8_t getDesiredCountDir(){
+  return desiredCountDir;
+}
+
+void setDesiredRepDir(uint8_t value){
+  desiredRepDir = value;  
+}
+
+uint8_t getDesiredRepDir(){
+  return desiredRepDir;
+}
 
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
 
@@ -224,50 +305,7 @@ void turnOffSubscription(void){
 		    subscriptionHandle);
 }
 
-void writeEncoderValues(uint16_t value0,
-			 uint16_t value1,
-			 uint16_t value2){
 
-  runLockingCOMMAND(&characteristicStatus.isNotifying
-		    ,"SHW,%04X,"
-		    "%04X"
-		    "%04X"
-		    "%04X\n",
-		    characteristicStatus.handle,
-		    value0,
-		    value1,
-		    value2);
-}
-
-void setBLEConnected(uint8_t boolean){
-  taskENTER_CRITICAL();
-  bluetoothConnected = boolean;
-  taskEXIT_CRITICAL();
-}
-
-uint8_t getBLEConnected(){
-  uint8_t bleConnectionStatus;
-  
-  taskENTER_CRITICAL();
-  bleConnectionStatus = bluetoothConnected;
-  taskEXIT_CRITICAL();
-
-  return bleConnectionStatus;
-}
-
-void setENCODERStarted(uint8_t boolean){
-  taskENTER_CRITICAL();
-  encoderStarted = boolean;
-  taskEXIT_CRITICAL();
-}
-
-uint8_t getENCODERStarted(void){
-  uint8_t encoderStartedStatus;
-  taskENTER_CRITICAL();
-  encoderStartedStatus = encoderStarted;
-  taskEXIT_CRITICAL();
-  return encoderStartedStatus;
-}
 
 void startTimers(){
     setENCODERStarted(1);
@@ -340,15 +378,46 @@ int parseWVLine(const char* line){
     return 0;
   }
 
-  char cmessageType[3];
-  strncpy(cmessageType, line+10,2);
-  cmessageType[2] = '\n';
+  char cbyteBuffer[3];
 
-  uint8_t messageType = strtol(cmessageType, NULL, 16);
-  
+  //Begin at line 10 since 00 is expected from sender:
+  //WV,FFFF,00FFBBBBCCDD
+  strncpy(cbyteBuffer, line+10,2);
+  cbyteBuffer[2] = '\n';
+  uint8_t messageType = strtol(cbyteBuffer, NULL, 16);
+
+  uint8_t low = 0;
+  uint8_t high = 0;
 
   if(messageType == 1){
+
+
+    //Get minDistToTravel
+    strncpy(cbyteBuffer, line+12,2);
+    cbyteBuffer[2] = '\n';
+    low = strtol(cbyteBuffer, NULL, 16);
+
+    strncpy(cbyteBuffer, line+14,2);
+    cbyteBuffer[2] = '\n';
+    high = strtol(cbyteBuffer, NULL, 16);
+
+    setMinDistToTravel((high <<8) | low);    
+    //Get minDistToTravel
+
+    //Get desiredCountDir
+    strncpy(cbyteBuffer, line+16,2);
+    cbyteBuffer[2] = '\n';
+    setDesiredCountDir(strtol(cbyteBuffer,NULL,16));
+    //Get desiredCountDir
+
+    //Get desiredRepDir
+    strncpy(cbyteBuffer, line+18,2);
+    cbyteBuffer[2] = '\n';
+    setDesiredRepDir(strtol(cbyteBuffer,NULL,16));
+    //Get desiredRepDir
+
     startTimers();
+
   }else if(messageType ==2){
     stopTimers();
   }else if(messageType == 3){
