@@ -22,7 +22,9 @@ class ConnectionHandling : public QObject
     Q_PROPERTY(QString devicename READ getDevicename WRITE setDevicename NOTIFY devicenameChanged)
     Q_PROPERTY(QString deviceaddress READ getDeviceaddress
                WRITE setDeviceaddress NOTIFY deviceadressChanged)
-    Q_PROPERTY(QPointF computedValue READ getComputedValue NOTIFY computedValueChanged)
+    Q_PROPERTY(uint traveledDistance READ getTraveledDist WRITE setTraveledDist NOTIFY traveledDistanceChanged)
+    Q_PROPERTY(uint meanPropVel READ getMeanPropVel WRITE setMeanPropVel NOTIFY meanPropVelChanged)
+    Q_PROPERTY(uint peakVel READ getPeakVel WRITE setPeakVel NOTIFY peakVelChanged)
     //QML Properties related*
 
 public:
@@ -44,11 +46,15 @@ public:
     QString getDeviceaddress() const;
     void setDeviceaddress(const QString &value);
 
-    QPoint getComputedValue() const;
-    void setComputedValue(const int y);
+    uint getTraveledDist() const;
+    void setTraveledDist(const uint &value);
+
+    uint getMeanPropVel() const;
+    void setMeanPropVel(const uint &value);
+
+    uint getPeakVel() const;
+    void setPeakVel(const uint &value);
     //QML Properties related*
-
-
 
 signals:
     //QML Properties related
@@ -56,13 +62,16 @@ signals:
     void connectingChanged();
     void devicenameChanged();
     void deviceadressChanged();
-    void computedValueChanged();
+    void traveledDistanceChanged();
+    void meanPropVelChanged();
+    void peakVelChanged();
     //QML Properties related*
 
 public slots:
     void disconnect();
     void sendADC();
-    void sendStart();
+    void sendStart(uint minDistToTravel, uint desiredCountDir,
+                   uint desiredRepDir);
     void sendStop();
 
 private slots:
@@ -88,7 +97,9 @@ private:
     int connecting;
     QString devicename;
     QString deviceaddress;
-    QPoint computedValue;
+    uint traveledDist;
+    uint meanPropVel;
+    uint peakVel;
     //QML Properties related*
 
     QString encService;

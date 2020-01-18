@@ -386,32 +386,23 @@ int parseWVLine(const char* line){
   cbyteBuffer[2] = '\n';
   uint8_t messageType = strtol(cbyteBuffer, NULL, 16);
 
-  uint8_t low = 0;
-  uint8_t high = 0;
-
   if(messageType == 1){
 
 
     //Get minDistToTravel
     strncpy(cbyteBuffer, line+12,2);
     cbyteBuffer[2] = '\n';
-    low = strtol(cbyteBuffer, NULL, 16);
-
-    strncpy(cbyteBuffer, line+14,2);
-    cbyteBuffer[2] = '\n';
-    high = strtol(cbyteBuffer, NULL, 16);
-
-    setMinDistToTravel((high <<8) | low);    
+    setMinDistToTravel(strtol(cbyteBuffer,NULL,16));
     //Get minDistToTravel
 
     //Get desiredCountDir
-    strncpy(cbyteBuffer, line+16,2);
+    strncpy(cbyteBuffer, line+14,2);
     cbyteBuffer[2] = '\n';
     setDesiredCountDir(strtol(cbyteBuffer,NULL,16));
     //Get desiredCountDir
 
     //Get desiredRepDir
-    strncpy(cbyteBuffer, line+18,2);
+    strncpy(cbyteBuffer, line+16,2);
     cbyteBuffer[2] = '\n';
     setDesiredRepDir(strtol(cbyteBuffer,NULL,16));
     //Get desiredRepDir

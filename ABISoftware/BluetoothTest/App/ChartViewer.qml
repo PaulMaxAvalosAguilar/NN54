@@ -97,13 +97,16 @@ Page{
             }
 
 
+            /*
             Connections{
                 target: connhandling
                 onComputedValueChanged: {
 
                 }
             }
+            */
 
+            /*
             property int valx: 1
             property int valy: 200
 
@@ -114,6 +117,7 @@ Page{
                 axisX.max = (scatterseries.at(scatterseries.count-1).x)+1
                 axisX.applyNiceNumbers()
             }
+            */
         }
     }
 }

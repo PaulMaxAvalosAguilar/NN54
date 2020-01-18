@@ -7,7 +7,7 @@ ApplicationWindow {
     id:window
     visible: true
     visibility: Qt.WindowFullScreen
-    title: "Encoder App"
+    title: "VBT APP"
 
     property var currentView: homePageView
     property var connectedState: bleScannerView.connected
@@ -26,7 +26,7 @@ ApplicationWindow {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             anchors.top: parent.top
-            width: window.width * .05
+            width: window.width * .10
             Image{
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
@@ -34,7 +34,7 @@ ApplicationWindow {
             }
 
             onClicked: {
-                headerLabel.text = "Encoder App"
+                headerLabel.text = "VBT App"
                 changeView(homePageView)
             }
         }
@@ -45,7 +45,7 @@ ApplicationWindow {
             anchors.leftMargin: parent.width/60
             anchors.verticalCenter: parent.verticalCenter
             height: parent.height
-            width: window.width * .05
+            width: window.width * .10
             Image{
                 height: parent.height
                 anchors.fill: parent
@@ -58,11 +58,11 @@ ApplicationWindow {
 
         Label{
             id: headerLabel
-            text:"Encoder App"
+            text:"VBT App"
             anchors.left: parent.left
             anchors.right: parent.right
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize:  30
+            font.pointSize:  23
         }
     }
 
@@ -119,7 +119,7 @@ ApplicationWindow {
             Label{
                 id: textLabel
                 text: "App to open:"
-                font.pointSize: 25
+                font.pointSize: 17
                 anchors.left: parent.left
                 anchors.right: parent.right
                 horizontalAlignment: Text.AlignHCenter

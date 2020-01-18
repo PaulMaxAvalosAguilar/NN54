@@ -3,8 +3,6 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.1
 
 Page{
-
-
     ScrollView {
         id: scrollingArea
         anchors.fill: parent

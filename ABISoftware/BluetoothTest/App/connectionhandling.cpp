@@ -8,7 +8,9 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     connecting(false),
     devicename(""),
     deviceaddress(""),
-    computedValue(),
+    traveledDist(),
+    meanPropVel(),
+    peakVel(),
     encService("11223344-5566-7788-9900-AABBCCDDEEFF"),
     encCharacteristic("01020304-0506-0708-0900-0A0B0C0D0FFF"),
     controller(),
@@ -106,16 +108,41 @@ void ConnectionHandling::setDeviceaddress(const QString &value)
     deviceadressChanged();
 }
 
-QPoint ConnectionHandling::getComputedValue() const
+
+
+
+
+uint ConnectionHandling::getTraveledDist() const
 {
-    return computedValue;
+    return traveledDist;
 }
 
-void ConnectionHandling::setComputedValue(const int y)
+void ConnectionHandling::setTraveledDist(const uint &value)
 {
-    computedValue.setX(computedValue.x()+1);
-    computedValue.setY(y);
-    emit computedValueChanged();
+    traveledDist = value;
+    emit traveledDistanceChanged();
+}
+
+uint ConnectionHandling::getMeanPropVel() const
+{
+    return meanPropVel;
+}
+
+void ConnectionHandling::setMeanPropVel(const uint &value)
+{
+    meanPropVel = value;
+    emit meanPropVelChanged();
+}
+
+uint ConnectionHandling::getPeakVel() const
+{
+    return peakVel;
+}
+
+void ConnectionHandling::setPeakVel(const uint &value)
+{
+    peakVel = value;
+    emit peakVelChanged();
 }
 
 void ConnectionHandling::disconnect()
@@ -138,22 +165,19 @@ void ConnectionHandling::sendADC()
     }
 }
 
-void ConnectionHandling::sendStart()
+void ConnectionHandling::sendStart(uint minDistToTravel, uint desiredCountDir, uint desiredRepDir)
 {
     if(connected){
         char a = 0;
         char b = 1;
 
-
-        char f = (65000>>8);
-
         QByteArray c;
         c.append(a);
         c.append(b);
-        c.append(static_cast<char>(8));
-        c.append(static_cast<char>(8 >> 8));
-        c.append(1);
-        c.append(1);
+
+        c.append(static_cast<char>(minDistToTravel));
+        c.append(static_cast<char>(desiredCountDir));
+        c.append(static_cast<char>(desiredRepDir));
         encoderService->writeCharacteristic(encoderCharacteristic, c);
 
     }
@@ -278,24 +302,24 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
                 parsedValue.append(*iterator);
             }
             uvalue = parsedValue.toUInt(nullptr,16);
-            qDebug()<< uvalue;
             parsedValue.clear();
+            setTraveledDist(uvalue);
 
             for(auto iterator = hexValue.begin()+6; iterator < hexValue.begin() + 10;
                 iterator++){
                 parsedValue.append(*iterator);
             }
             uvalue = parsedValue.toUInt(nullptr,16);
-            qDebug()<< uvalue;
             parsedValue.clear();
+            setMeanPropVel(uvalue);
 
             for(auto iterator = hexValue.begin()+10; iterator < hexValue.begin() + 14;
                 iterator++){
                 parsedValue.append(*iterator);
             }
             uvalue = parsedValue.toUInt(nullptr,16);
-            qDebug()<< uvalue;
             parsedValue.clear();
+            setPeakVel(uvalue);
         }
     }
 }
@@ -306,3 +330,4 @@ void ConnectionHandling::confirmedDescriptorWritten(const QLowEnergyDescriptor &
         qDebug() <<"Notifications activated";
     }
 }
+
