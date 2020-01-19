@@ -38,8 +38,8 @@ Page{
 
             ListView{
                 id: listView                
-                width: parent.width - (parent.width * 0.5)
-                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.bottom: busyIndication.top
                 anchors.top: selectyourencoderrect.bottom
                 spacing: 5
@@ -52,7 +52,7 @@ Page{
                 delegate:Rectangle{
                     id:delegateRectangle
                     width: parent.width
-                    height: delegateText.height * 2
+                    height: delegateText.height * 3
                     color: "#d0d1d2"
                     border.width: 2
                     border.color: "black"

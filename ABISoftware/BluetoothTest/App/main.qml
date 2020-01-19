@@ -59,10 +59,11 @@ ApplicationWindow {
         Label{
             id: headerLabel
             text:"VBT App"
+            clip: true
             anchors.left: parent.left
             anchors.right: parent.right
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize:  23
+            font.pointSize:  window.height / 30
         }
     }
 
@@ -96,7 +97,7 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         Label{
             id: footerLabel
-            font.pointSize: 13
+            font.pointSize: window.height / 40
             anchors.left: parent.left
             anchors.right: parent.right
             text: "V.B.T Encoder by S(T)"

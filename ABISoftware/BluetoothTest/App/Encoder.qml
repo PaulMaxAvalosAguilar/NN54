@@ -19,6 +19,9 @@ Page{
     property int valy: 0
     property int minWspd: 0
     property int maxWspd: 250
+    property int maxVel: 0
+    property int fatigue: 0
+    property var graphNameText: ""
 
     onConnectedChanged: {
         connected? "": startbutton.y = startButtonTopPosition
@@ -26,8 +29,19 @@ Page{
         connected? started = 0 : started  = false
     }
 
+    onTraveledDistChanged: {
+        travellabel.text = traveledDist
+
+    }
+
     onMeanPropVelChanged: {
-        scrollingArea.addToChart(meanPropVel)
+        mpvlabel.text = meanPropVel/100
+        modeTextField.currentIndex? scrollingArea.addToChart(meanPropVel) :""
+    }
+
+    onPeakVelChanged: {
+        peaklabel.text = peakVel/100
+        !modeTextField.currentIndex? scrollingArea.addToChart(peakVel): ""
     }
 
     ScrollView {
@@ -59,46 +73,168 @@ Page{
                 }
             }
 
-            ChartView {
-                id: chart
-                title: "MPV"
+            Rectangle{
+                id:dataRectangle
                 width: firstRect.width
                 anchors.top: settingsButton.bottom
-                height:startButtonBottPosition - startbutton.height/2 -scrollingArea.height/60
-                antialiasing: true
-                legend.alignment: Qt.AlignBottom
-                legend.markerShape: Legend.MarkerShapeCircle
+                anchors.topMargin: firstRect.height/85
+                height:startButtonBottPosition - startbutton.height/2 - settingsButton.height
+                opacity: 1
 
-                opacity: 0
 
-                ValueAxis {
-                    id: axisX
-                    labelFormat: "%d"
-                    tickCount: 2
-                    Component.onCompleted: applyNiceNumbers()
+                ChartView {
+                    id: chart
+                    title: graphNameText
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: meanPropVelunitRect.top
+                    antialiasing: true
+                    legend.visible: false
+
+                    ValueAxis {
+                        id: axisX
+                        labelFormat: "%d"
+                        tickCount: 2
+                        Component.onCompleted: applyNiceNumbers()
+                    }
+
+                    ValueAxis {
+                        id: axisY
+                        min: minWspd
+                        max: maxWspd
+                        labelFormat: "%d"
+                    }
+
+                    ScatterSeries {
+                        id: scatterseries
+                        pointLabelsVisible: true
+                        pointLabelsFormat: "@xPoint"
+                        markerSize: (window.width *window.height )/ 65000.0
+                        axisX: axisX
+                        axisY: axisY
+                    }
+
+                    SplineSeries{
+                        id: lineseries
+                        axisX: axisX
+                        axisY: axisY
+                    }
                 }
 
-                ValueAxis {
-                    id: axisY
-                    min: minWspd
-                    max: maxWspd
-                    labelFormat: "%d"
+                Rectangle{
+                    id:traveledDistunitRect
+                    height: parent.height /10
+                    width: parent.width /5
+                    anchors.right: meanPropVelunitRect.left
+                    anchors.bottom: traveledDistRect.top
+                    border.color: "black"
+                    border.width: 1
+                    Label{
+                        id:travelunitlabel
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: "cm"
+                        clip: true
+                        font.pointSize: window.height / 60
+                    }
                 }
 
-                ScatterSeries {
-                    id: scatterseries
-                    name: "MPV"
-                    pointLabelsVisible: true
-                    pointLabelsFormat: "@xPoint"
-                    markerSize: (window.width *window.height )/ 65000.0
-                    axisX: axisX
-                    axisY: axisY
+                Rectangle{
+                    id:meanPropVelunitRect
+                    height: parent.height /10
+                    width: parent.width /5
+                    anchors.bottom: meanPropVelRect.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    border.color: "black"
+                    border.width: 1
+                    Label{
+                        id:mpvunitlabel
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: "m/s"
+                        clip: true
+                        font.pointSize: window.height / 60
+                    }
                 }
 
-                SplineSeries{
-                    id: lineseries
-                    axisX: axisX
-                    axisY: axisY
+                Rectangle{
+                    id:peakVelunitRect
+                    height: parent.height /10
+                    width: parent.width /5
+                    anchors.left: meanPropVelunitRect.right
+                    anchors.bottom: peakVelRect.top
+                    border.color: "black"
+                    border.width: 1
+                    Label{
+                        id:peakunitlabel
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: "m/s"
+                        clip: true
+                        font.pointSize: window.height / 60
+                    }
+                }
+
+
+                Rectangle{
+                    id:traveledDistRect
+                    height: parent.height /10
+                    width: parent.width /5
+                    anchors.right: meanPropVelRect.left
+                    anchors.bottom: parent.bottom
+                    border.color: "black"
+                    border.width: 1
+                    Label{
+                        id:travellabel
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: "HOLA"
+                        clip: true
+                        font.pointSize: window.height / 60
+                    }
+                }
+
+                Rectangle{
+                    id:meanPropVelRect
+                    height: parent.height /10
+                    width: parent.width /5
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    border.color: "black"
+                    border.width: 1
+                    Label{
+                        id:mpvlabel
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: "HOLA"
+                        clip: true
+                        font.pointSize: window.height / 60
+                    }
+                }
+
+                Rectangle{
+                    id:peakVelRect
+                    height: parent.height /10
+                    width: parent.width /5
+                    anchors.left: meanPropVelRect.right
+                    anchors.bottom: parent.bottom
+                    border.color: "black"
+                    border.width: 1
+                    Label{
+                        id:peaklabel
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: "HOLA"
+                        clip: true
+                        font.pointSize: window.height / 60
+                    }
                 }
 
                 Behavior on opacity {
@@ -122,11 +258,20 @@ Page{
                     started? y = Qt.binding(function(){return startButtonTopPosition}) :
                              y = Qt.binding(function(){return startButtonBottPosition})
                     started? settingsButton.enabled = true : settingsButton.enabled = false
-                    started? chart.opacity = 0 : chart.opacity = 1
+                    started? dataRectangle.opacity = 0 : dataRectangle.opacity = 1
 
                     started? "": scatterseries.clear()
                     started? "": lineseries.clear()
                     started? "": valx = 1
+
+                    started? "": travellabel.text = ""
+                    started? "": mpvlabel.text = ""
+                    started? "": peaklabel.text = ""
+
+                    started? "": maxVel = 0
+                    started? "": fatigue = 0
+
+                    modeTextField.currentIndex? graphNameText = "MPV" :graphNameText = "PV"
 
                     started? started = 0 : started = 1
                 }
@@ -147,7 +292,7 @@ Page{
             Rectangle{
                 id:settingsRect
                 color:"red"
-                height: elementsHeight * 3
+                height: elementsHeight * 4
                 width: parent.width/1.5
                 x: (parent.width/2) -width/2
                 y:  (parent.height/2)-height/2
@@ -157,10 +302,38 @@ Page{
 
 
                 Rectangle{
-                    id: minDistToTravelLabel
+                    id: modeLabel
                     width: parent.elementsWidth
                     height: parent.elementsHeight
                     anchors.top: parent.top
+                    anchors.left: settingsRect.left
+                    border.color: "black"
+                    border.width: 3
+                    Label{
+                        text: "Desired Count Direction:"
+                        wrapMode: Text.Wrap
+                        clip: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.fill: parent
+                    }
+                }
+
+                ComboBox{
+                    id:modeTextField
+                    model: ["Olympic","PL"]
+                    currentIndex: 1
+                    width: parent.elementsWidth
+                    height: parent.elementsHeight
+                    anchors.top:parent.top
+                    anchors.right:  settingsRect.right
+                }
+
+                Rectangle{
+                    id: minDistToTravelLabel
+                    width: parent.elementsWidth
+                    height: parent.elementsHeight
+                    anchors.top: modeLabel.bottom
                     anchors.left: settingsRect.left
                     border.color: "black"
                     border.width: 3
@@ -183,7 +356,7 @@ Page{
 
                     width: parent.elementsWidth
                     height: parent.elementsHeight
-                    anchors.top: parent.top
+                    anchors.top: modeLabel.bottom
                     anchors.right: settingsRect.right
                 }
 
@@ -269,6 +442,13 @@ Page{
 
             if( valy > maxWspd) {
                 maxWspd = valy+10;
+            }
+
+            if(valy > maxVel){
+                maxVel = valy
+            }else{
+                fatigue = (  (1-(valy/maxVel))*100 )
+                console.log(fatigue)
             }
 
             scatterseries.append(valx, valy)
