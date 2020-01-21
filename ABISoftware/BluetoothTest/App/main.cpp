@@ -5,6 +5,8 @@
 #include <memory>
 #include "blescannermodel.h"
 
+#include <QTextToSpeech>
+
 int main(int argc, char *argv[]){
 
     QApplication app(argc,argv);
@@ -16,6 +18,5 @@ int main(int argc, char *argv[]){
     context->setContextProperty("connhandling", blescannermodel->getConnHandling().get());
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-
     return app.exec();
 }

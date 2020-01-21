@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2
+import QtQuick.Layouts 1.12
 import QtCharts 2.3
 
 Page{
@@ -37,11 +38,13 @@ Page{
     onMeanPropVelChanged: {
         mpvlabel.text = meanPropVel/100
         modeTextField.currentIndex? scrollingArea.addToChart(meanPropVel) :""
+        modeTextField.currentIndex && started? connhandling.say(mpvlabel.text) :""
     }
 
     onPeakVelChanged: {
         peaklabel.text = peakVel/100
         !modeTextField.currentIndex? scrollingArea.addToChart(peakVel): ""
+        !modeTextField.currentIndex && started? connhandling.say(peaklabel.text) :""
     }
 
     ScrollView {
@@ -88,7 +91,7 @@ Page{
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.bottom: meanPropVelunitRect.top
+                    anchors.bottom: grid.top
                     antialiasing: true
                     legend.visible: false
 
@@ -122,120 +125,153 @@ Page{
                     }
                 }
 
-                Rectangle{
-                    id:traveledDistunitRect
-                    height: parent.height /10
-                    width: parent.width /5
-                    anchors.right: meanPropVelunitRect.left
-                    anchors.bottom: traveledDistRect.top
-                    border.color: "black"
-                    border.width: 1
-                    Label{
-                        id:travelunitlabel
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        text: "cm"
-                        clip: true
-                        font.pointSize: window.height / 60
-                    }
-                }
 
-                Rectangle{
-                    id:meanPropVelunitRect
-                    height: parent.height /10
-                    width: parent.width /5
-                    anchors.bottom: meanPropVelRect.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    border.color: "black"
-                    border.width: 1
-                    Label{
-                        id:mpvunitlabel
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        text: "m/s"
-                        clip: true
-                        font.pointSize: window.height / 60
-                    }
-                }
+                GridLayout {
+                        id: grid
 
-                Rectangle{
-                    id:peakVelunitRect
-                    height: parent.height /10
-                    width: parent.width /5
-                    anchors.left: meanPropVelunitRect.right
-                    anchors.bottom: peakVelRect.top
-                    border.color: "black"
-                    border.width: 1
-                    Label{
-                        id:peakunitlabel
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        text: "m/s"
-                        clip: true
-                        font.pointSize: window.height / 60
-                    }
-                }
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: parent.height/10
+
+                        rowSpacing: 0
+
+                        columns: 4
+
+                        Rectangle{
+                            id:traveledDistunitRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:travelunitlabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text: "cm"
+                                clip: true
+                                font.pointSize: window.height / 60
+                            }
+                        }
+
+                        Rectangle{
+                            id:meanPropVelunitRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:mpvunitlabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text: "m/s"
+                                clip: true
+                                font.pointSize: window.height / 60
+                            }
+                        }
+
+                        Rectangle{
+                            id:peakVelunitRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:peakunitlabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text: "m/s"
+                                clip: true
+                                font.pointSize: window.height / 60
+                            }
+                        }
+
+                        Rectangle{
+                            id:fatigueunitRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:fatigueunitlabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text: "%"
+                                clip: true
+                                font.pointSize: window.height / 60
+                            }
+                        }
 
 
-                Rectangle{
-                    id:traveledDistRect
-                    height: parent.height /10
-                    width: parent.width /5
-                    anchors.right: meanPropVelRect.left
-                    anchors.bottom: parent.bottom
-                    border.color: "black"
-                    border.width: 1
-                    Label{
-                        id:travellabel
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        text: "HOLA"
-                        clip: true
-                        font.pointSize: window.height / 60
-                    }
-                }
+                        Rectangle{
+                            id:traveledDistRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:travellabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                wrapMode: Text.Wrap
+                                font.pointSize: window.height / 60
+                            }
+                        }
 
-                Rectangle{
-                    id:meanPropVelRect
-                    height: parent.height /10
-                    width: parent.width /5
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    border.color: "black"
-                    border.width: 1
-                    Label{
-                        id:mpvlabel
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        text: "HOLA"
-                        clip: true
-                        font.pointSize: window.height / 60
-                    }
-                }
+                        Rectangle{
+                            id:meanPropVelRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:mpvlabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                wrapMode: Text.Wrap
+                                font.pointSize: window.height / 60
+                            }
+                        }
 
-                Rectangle{
-                    id:peakVelRect
-                    height: parent.height /10
-                    width: parent.width /5
-                    anchors.left: meanPropVelRect.right
-                    anchors.bottom: parent.bottom
-                    border.color: "black"
-                    border.width: 1
-                    Label{
-                        id:peaklabel
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        text: "HOLA"
-                        clip: true
-                        font.pointSize: window.height / 60
+                        Rectangle{
+                            id:peakVelRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:peaklabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                wrapMode: Text.Wrap
+                                font.pointSize: window.height / 60
+                            }
+                        }
+
+                        Rectangle{
+                            id:fatigueRect
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            border.color: "black"
+                            border.width: 1
+                            Label{
+                                id:fatiguelabel
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text: "nA"
+                                wrapMode: Text.Wrap
+                                font.pointSize: window.height / 60
+                            }
+                        }
                     }
-                }
 
                 Behavior on opacity {
                     NumberAnimation{ duration: 250}
@@ -267,6 +303,7 @@ Page{
                     started? "": travellabel.text = ""
                     started? "": mpvlabel.text = ""
                     started? "": peaklabel.text = ""
+                    started? "": fatiguelabel.text = "nA"
 
                     started? "": maxVel = 0
                     started? "": fatigue = 0
@@ -446,9 +483,10 @@ Page{
 
             if(valy > maxVel){
                 maxVel = valy
+                fatiguelabel.text = "nA"
             }else{
                 fatigue = (  (1-(valy/maxVel))*100 )
-                console.log(fatigue)
+                fatiguelabel.text = fatigue
             }
 
             scatterseries.append(valx, valy)

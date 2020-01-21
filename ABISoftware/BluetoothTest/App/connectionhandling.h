@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <QPoint>
+#include <QTextToSpeech>
 
 class ConnectionHandling : public QObject
 {
@@ -73,6 +74,7 @@ public slots:
     void sendStart(uint minDistToTravel, uint desiredCountDir,
                    uint desiredRepDir);
     void sendStop();
+    void say(QString text);
 
 private slots:
 
@@ -113,6 +115,8 @@ private:
     //Timer Related
     std::unique_ptr<QTimer> timer;
     //Timer Related
+
+    std::unique_ptr<QTextToSpeech> speech;
 };
 
 #endif // CONNECTIONHANDLING_H

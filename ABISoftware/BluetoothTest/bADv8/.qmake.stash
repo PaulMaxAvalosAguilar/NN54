@@ -1,0 +1,29 @@
+QMAKE_CXX.QT_COMPILER_STDCXX = 201402L
+QMAKE_CXX.QMAKE_CLANG_MAJOR_VERSION = 9
+QMAKE_CXX.QMAKE_CLANG_MINOR_VERSION = 0
+QMAKE_CXX.QMAKE_CLANG_PATCH_VERSION = 8
+QMAKE_CXX.QMAKE_GCC_MAJOR_VERSION = 4
+QMAKE_CXX.QMAKE_GCC_MINOR_VERSION = 2
+QMAKE_CXX.QMAKE_GCC_PATCH_VERSION = 1
+QMAKE_CXX.COMPILER_MACROS = \
+    QT_COMPILER_STDCXX \
+    QMAKE_CLANG_MAJOR_VERSION \
+    QMAKE_CLANG_MINOR_VERSION \
+    QMAKE_CLANG_PATCH_VERSION \
+    QMAKE_GCC_MAJOR_VERSION \
+    QMAKE_GCC_MINOR_VERSION \
+    QMAKE_GCC_PATCH_VERSION
+QMAKE_CXX.INCDIRS = \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/sysroot/usr/include/aarch64-linux-android \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/sources/cxx-stl/llvm-libc++/include \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/sources/android/support/include \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/sources/cxx-stl/llvm-libc++abi/include \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/9.0.8/include \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/sysroot/usr/include
+QMAKE_CXX.LIBDIRS = \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/9.0.8 \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/9.0.8/lib/linux/aarch64 \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/aarch64-linux-android-4.9/prebuilt/windows-x86_64/lib/gcc/aarch64-linux-android/4.9.x \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/aarch64-linux-android-4.9/prebuilt/windows-x86_64/aarch64-linux-android/lib64 \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/aarch64-linux-android-4.9/prebuilt/windows-x86_64/aarch64-linux-android/lib \
+    D:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/platforms/android-21/arch-arm64/usr/lib

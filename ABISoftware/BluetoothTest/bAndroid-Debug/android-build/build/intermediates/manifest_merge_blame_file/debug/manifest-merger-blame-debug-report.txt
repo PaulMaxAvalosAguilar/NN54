@@ -1,0 +1,252 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="org.qtproject.example.App"
+4    android:installLocation="auto"
+5    android:versionCode="1"
+6    android:versionName="1.0" >
+7
+8    <uses-sdk
+8-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:3:5-73
+9        android:minSdkVersion="21"
+9-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:3:15-41
+10        android:targetSdkVersion="28" />
+10-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:3:42-71
+11
+12    <!--
+13         The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
+14         Remove the comment if you do not require these default permissions.
+15    -->
+16    <uses-permission android:name="android.permission.INTERNET" />
+16-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:7:5-67
+16-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:7:22-64
+17    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+17-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:8:5-81
+17-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:8:22-78
+18    <uses-permission android:name="android.permission.BLUETOOTH" />
+18-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:9:5-68
+18-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:9:22-65
+19    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+19-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:10:5-74
+19-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:10:22-71
+20    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+20-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:11:5-81
+20-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:11:22-78
+21    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+21-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:12:5-79
+21-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:12:22-76
+22
+23    <!--
+24         The following comment will be replaced upon deployment with default features based on the dependencies of the application.
+25         Remove the comment if you do not require these default features.
+26    -->
+27
+28    <supports-screens
+28-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:5-135
+29        android:anyDensity="true"
+29-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:80-105
+30        android:largeScreens="true"
+30-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:23-50
+31        android:normalScreens="true"
+31-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:51-79
+32        android:smallScreens="true" />
+32-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:106-133
+33
+34    <application
+34-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:5-94:19
+35        android:name="org.qtproject.qt5.android.bindings.QtApplication"
+35-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:53-116
+36        android:debuggable="true"
+37        android:extractNativeLibs="true"
+37-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:137-169
+38        android:hardwareAccelerated="true"
+38-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:18-52
+39        android:label="App" >
+39-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:117-136
+40        <activity
+40-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:21:9-90:16
+41            android:name="org.qtproject.qt5.android.bindings.QtActivity"
+41-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:22:19-79
+42            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
+42-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:21:19-188
+43            android:label="App"
+43-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:23:19-38
+44            android:launchMode="singleTop"
+44-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:25:19-49
+45            android:screenOrientation="unspecified" >
+45-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:24:19-58
+46            <intent-filter>
+46-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:26:13-29:29
+47                <action android:name="android.intent.action.MAIN" />
+47-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:27:17-68
+47-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:27:25-66
+48
+49                <category android:name="android.intent.category.LAUNCHER" />
+49-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:28:17-76
+49-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:28:27-74
+50            </intent-filter>
+51
+52            <!-- Application arguments -->
+53            <!-- meta-data android:name="android.app.arguments" android:value="arg1 arg2 arg3"/ -->
+54            <!-- Application arguments -->
+55
+56            <meta-data
+56-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:35:13-81
+57                android:name="android.app.lib_name"
+57-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:35:24-59
+58                android:value="App" />
+58-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:35:60-79
+59            <meta-data
+59-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:36:13-112
+60                android:name="android.app.qt_sources_resource_id"
+60-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:36:24-73
+61                android:resource="@array/qt_sources" />
+61-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:36:74-110
+62            <meta-data
+62-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:37:13-87
+63                android:name="android.app.repository"
+63-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:37:24-61
+64                android:value="default" />
+64-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:37:62-85
+65            <meta-data
+65-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:38:13-106
+66                android:name="android.app.qt_libs_resource_id"
+66-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:38:24-70
+67                android:resource="@array/qt_libs" />
+67-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:38:71-104
+68            <meta-data
+68-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:13-116
+69                android:name="android.app.bundled_libs_resource_id"
+69-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:24-75
+70                android:resource="@array/bundled_libs" />
+70-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:76-114
+71            <!-- Deploy Qt libs as part of package -->
+72            <meta-data
+72-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:13-91
+73                android:name="android.app.bundle_local_qt_libs"
+73-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:24-71
+74                android:value="1" />
+74-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:72-89
+75
+76            <!-- Run with local libs -->
+77            <meta-data
+77-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:44:13-88
+78                android:name="android.app.use_local_qt_libs"
+78-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:44:24-68
+79                android:value="1" />
+79-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:44:69-86
+80            <meta-data
+80-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:13-100
+81                android:name="android.app.libs_prefix"
+81-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:24-62
+82                android:value="/data/local/tmp/qt/" />
+82-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:63-98
+83            <meta-data
+83-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:46:13-122
+84                android:name="android.app.load_local_libs_resource_id"
+84-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:46:24-78
+85                android:resource="@array/load_local_libs" />
+85-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:46:79-120
+86            <meta-data
+86-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:47:13-177
+87                android:name="android.app.load_local_jars"
+87-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:47:24-66
+88                android:value="jar/QtAndroid.jar:jar/QtAndroidExtras.jar:jar/QtAndroidBluetooth.jar:jar/QtAndroidBearer.jar" />
+88-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:47:67-175
+89            <meta-data
+89-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:13-153
+90                android:name="android.app.static_init_classes"
+90-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:24-70
+91                android:value="org.qtproject.qt5.android.bluetooth.QtBluetoothBroadcastReceiver" />
+91-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:71-151
+92            <!-- Used to specify custom system library path to run with local system libs -->
+93            <!-- <meta-data android:name="android.app.system_libs_prefix" android:value="/system/lib/"/> -->
+94            <!-- Messages maps -->
+95            <meta-data
+95-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:13-122
+96                android:name="android.app.ministro_not_found_msg"
+96-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:71-120
+97                android:value="@string/ministro_not_found_msg" />
+97-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:24-70
+98            <meta-data
+98-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:53:13-116
+99                android:name="android.app.ministro_needed_msg"
+99-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:53:68-114
+100                android:value="@string/ministro_needed_msg" />
+100-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:53:24-67
+101            <meta-data
+101-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:54:13-108
+102                android:name="android.app.fatal_error_msg"
+102-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:54:64-106
+103                android:value="@string/fatal_error_msg" />
+103-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:54:24-63
+104            <meta-data
+104-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:55:13-132
+105                android:name="android.app.unsupported_android_version"
+105-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:55:76-130
+106                android:value="@string/unsupported_android_version" />
+106-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:55:24-75
+107            <!-- Messages maps -->
+108
+109
+110            <!-- Splash screen -->
+111            <!--
+112                 Orientation-specific (portrait/landscape) data is checked first. If not available for current orientation,
+113                 then android.app.splash_screen_drawable. For best results, use together with splash_screen_sticky and
+114                 use hideSplashScreen() with a fade-out animation from Qt Android Extras to hide the splash screen when you
+115                 are done populating your window with content.
+116            -->
+117            <!-- meta-data android:name="android.app.splash_screen_drawable_portrait" android:resource="@drawable/logo_portrait" / -->
+118            <!-- meta-data android:name="android.app.splash_screen_drawable_landscape" android:resource="@drawable/logo_landscape" / -->
+119            <!-- meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/logo"/ -->
+120            <!-- meta-data android:name="android.app.splash_screen_sticky" android:value="true"/ -->
+121            <!-- Splash screen -->
+122
+123
+124            <!-- Background running -->
+125            <!--
+126                 Warning: changing this value to true may cause unexpected crashes if the
+127                          application still try to draw after
+128                          "applicationStateChanged(Qt::ApplicationSuspended)"
+129                          signal is sent!
+130            -->
+131            <meta-data
+131-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:74:13-93
+132                android:name="android.app.background_running"
+132-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:74:24-69
+133                android:value="false" />
+133-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:74:70-91
+134            <!-- Background running -->
+135
+136
+137            <!-- auto screen scale factor -->
+138            <meta-data
+138-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:13-99
+139                android:name="android.app.auto_screen_scale_factor"
+139-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:24-75
+140                android:value="false" />
+140-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:76-97
+141            <!-- auto screen scale factor -->
+142
+143
+144            <!-- extract android style -->
+145            <!--
+146                 available android:values :
+147                * default - In most cases this will be the same as "full", but it can also be something else if needed, e.g., for compatibility reasons
+148                * full - useful QWidget & Quick Controls 1 apps
+149                * minimal - useful for Quick Controls 2 apps, it is much faster than "full"
+150                * none - useful for apps that don't use any of the above Qt modules
+151            -->
+152            <meta-data
+152-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:88:13-98
+153                android:name="android.app.extract_android_style"
+153-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:88:24-72
+154                android:value="default" />
+154-->D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:88:73-96
+155            <!-- extract android style -->
+156        </activity>
+157
+158        <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
+159
+160    </application>
+161
+162</manifest>

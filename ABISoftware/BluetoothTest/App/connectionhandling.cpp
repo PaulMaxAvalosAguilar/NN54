@@ -18,7 +18,9 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     encoderService(),
     encoderCharacteristic(),
     batteryDescriptor(),
-    timer(new QTimer)
+    timer(new QTimer),
+    speech(new QTextToSpeech)
+
 {
     connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
 }
@@ -194,6 +196,11 @@ void ConnectionHandling::sendStop()
         c.append(b);
         encoderService->writeCharacteristic(encoderCharacteristic, c);
     }
+}
+
+void ConnectionHandling::say(QString text)
+{
+    speech->say(text);
 }
 
 void ConnectionHandling::deviceConnected()
