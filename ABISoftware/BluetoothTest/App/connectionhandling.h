@@ -12,6 +12,7 @@
 #include <string>
 #include <QPoint>
 #include <QTextToSpeech>
+#include <QSoundEffect>
 
 class ConnectionHandling : public QObject
 {
@@ -74,7 +75,8 @@ public slots:
     void sendStart(uint minDistToTravel, uint desiredCountDir,
                    uint desiredRepDir);
     void sendStop();
-    void say(QString text);
+    void say(double number);
+    void soundeffect();
 
 private slots:
 
@@ -117,6 +119,7 @@ private:
     //Timer Related
 
     std::unique_ptr<QTextToSpeech> speech;
+    std::unique_ptr<QSoundEffect> seffect;
 };
 
 #endif // CONNECTIONHANDLING_H

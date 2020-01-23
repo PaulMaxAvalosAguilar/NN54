@@ -12,14 +12,17 @@
         <item>armeabi-v7a;Qt5Widgets_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Charts_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Network_armeabi-v7a</item>
+        <item>armeabi-v7a;Qt5Multimedia_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Qml_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QmlModels_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Quick_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Svg_armeabi-v7a</item>
+        <item>armeabi-v7a;Qt5TextToSpeech_armeabi-v7a</item>
+        <item>armeabi-v7a;Qt5MultimediaQuick_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QuickParticles_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QmlWorkerScript_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QuickTemplates2_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QuickControls2_armeabi-v7a</item>
     </array><array name="load_local_libs">
-        <item>armeabi-v7a;libplugins_platforms_qtforandroid_armeabi-v7a.so:libplugins_bearer_qandroidbearer_armeabi-v7a.so:libQt5QuickParticles_armeabi-v7a.so</item>
+        <item>armeabi-v7a;libplugins_platforms_qtforandroid_armeabi-v7a.so:libplugins_bearer_qandroidbearer_armeabi-v7a.so:libplugins_mediaservice_qtmedia_android_armeabi-v7a.so:libQt5MultimediaQuick_armeabi-v7a.so:libQt5QuickParticles_armeabi-v7a.so:libplugins_texttospeech_qttexttospeech_android_armeabi-v7a.so</item>
     </array></file></source><source path="D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\build\generated\res\rs\debug"/><source path="D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\build\generated\res\resValues\debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\src\debug\res"/></dataSet><mergedItems/></merger>

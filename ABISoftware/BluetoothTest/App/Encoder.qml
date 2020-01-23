@@ -12,9 +12,7 @@ Page{
     property var currentView: homePageView
     property int connected: connhandling.connected
     property var started: 0
-
-    property var startButtonTopPosition: (scrollingArea.height/2)- startbutton.height/2
-    property var startButtonBottPosition: scrollingArea.height - startbutton.height - scrollingArea.height/60
+    property var soundEnabled: true
 
     property int valx: 1
     property int valy: 0
@@ -24,9 +22,14 @@ Page{
     property int fatigue: 0
     property var graphNameText: ""
 
+    property var startButtonTopPosition: (scrollingArea.height/2)- startbutton.height/2
+    property var startButtonBottPosition: scrollingArea.height - startbutton.height - scrollingArea.height/60
+
+    property var timerCount: timerCountTextField.value
+
     onConnectedChanged: {
         connected? "": startbutton.y = startButtonTopPosition
-        connected? startbutton.enabled = true : startbutton.enabled = false
+        //connected? startbutton.enabled = true : startbutton.enabled = false
         connected? started = 0 : started  = false
     }
 
@@ -38,13 +41,11 @@ Page{
     onMeanPropVelChanged: {
         mpvlabel.text = meanPropVel/100
         modeTextField.currentIndex? scrollingArea.addToChart(meanPropVel) :""
-        modeTextField.currentIndex && started? connhandling.say(mpvlabel.text) :""
     }
 
     onPeakVelChanged: {
         peaklabel.text = peakVel/100
-        !modeTextField.currentIndex? scrollingArea.addToChart(peakVel): ""
-        !modeTextField.currentIndex && started? connhandling.say(peaklabel.text) :""
+                !modeTextField.currentIndex? scrollingArea.addToChart(peakVel): ""
     }
 
     ScrollView {
@@ -65,24 +66,69 @@ Page{
             width: scrollingArea.width
             visible: true
 
-            Button{
-                id:settingsButton
-                text: "Settings"
+            Rectangle{
+                id:quickSettingsLayout
+                color: "red"
                 anchors.top: parent.top
-                anchors.topMargin: parent.width/65
                 anchors.horizontalCenter: parent.horizontalCenter
-                onClicked:{
-                    scrollingArea.changeView(secondRect)
+                width:  (parent.width/5)*2 + height
+                height: parent.height/15
+
+                Button{
+                    id:settingsButton
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+                    width: firstRect.width/5
+                    font.pixelSize: parent.height/1.5
+                    text: "Settings"
+
+                    onClicked:{
+                        scrollingArea.changeView(secondRect)
+                    }
+                }
+
+                Label{
+                    id:soundLabel
+                    color: "white"
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.right: soundCheckbox.left
+                    width: firstRect.width/5
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: parent.height/1.5
+                    text: "Sound:"
+                }
+
+
+                CheckBox{
+                    id:soundCheckbox
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    indicator.height: quickSettingsLayout.height
+                    indicator.width: indicator.height
+                    display: AbstractButton.IconOnly
+                    checked: true
+
+                    onCheckStateChanged: function(){
+                        if(checkState == Qt.Checked){
+                            soundEnabled = true
+                        }else{
+                            soundEnabled = false
+                        }
+                    }
                 }
             }
 
             Rectangle{
                 id:dataRectangle
                 width: firstRect.width
-                anchors.top: settingsButton.bottom
+                anchors.top: quickSettingsLayout.bottom
                 anchors.topMargin: firstRect.height/85
-                height:startButtonBottPosition - startbutton.height/2 - settingsButton.height
-                opacity: 1
+                height:startButtonBottPosition - startbutton.height/2 - quickSettingsLayout.height
+                opacity: 0
 
 
                 ChartView {
@@ -136,6 +182,7 @@ Page{
 
                         rowSpacing: 0
 
+
                         columns: 4
 
                         Rectangle{
@@ -151,7 +198,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "cm"
                                 clip: true
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
 
@@ -168,7 +215,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "m/s"
                                 clip: true
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
 
@@ -185,7 +232,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "m/s"
                                 clip: true
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
 
@@ -202,7 +249,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "%"
                                 clip: true
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
 
@@ -219,7 +266,7 @@ Page{
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
 
@@ -235,7 +282,7 @@ Page{
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
 
@@ -251,7 +298,7 @@ Page{
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
 
@@ -268,7 +315,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "nA"
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 60
+                                font.pointSize: window.height / 70
                             }
                         }
                     }
@@ -285,36 +332,77 @@ Page{
                 height: window.height/8
                 width: height
                 text: started? "Stop": "Start"
-                enabled: false
+                //enabled: false
+                enabled: true
                 font.pointSize: window.height/60
                 onClicked: {
-                    started? connhandling.sendStop() : connhandling.sendStart(minDistToTravelTextField.value,
-                                                                              desiredCountDirTextField.currentIndex,
-                                                                              desiredRepDirTextField.currentIndex)
+                    started? connhandling.sendStop() : ""
                     started? y = Qt.binding(function(){return startButtonTopPosition}) :
                              y = Qt.binding(function(){return startButtonBottPosition})
                     started? settingsButton.enabled = true : settingsButton.enabled = false
-                    started? dataRectangle.opacity = 0 : dataRectangle.opacity = 1
+                    started? dataRectangle.opacity = 0: ""
 
                     started? "": scatterseries.clear()
                     started? "": lineseries.clear()
                     started? "": valx = 1
+                    started? "": maxWspd = 255
 
-                    started? "": travellabel.text = ""
-                    started? "": mpvlabel.text = ""
-                    started? "": peaklabel.text = ""
+                    started? "": travellabel.text = 0
+                    started? "": mpvlabel.text = 0
+                    started? "": peaklabel.text = 0
                     started? "": fatiguelabel.text = "nA"
 
                     started? "": maxVel = 0
                     started? "": fatigue = 0
 
+                    started? timerCount = Qt.binding(function(){return timerCountTextField.value}) : ""
+                    started? timerText.opacity = 0 : timerText.opacity = 1;
+                    started? "": connhandling.say(timerCountTextField.value);
+                    started? timer.stop() : timer.start()
+
                     modeTextField.currentIndex? graphNameText = "MPV" :graphNameText = "PV"
 
                     started? started = 0 : started = 1
+
                 }
 
                 Behavior on y {
                     NumberAnimation {duration:250}
+                }                
+            }
+
+            Text{
+                id: timerText
+                anchors.fill: parent
+                font.pixelSize: parent.height/2.5
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                text: timerCount
+                opacity: 0
+            }
+
+            Timer{
+                id: timer
+                interval: 1000
+                onTriggered: function(){
+
+                    if(timerCount != 0){
+                        timerCount--
+                        timer.start()
+
+                        if(soundEnabled){
+                        connhandling.say(timerCount)
+                        }
+                    }
+
+                    if(timerCount == 0){                                            
+                        connhandling.sendStart(minDistToTravelTextField.value,
+                                               desiredCountDirTextField.currentIndex,
+                                               desiredRepDirTextField.currentIndex);
+
+                        timerText.opacity  = 0
+                        dataRectangle.opacity = 1
+                    }
                 }
             }
         }
@@ -326,138 +414,228 @@ Page{
             color:"red"
             visible:false
 
-            Rectangle{
-                id:settingsRect
-                color:"red"
-                height: elementsHeight * 4
-                width: parent.width/1.5
-                x: (parent.width/2) -width/2
-                y:  (parent.height/2)-height/2
+            ColumnLayout{
+                id: settingsLayout
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: parent.width/15
+                anchors.rightMargin: parent.width/15
+                anchors.verticalCenter:  parent.verticalCenter
+                spacing: 0
 
-                property var elementsWidth: settingsRect.width/2
+                height: numberOfElements * elementsHeight
                 property var elementsHeight:  parent.height/10
-
+                property var numberOfElements: 6
 
                 Rectangle{
-                    id: modeLabel
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.top: parent.top
-                    anchors.left: settingsRect.left
-                    border.color: "black"
-                    border.width: 3
-                    Label{
-                        text: "Desired Count Direction:"
-                        wrapMode: Text.Wrap
-                        clip: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        anchors.fill: parent
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Rectangle{
+                        id: modeLabel
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        border.color: "black"
+                        border.width: 3
+                        Label{
+                            text: "Desired Count Direction:"
+                            wrapMode: Text.Wrap
+                            clip: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                        }
+                    }
+
+                    ComboBox{
+                        id:modeTextField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        model: ["Olympic","PL"]
+                        currentIndex: 1
                     }
                 }
 
-                ComboBox{
-                    id:modeTextField
-                    model: ["Olympic","PL"]
-                    currentIndex: 1
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.top:parent.top
-                    anchors.right:  settingsRect.right
-                }
-
                 Rectangle{
-                    id: minDistToTravelLabel
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.top: modeLabel.bottom
-                    anchors.left: settingsRect.left
-                    border.color: "black"
-                    border.width: 3
-                    Label{
-                        text: "Min Dist To Travel:"
-                        wrapMode: Text.Wrap
-                        clip: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        anchors.fill: parent
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Rectangle{
+                        id: minDistToTravelLabel
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        border.color: "black"
+                        border.width: 3
+                        Label{
+                            text: "Min Dist To Travel:"
+                            wrapMode: Text.Wrap
+                            clip: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                        }
+                    }
+
+                    SpinBox{
+                        id: minDistToTravelTextField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        from: 0
+                        to: 255
+                        value: 25
+                        editable: true
                     }
                 }
 
-                SpinBox{
-                    id: minDistToTravelTextField
-                    from: 0
-                    to: 255
-                    value: 25
-                    editable: true
-
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.top: modeLabel.bottom
-                    anchors.right: settingsRect.right
-                }
-
                 Rectangle{
-                    id: desiredCountDirLabel
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.top: minDistToTravelLabel.bottom
-                    anchors.left: settingsRect.left
-                    border.color: "black"
-                    border.width: 3
-                    Label{
-                        text: "Desired Count Direction:"
-                        wrapMode: Text.Wrap
-                        clip: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        anchors.fill: parent
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Rectangle{
+                        id: desiredCountDirLabel
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        border.color: "black"
+                        border.width: 3
+                        Label{
+                            text: "Desired Count Direction:"
+                            wrapMode: Text.Wrap
+                            clip: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                        }
+                    }
+
+                    ComboBox{
+                        id:desiredCountDirTextField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        model: ["Descendant","Ascendant"]
+                        currentIndex: 1
                     }
                 }
 
-                ComboBox{
-                    id:desiredCountDirTextField
-                    model: ["Descendant","Ascendant"]
-                    currentIndex: 1
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.right: settingsRect.right
-                    anchors.top: minDistToTravelTextField.bottom
-                }
-
-
                 Rectangle{
-                    id: desiredRepDirLabel
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.top: desiredCountDirLabel.bottom
-                    anchors.left: settingsRect.left
-                    border.color: "black"
-                    border.width: 3
-                    Label{
-                        text: "Desired Rep Direction:"
-                        wrapMode: Text.Wrap
-                        clip: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        anchors.fill: parent
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Rectangle{
+                        id: desiredRepDirLabel
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        border.color: "black"
+                        border.width: 3
+                        Label{
+                            text: "Desired Rep Direction:"
+                            wrapMode: Text.Wrap
+                            clip: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                        }
+                    }
+
+                    ComboBox{
+                        id: desiredRepDirTextField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        model: ["Descendant","Ascendant"]
+                        currentIndex: 1
+
                     }
                 }
 
-                ComboBox{
-                    id: desiredRepDirTextField
-                    model: ["Descendant","Ascendant"]
-                    currentIndex: 1
-                    width: parent.elementsWidth
-                    height: parent.elementsHeight
-                    anchors.right: settingsRect.right
-                    anchors.top: desiredCountDirTextField.bottom
+                Rectangle{
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Rectangle{
+                        id: fatigueLabel
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        border.color: "black"
+                        border.width: 3
+                        Label{
+                            text: "Fatigue:"
+                            wrapMode: Text.Wrap
+                            clip: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                        }
+                    }
+
+                    SpinBox{
+                        id: fatigueTextField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        from: 0
+                        to: 100
+                        value: 10
+                        editable: true
+                    }
+                }
+
+                Rectangle{
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Rectangle{
+                        id: timerCountlabel
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        border.color: "black"
+                        border.width: 3
+                        Label{
+                            text: "Timer:"
+                            wrapMode: Text.Wrap
+                            clip: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                        }
+                    }
+
+                    SpinBox{
+                        id: timerCountTextField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: parent.width/2
+                        from: 0
+                        to: 60
+                        value: 10
+                        editable: true
+                    }
                 }
             }
 
             Button{
                 text: "OK"
-                anchors.top: settingsRect.bottom
+                anchors.top: settingsLayout.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.topMargin: parent.height/20
                 height: window.height/17
@@ -474,19 +652,33 @@ Page{
             scrollingArea.currentView = view
         }
 
-        function addToChart(meanPropVel){
-            valy = meanPropVel
+        function addToChart(vel){
+            valy = vel
+            fatigue = 0;
 
+            //Graph Y Value
             if( valy > maxWspd) {
-                maxWspd = valy+10;
+                maxWspd = valy+10
             }
 
+            //Fatigue Calculation
             if(valy > maxVel){
                 maxVel = valy
                 fatiguelabel.text = "nA"
             }else{
                 fatigue = (  (1-(valy/maxVel))*100 )
                 fatiguelabel.text = fatigue
+            }
+
+            //Sound Effects
+            if(started == 1){
+                if(soundEnabled){
+                    if(fatigue > fatigueTextField.value){
+                        connhandling.soundeffect()
+                    }else{
+                        connhandling.say(vel/100)
+                    }
+                }
             }
 
             scatterseries.append(valx, valy)

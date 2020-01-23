@@ -1,10 +1,10 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-96:12
-INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-96:12
-INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-96:12
-INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-96:12
-INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-96:12
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-100:12
+INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-100:12
+INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-100:12
+INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-100:12
+INJECTED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:1-100:12
 	package
 		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:2:11-46
 	android:versionName
@@ -33,169 +33,195 @@ uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
 ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:8:5-81
 	android:name
 		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:8:22-78
-uses-permission#android.permission.BLUETOOTH
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:9:5-68
-	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:9:22-65
-uses-permission#android.permission.BLUETOOTH_ADMIN
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:10:5-74
-	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:10:22-71
-uses-permission#android.permission.ACCESS_COARSE_LOCATION
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:11:5-81
-	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:11:22-78
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:12:5-79
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:9:5-79
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:12:22-76
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:9:22-76
+uses-permission#android.permission.BLUETOOTH
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:10:5-68
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:10:22-65
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:11:5-74
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:11:22-71
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:12:5-81
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:12:22-78
+uses-permission#android.permission.CAMERA
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:13:5-65
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:13:22-62
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:14:5-71
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:14:22-68
+uses-feature#android.hardware.camera
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:5-85
+	android:required
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:58-82
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:19-57
+uses-feature#android.hardware.camera.autofocus
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:19:5-95
+	android:required
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:19:68-92
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:19:19-67
+uses-feature#android.hardware.microphone
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:5-89
+	android:required
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:62-86
+	android:name
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:19-61
 supports-screens
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:5-135
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:22:5-135
 	android:largeScreens
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:23-50
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:22:23-50
 	android:smallScreens
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:106-133
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:22:106-133
 	android:normalScreens
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:51-79
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:22:51-79
 	android:anyDensity
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:18:80-105
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:22:80-105
 application
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:5-94:19
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:24:5-98:19
 	android:extractNativeLibs
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:137-169
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:24:137-169
 	android:label
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:117-136
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:24:117-136
 	android:hardwareAccelerated
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:18-52
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:24:18-52
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:20:53-116
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:24:53-116
 activity#org.qtproject.qt5.android.bindings.QtActivity
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:21:9-90:16
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:25:9-94:16
 	android:screenOrientation
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:24:19-58
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:28:19-58
 	android:label
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:23:19-38
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:27:19-38
 	android:launchMode
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:25:19-49
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:29:19-49
 	android:configChanges
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:21:19-188
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:25:19-188
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:22:19-79
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:26:19-79
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:26:13-29:29
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:30:13-33:29
 action#android.intent.action.MAIN
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:27:17-68
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:31:17-68
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:27:25-66
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:31:25-66
 category#android.intent.category.LAUNCHER
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:28:17-76
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:32:17-76
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:28:27-74
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:32:27-74
 meta-data#android.app.lib_name
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:35:13-81
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:13-81
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:35:60-79
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:60-79
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:35:24-59
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:24-59
 meta-data#android.app.qt_sources_resource_id
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:36:13-112
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:40:13-112
 	android:resource
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:36:74-110
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:40:74-110
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:36:24-73
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:40:24-73
 meta-data#android.app.repository
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:37:13-87
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:13-87
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:37:62-85
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:62-85
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:37:24-61
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:24-61
 meta-data#android.app.qt_libs_resource_id
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:38:13-106
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:42:13-106
 	android:resource
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:38:71-104
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:42:71-104
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:38:24-70
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:42:24-70
 meta-data#android.app.bundled_libs_resource_id
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:13-116
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:43:13-116
 	android:resource
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:76-114
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:43:76-114
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:39:24-75
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:43:24-75
 meta-data#android.app.bundle_local_qt_libs
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:13-91
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:13-91
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:72-89
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:72-89
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:41:24-71
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:24-71
 meta-data#android.app.use_local_qt_libs
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:44:13-88
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:13-88
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:44:69-86
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:69-86
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:44:24-68
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:24-68
 meta-data#android.app.libs_prefix
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:13-100
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:49:13-100
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:63-98
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:49:63-98
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:45:24-62
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:49:24-62
 meta-data#android.app.load_local_libs_resource_id
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:46:13-122
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:50:13-122
 	android:resource
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:46:79-120
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:50:79-120
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:46:24-78
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:50:24-78
 meta-data#android.app.load_local_jars
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:47:13-177
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:51:13-221
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:47:67-175
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:51:67-219
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:47:24-66
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:51:24-66
 meta-data#android.app.static_init_classes
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:13-153
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:13-208
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:71-151
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:71-206
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:48:24-70
-meta-data#android.app.ministro_not_found_msg
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:13-122
-	android:value
 		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:24-70
+meta-data#android.app.ministro_not_found_msg
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:56:13-122
+	android:value
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:56:24-70
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:52:71-120
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:56:71-120
 meta-data#android.app.ministro_needed_msg
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:53:13-116
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:57:13-116
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:53:24-67
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:57:24-67
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:53:68-114
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:57:68-114
 meta-data#android.app.fatal_error_msg
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:54:13-108
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:58:13-108
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:54:24-63
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:58:24-63
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:54:64-106
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:58:64-106
 meta-data#android.app.unsupported_android_version
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:55:13-132
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:59:13-132
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:55:24-75
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:59:24-75
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:55:76-130
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:59:76-130
 meta-data#android.app.background_running
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:74:13-93
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:13-93
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:74:70-91
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:70-91
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:74:24-69
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:24-69
 meta-data#android.app.auto_screen_scale_factor
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:13-99
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:82:13-99
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:76-97
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:82:76-97
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:78:24-75
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:82:24-75
 meta-data#android.app.extract_android_style
-ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:88:13-98
+ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:92:13-98
 	android:value
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:88:73-96
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:92:73-96
 	android:name
-		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:88:24-72
+		ADDED from D:\pauld\Programming\NN54\ABISoftware\BluetoothTest\bAndroid-Debug\android-build\AndroidManifest.xml:92:24-72

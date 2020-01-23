@@ -19,10 +19,13 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     encoderCharacteristic(),
     batteryDescriptor(),
     timer(new QTimer),
-    speech(new QTextToSpeech)
+    speech(new QTextToSpeech),
+    seffect(new QSoundEffect)
 
 {
     connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
+    seffect->setSource(QUrl(QStringLiteral("qrc:/SoundEffects/fatigue-alert.wav")));
+    seffect->setVolume(1);
 }
 
 ConnectionHandling::~ConnectionHandling()
@@ -110,10 +113,6 @@ void ConnectionHandling::setDeviceaddress(const QString &value)
     deviceadressChanged();
 }
 
-
-
-
-
 uint ConnectionHandling::getTraveledDist() const
 {
     return traveledDist;
@@ -198,9 +197,32 @@ void ConnectionHandling::sendStop()
     }
 }
 
-void ConnectionHandling::say(QString text)
+void ConnectionHandling::say(double number)
 {
-    speech->say(text);
+
+    QString string;
+
+    uint a = static_cast<uint>(number);
+    number = number - a;
+    number *= 100;
+
+    string.append(QString::number(a));
+
+    if(number != 0){
+        string.append(" ");
+
+        if(number < 10){
+            string.append(" 0 ");
+        }
+        string.append(QString::number(number));
+    }
+
+    speech->say(string);
+}
+
+void ConnectionHandling::soundeffect()
+{
+    seffect->play();
 }
 
 void ConnectionHandling::deviceConnected()

@@ -13,10 +13,10 @@ EQ            = =
 
 CC            = D:\pauld\Programming\sdk-tools-windows-4333796\ndk\21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang
 CXX           = D:\pauld\Programming\sdk-tools-windows-4333796\ndk\21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++
-DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_QUICK_LIB -DQT_SVG_LIB -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QMLMODELS_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_BLUETOOTH_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_QUICK_LIB -DQT_SVG_LIB -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_GUI_LIB -DQT_QMLMODELS_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_BLUETOOTH_LIB -DQT_TEXTTOSPEECH_LIB -DQT_CORE_LIB
 CFLAGS        = -target armv7a-linux-androideabi21 -fno-limit-debug-info -fPIC -fstack-protector-strong -DANDROID -g -marm -O0 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -target armv7a-linux-androideabi21 -fno-limit-debug-info -fPIC -fstack-protector-strong -DANDROID -g -marm -O0 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../App -I. -ID:/Qt/5.14.0/android/include -ID:/Qt/5.14.0/android/include/QtQuick -ID:/Qt/5.14.0/android/include/QtSvg -ID:/Qt/5.14.0/android/include/QtCharts -ID:/Qt/5.14.0/android/include/QtWidgets -ID:/Qt/5.14.0/android/include/QtGui -ID:/Qt/5.14.0/android/include/QtQmlModels -ID:/Qt/5.14.0/android/include/QtQml -ID:/Qt/5.14.0/android/include/QtNetwork -ID:/Qt/5.14.0/android/include/QtBluetooth -ID:/Qt/5.14.0/android/include/QtCore -Iarmeabi-v7a -ID:/Qt/5.14.0/android/mkspecs/android-clang
+INCPATH       = -I../App -I. -ID:/Qt/5.14.0/android/include -ID:/Qt/5.14.0/android/include/QtQuick -ID:/Qt/5.14.0/android/include/QtSvg -ID:/Qt/5.14.0/android/include/QtCharts -ID:/Qt/5.14.0/android/include/QtWidgets -ID:/Qt/5.14.0/android/include/QtMultimedia -ID:/Qt/5.14.0/android/include/QtGui -ID:/Qt/5.14.0/android/include/QtQmlModels -ID:/Qt/5.14.0/android/include/QtQml -ID:/Qt/5.14.0/android/include/QtNetwork -ID:/Qt/5.14.0/android/include/QtBluetooth -ID:/Qt/5.14.0/android/include/QtTextToSpeech -ID:/Qt/5.14.0/android/include/QtCore -Iarmeabi-v7a -ID:/Qt/5.14.0/android/mkspecs/android-clang
 QMAKE         = D:/Qt/5.14.0/android/bin/qmake.exe
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -39,7 +39,7 @@ DISTNAME      = libApp_armeabi-v7a.so1.0.0
 DISTDIR = D:/pauld/Programming/NN54/ABISoftware/BluetoothTest/bAndroid-Debug/armeabi-v7a/libApp_armeabi-v7a.so1.0.0
 LINK          = D:\pauld\Programming\sdk-tools-windows-4333796\ndk\21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++ -target armv7a-linux-androideabi21 -fno-limit-debug-info
 LFLAGS        = -Wl,-soname,libApp_armeabi-v7a.so -Wl,-rpath-link=D:/Qt/5.14.0/android/lib -Wl,--build-id=sha1 -Wl,--no-undefined -Wl,-z,noexecstack -shared
-LIBS          = $(SUBLIBS) D:/Qt/5.14.0/android/lib/libQt5Quick_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Svg_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Charts_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Widgets_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Gui_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5QmlModels_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Qml_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Network_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Bluetooth_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Core_armeabi-v7a.so -lGLESv2   -llog -lz -lm -ldl -lc
+LIBS          = $(SUBLIBS) D:/Qt/5.14.0/android/lib/libQt5Quick_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Svg_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Charts_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Widgets_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Multimedia_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Gui_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5QmlModels_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Qml_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Network_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Bluetooth_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5TextToSpeech_armeabi-v7a.so D:/Qt/5.14.0/android/lib/libQt5Core_armeabi-v7a.so -lGLESv2   -llog -lz -lm -ldl -lc
 AR            = D:\pauld\Programming\sdk-tools-windows-4333796\ndk\21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-ar cqs
 RANLIB        = D:\pauld\Programming\sdk-tools-windows-4333796\ndk\21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/bin/arm-linux-androideabi-ranlib
 SED           = sed
@@ -129,11 +129,11 @@ armeabi-v7a/qrc_qml.cpp: ../App/qml.qrc \
 		D:/Qt/5.14.0/android/bin/rcc.exe \
 		../App/HomePage.qml \
 		../App/BleScanner.qml \
-		../App/ChartViewer.qml \
 		../App/Encoder.qml \
 		../App/main.qml \
 		../App/Images/baseline-menu-24px.svg \
-		../App/Images/flecha-hacia-la-izquierda.svg
+		../App/Images/flecha-hacia-la-izquierda.svg \
+		../App/SoundEffects/fatigue-alert.wav
 	'D:\Qt\5.14.0\android\bin\rcc.exe' -name qml ../App/qml.qrc -o armeabi-v7a/qrc_qml.cpp
 
 compiler_moc_predefs_make_all: armeabi-v7a/moc_predefs.h
@@ -249,9 +249,22 @@ armeabi-v7a/moc_blescannermodel.cpp: ../App/blescannermodel.h \
 		D:/Qt/5.14.0/android/include/QtCore/qtimer.h \
 		D:/Qt/5.14.0/android/include/QtCore/qbasictimer.h \
 		D:/Qt/5.14.0/android/include/QtCore/QPoint \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/QTextToSpeech \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech.h \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech_global.h \
+		D:/Qt/5.14.0/android/include/QtCore/QSharedDataPointer \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qvoice.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/QSoundEffect \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qsoundeffect.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimediaglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtguiglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtgui-config.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimedia-config.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurl.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurlquery.h \
 		armeabi-v7a/moc_predefs.h \
 		D:/Qt/5.14.0/android/bin/moc.exe
-	'D:\Qt\5.14.0\android\bin\moc.exe' $(DEFINES) --include D:/pauld/Programming/NN54/ABISoftware/BluetoothTest/bAndroid-Debug/armeabi-v7a/moc_predefs.h -ID:/Qt/5.14.0/android/mkspecs/android-clang -ID:/pauld/Programming/NN54/ABISoftware/BluetoothTest/App -ID:/Qt/5.14.0/android/include -ID:/Qt/5.14.0/android/include/QtQuick -ID:/Qt/5.14.0/android/include/QtSvg -ID:/Qt/5.14.0/android/include/QtCharts -ID:/Qt/5.14.0/android/include/QtWidgets -ID:/Qt/5.14.0/android/include/QtGui -ID:/Qt/5.14.0/android/include/QtQmlModels -ID:/Qt/5.14.0/android/include/QtQml -ID:/Qt/5.14.0/android/include/QtNetwork -ID:/Qt/5.14.0/android/include/QtBluetooth -ID:/Qt/5.14.0/android/include/QtCore -I. -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include/c++ -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/9.0.8/include -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include ../App/blescannermodel.h -o armeabi-v7a/moc_blescannermodel.cpp
+	'D:\Qt\5.14.0\android\bin\moc.exe' $(DEFINES) --include D:/pauld/Programming/NN54/ABISoftware/BluetoothTest/bAndroid-Debug/armeabi-v7a/moc_predefs.h -ID:/Qt/5.14.0/android/mkspecs/android-clang -ID:/pauld/Programming/NN54/ABISoftware/BluetoothTest/App -ID:/Qt/5.14.0/android/include -ID:/Qt/5.14.0/android/include/QtQuick -ID:/Qt/5.14.0/android/include/QtSvg -ID:/Qt/5.14.0/android/include/QtCharts -ID:/Qt/5.14.0/android/include/QtWidgets -ID:/Qt/5.14.0/android/include/QtMultimedia -ID:/Qt/5.14.0/android/include/QtGui -ID:/Qt/5.14.0/android/include/QtQmlModels -ID:/Qt/5.14.0/android/include/QtQml -ID:/Qt/5.14.0/android/include/QtNetwork -ID:/Qt/5.14.0/android/include/QtBluetooth -ID:/Qt/5.14.0/android/include/QtTextToSpeech -ID:/Qt/5.14.0/android/include/QtCore -I. -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include/c++ -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/9.0.8/include -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include ../App/blescannermodel.h -o armeabi-v7a/moc_blescannermodel.cpp
 
 armeabi-v7a/moc_connectionhandling.cpp: ../App/connectionhandling.h \
 		D:/Qt/5.14.0/android/include/QtCore/QObject \
@@ -351,9 +364,22 @@ armeabi-v7a/moc_connectionhandling.cpp: ../App/connectionhandling.h \
 		D:/Qt/5.14.0/android/include/QtCore/qtimer.h \
 		D:/Qt/5.14.0/android/include/QtCore/qbasictimer.h \
 		D:/Qt/5.14.0/android/include/QtCore/QPoint \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/QTextToSpeech \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech.h \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech_global.h \
+		D:/Qt/5.14.0/android/include/QtCore/QSharedDataPointer \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qvoice.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/QSoundEffect \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qsoundeffect.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimediaglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtguiglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtgui-config.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimedia-config.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurl.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurlquery.h \
 		armeabi-v7a/moc_predefs.h \
 		D:/Qt/5.14.0/android/bin/moc.exe
-	'D:\Qt\5.14.0\android\bin\moc.exe' $(DEFINES) --include D:/pauld/Programming/NN54/ABISoftware/BluetoothTest/bAndroid-Debug/armeabi-v7a/moc_predefs.h -ID:/Qt/5.14.0/android/mkspecs/android-clang -ID:/pauld/Programming/NN54/ABISoftware/BluetoothTest/App -ID:/Qt/5.14.0/android/include -ID:/Qt/5.14.0/android/include/QtQuick -ID:/Qt/5.14.0/android/include/QtSvg -ID:/Qt/5.14.0/android/include/QtCharts -ID:/Qt/5.14.0/android/include/QtWidgets -ID:/Qt/5.14.0/android/include/QtGui -ID:/Qt/5.14.0/android/include/QtQmlModels -ID:/Qt/5.14.0/android/include/QtQml -ID:/Qt/5.14.0/android/include/QtNetwork -ID:/Qt/5.14.0/android/include/QtBluetooth -ID:/Qt/5.14.0/android/include/QtCore -I. -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include/c++ -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/9.0.8/include -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include ../App/connectionhandling.h -o armeabi-v7a/moc_connectionhandling.cpp
+	'D:\Qt\5.14.0\android\bin\moc.exe' $(DEFINES) --include D:/pauld/Programming/NN54/ABISoftware/BluetoothTest/bAndroid-Debug/armeabi-v7a/moc_predefs.h -ID:/Qt/5.14.0/android/mkspecs/android-clang -ID:/pauld/Programming/NN54/ABISoftware/BluetoothTest/App -ID:/Qt/5.14.0/android/include -ID:/Qt/5.14.0/android/include/QtQuick -ID:/Qt/5.14.0/android/include/QtSvg -ID:/Qt/5.14.0/android/include/QtCharts -ID:/Qt/5.14.0/android/include/QtWidgets -ID:/Qt/5.14.0/android/include/QtMultimedia -ID:/Qt/5.14.0/android/include/QtGui -ID:/Qt/5.14.0/android/include/QtQmlModels -ID:/Qt/5.14.0/android/include/QtQml -ID:/Qt/5.14.0/android/include/QtNetwork -ID:/Qt/5.14.0/android/include/QtBluetooth -ID:/Qt/5.14.0/android/include/QtTextToSpeech -ID:/Qt/5.14.0/android/include/QtCore -I. -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include/c++ -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/9.0.8/include -ID:/pauld/Programming/sdk-tools-windows-4333796/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/include ../App/connectionhandling.h -o armeabi-v7a/moc_connectionhandling.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -541,7 +567,16 @@ armeabi-v7a/main.obj: ../App/main.cpp D:/Qt/5.14.0/android/include/QtGui/QGuiApp
 		D:/Qt/5.14.0/android/include/QtCore/QTimer \
 		D:/Qt/5.14.0/android/include/QtCore/qtimer.h \
 		D:/Qt/5.14.0/android/include/QtCore/qbasictimer.h \
-		D:/Qt/5.14.0/android/include/QtCore/QPoint
+		D:/Qt/5.14.0/android/include/QtCore/QPoint \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/QTextToSpeech \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech.h \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech_global.h \
+		D:/Qt/5.14.0/android/include/QtCore/QSharedDataPointer \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qvoice.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/QSoundEffect \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qsoundeffect.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimediaglobal.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimedia-config.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o armeabi-v7a/main.obj ../App/main.cpp
 
 armeabi-v7a/deviceinfo.obj: ../App/deviceinfo.cpp D:/Qt/5.14.0/android/include/QtBluetooth/qbluetoothuuid.h \
@@ -726,7 +761,20 @@ armeabi-v7a/blescannermodel.obj: ../App/blescannermodel.cpp ../App/blescannermod
 		D:/Qt/5.14.0/android/include/QtCore/QTimer \
 		D:/Qt/5.14.0/android/include/QtCore/qtimer.h \
 		D:/Qt/5.14.0/android/include/QtCore/qbasictimer.h \
-		D:/Qt/5.14.0/android/include/QtCore/QPoint
+		D:/Qt/5.14.0/android/include/QtCore/QPoint \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/QTextToSpeech \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech.h \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech_global.h \
+		D:/Qt/5.14.0/android/include/QtCore/QSharedDataPointer \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qvoice.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/QSoundEffect \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qsoundeffect.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimediaglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtguiglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtgui-config.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimedia-config.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurl.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurlquery.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o armeabi-v7a/blescannermodel.obj ../App/blescannermodel.cpp
 
 armeabi-v7a/connectionhandling.obj: ../App/connectionhandling.cpp ../App/connectionhandling.h \
@@ -826,7 +874,20 @@ armeabi-v7a/connectionhandling.obj: ../App/connectionhandling.cpp ../App/connect
 		D:/Qt/5.14.0/android/include/QtCore/QTimer \
 		D:/Qt/5.14.0/android/include/QtCore/qtimer.h \
 		D:/Qt/5.14.0/android/include/QtCore/qbasictimer.h \
-		D:/Qt/5.14.0/android/include/QtCore/QPoint
+		D:/Qt/5.14.0/android/include/QtCore/QPoint \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/QTextToSpeech \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech.h \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qtexttospeech_global.h \
+		D:/Qt/5.14.0/android/include/QtCore/QSharedDataPointer \
+		D:/Qt/5.14.0/android/include/QtTextToSpeech/qvoice.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/QSoundEffect \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qsoundeffect.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimediaglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtguiglobal.h \
+		D:/Qt/5.14.0/android/include/QtGui/qtgui-config.h \
+		D:/Qt/5.14.0/android/include/QtMultimedia/qtmultimedia-config.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurl.h \
+		D:/Qt/5.14.0/android/include/QtCore/qurlquery.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o armeabi-v7a/connectionhandling.obj ../App/connectionhandling.cpp
 
 armeabi-v7a/qrc_qml.obj: armeabi-v7a/qrc_qml.cpp 

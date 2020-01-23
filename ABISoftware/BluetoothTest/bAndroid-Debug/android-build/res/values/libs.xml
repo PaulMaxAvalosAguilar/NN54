@@ -20,10 +20,13 @@
         <item>armeabi-v7a;Qt5Widgets_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Charts_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Network_armeabi-v7a</item>
+        <item>armeabi-v7a;Qt5Multimedia_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Qml_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QmlModels_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Quick_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5Svg_armeabi-v7a</item>
+        <item>armeabi-v7a;Qt5TextToSpeech_armeabi-v7a</item>
+        <item>armeabi-v7a;Qt5MultimediaQuick_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QuickParticles_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QmlWorkerScript_armeabi-v7a</item>
         <item>armeabi-v7a;Qt5QuickTemplates2_armeabi-v7a</item>
@@ -31,7 +34,7 @@
     </array>
 
     <array name="load_local_libs">
-        <item>armeabi-v7a;libplugins_platforms_qtforandroid_armeabi-v7a.so:libplugins_bearer_qandroidbearer_armeabi-v7a.so:libQt5QuickParticles_armeabi-v7a.so</item>
+        <item>armeabi-v7a;libplugins_platforms_qtforandroid_armeabi-v7a.so:libplugins_bearer_qandroidbearer_armeabi-v7a.so:libplugins_mediaservice_qtmedia_android_armeabi-v7a.so:libQt5MultimediaQuick_armeabi-v7a.so:libQt5QuickParticles_armeabi-v7a.so:libplugins_texttospeech_qttexttospeech_android_armeabi-v7a.so</item>
     </array>
 
 </resources>

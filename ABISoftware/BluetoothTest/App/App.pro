@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick bluetooth svg charts texttospeech
+QT += qml quick bluetooth svg charts texttospeech multimedia
 CONFIG += c++11
 
 SOURCES += main.cpp \

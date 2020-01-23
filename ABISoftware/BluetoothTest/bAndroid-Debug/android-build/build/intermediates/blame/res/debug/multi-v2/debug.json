@@ -204,37 +204,35 @@
                 {
                     "source": "D:\\pauld\\Programming\\NN54\\ABISoftware\\BluetoothTest\\bAndroid-Debug\\android-build\\res\\values\\libs.xml",
                     "from": {
-                        "startLines": "9,32,13,2",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "301,1311,360,57",
-                        "endLines": "11,34,30,4",
-                        "endColumns": "12,12,12,12",
-                        "endOffsets": "352,1522,1303,170"
+                        "startLines": "-1,35,13,-1",
+                        "startColumns": "-1,4,4,-1",
+                        "startOffsets": "-1,1495,360,-1",
+                        "endLines": "-1,37,33,-1",
+                        "endColumns": "-1,12,12,-1",
+                        "endOffsets": "-1,1860,1487,-1"
                     },
                     "to": {
-                        "startLines": "2,5,8,26",
+                        "startLines": "2,5,8,29",
                         "startColumns": "4,4,4,4",
-                        "startOffsets": "55,109,323,1269",
-                        "endLines": "4,7,25,28",
+                        "startOffsets": "55,109,477,1607",
+                        "endLines": "4,7,28,31",
                         "endColumns": "12,12,12,12",
-                        "endOffsets": "104,318,1264,1380"
+                        "endOffsets": "104,472,1602,1718"
                     }
                 },
                 {
                     "source": "D:\\Qt\\5.14.0\\android\\src\\android\\java\\res\\values\\strings.xml",
                     "from": {
-                        "startLines": "5,4,3,6",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "324,201,88,433",
-                        "endColumns": "107,121,111,97",
-                        "endOffsets": "427,318,195,526"
+                        "startLines": "-1,-1,-1,-1",
+                        "startColumns": "-1,-1,-1,-1",
+                        "startOffsets": "-1,-1,-1,-1"
                     },
                     "to": {
-                        "startLines": "29,30,31,32",
+                        "startLines": "32,33,34,35",
                         "startColumns": "4,4,4,4",
-                        "startOffsets": "1385,1493,1615,1727",
+                        "startOffsets": "1723,1831,1953,2065",
                         "endColumns": "107,121,111,97",
-                        "endOffsets": "1488,1610,1722,1820"
+                        "endOffsets": "1826,1948,2060,2158"
                     }
                 }
             ]
