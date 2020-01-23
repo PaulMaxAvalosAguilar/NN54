@@ -197,27 +197,29 @@ void ConnectionHandling::sendStop()
     }
 }
 
-void ConnectionHandling::say(double number)
+void ConnectionHandling::saySpeed(uint number)
 {
-
     QString string;
-
-    uint a = static_cast<uint>(number);
-    number = number - a;
-    number *= 100;
+    uint a = number/100;
+    uint b = number - (a*100);
 
     string.append(QString::number(a));
 
     if(number != 0){
         string.append(" ");
 
-        if(number < 10){
+        if(b < 10){
             string.append(" 0 ");
         }
-        string.append(QString::number(number));
+        string.append(QString::number(b));
     }
-
     speech->say(string);
+}
+
+void ConnectionHandling::sayCount(uint number)
+{
+
+    speech->say(QString::number(number));
 }
 
 void ConnectionHandling::soundeffect()

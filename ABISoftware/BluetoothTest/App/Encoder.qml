@@ -181,8 +181,6 @@ Page{
                         height: parent.height/10
 
                         rowSpacing: 0
-
-
                         columns: 4
 
                         Rectangle{
@@ -357,7 +355,7 @@ Page{
 
                     started? timerCount = Qt.binding(function(){return timerCountTextField.value}) : ""
                     started? timerText.opacity = 0 : timerText.opacity = 1;
-                    started? "": connhandling.say(timerCountTextField.value);
+                    started? "": connhandling.sayCount(timerCountTextField.value);
                     started? timer.stop() : timer.start()
 
                     modeTextField.currentIndex? graphNameText = "MPV" :graphNameText = "PV"
@@ -391,7 +389,7 @@ Page{
                         timer.start()
 
                         if(soundEnabled){
-                        connhandling.say(timerCount)
+                        connhandling.sayCount(timerCount)
                         }
                     }
 
@@ -676,7 +674,7 @@ Page{
                     if(fatigue > fatigueTextField.value){
                         connhandling.soundeffect()
                     }else{
-                        connhandling.say(vel/100)
+                        connhandling.saySpeed(vel)
                     }
                 }
             }

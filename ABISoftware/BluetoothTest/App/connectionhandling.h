@@ -75,7 +75,8 @@ public slots:
     void sendStart(uint minDistToTravel, uint desiredCountDir,
                    uint desiredRepDir);
     void sendStop();
-    void say(double number);
+    void saySpeed(uint number);
+    void sayCount(uint number);
     void soundeffect();
 
 private slots:
