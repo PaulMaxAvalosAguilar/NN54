@@ -24,11 +24,11 @@ Page{
                 anchors.left: firstRect.left
                 anchors.right: firstRect.right
                 anchors.top: firstRect.top
-                color:"#3548f2"
+                color:"yellow"
                 Label{
                     id: textLabel
                     text: "Click to connect:"
-                    font.pointSize: 25
+                    font.pixelSize: window.height / 25
                     anchors.left: parent.left
                     anchors.right: parent.right
                     horizontalAlignment: Text.AlignHCenter
@@ -40,8 +40,8 @@ Page{
                 id: listView                
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: busyIndication.top
                 anchors.top: selectyourencoderrect.bottom
+                anchors.bottom: busyIndication.top                
                 spacing: 5
                 snapMode: ListView.SnapToItem
                 clip:true
@@ -59,6 +59,7 @@ Page{
                     Label{
                         id:delegateText
                         text: blename +" "+bleaddress + " " + blerssi
+                        font.pixelSize: window.height/30
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.centerIn: parent
@@ -80,31 +81,34 @@ Page{
                 anchors.left: firstRect.left
                 anchors.right:  firstRect.right
                 height: firstRect.height * 0.0666
-                anchors.bottom: buttonsLayout.top
+                anchors.bottom: scannButton.top
             }
 
-            RowLayout{
-                id: buttonsLayout
-                anchors.horizontalCenter: firstRect.horizontalCenter
+            Button{
+                id: scannButton
+                text: blescannermodel.scanning? "Stop":"Start"
                 anchors.bottom: scannerLabel.top
-
-                Button{
-                    id: scannButton
-                    text: blescannermodel.scanning? "Stop":"Start"
-                    enabled: connhandling.connected? false: true
-                    onClicked: {
-                        blescannermodel.scanning? blescannermodel.stopDiscovery() : blescannermodel.startDiscovery()
-                    }
+                x: (parent.width/2) - width - (parent.width/50)
+                height: window.height/20
+                width: disconnectButton.width
+                font.pixelSize: window.height/30
+                enabled: connhandling.connected? false: true
+                onClicked: {
+                    blescannermodel.scanning? blescannermodel.stopDiscovery() : blescannermodel.startDiscovery()
                 }
+            }
 
-                Button{
-                    id: disconnectButton
-                    text: "Disconnect"
-                    enabled: connhandling.connected
-                    onClicked: {
-                        blescannermodel.clear()
-                        connhandling.disconnect()
-                    }
+            Button{
+                id: disconnectButton
+                text: "Disconnect"
+                anchors.bottom: scannerLabel.top
+                x: (parent.width/2) + (parent.width/50)
+                height: window.height/20
+                font.pixelSize: window.height/30
+                enabled: connhandling.connected
+                onClicked: {
+                    blescannermodel.clear()
+                    connhandling.disconnect()
                 }
             }
 
@@ -112,6 +116,7 @@ Page{
                 id: scannerLabel
                 anchors.horizontalCenter: firstRect.horizontalCenter
                 anchors.bottom: connectingLabel.top
+                font.pixelSize: window.height/30
                 text: blescannermodel.scannerState
             }
 
@@ -119,6 +124,7 @@ Page{
                 id: connectingLabel
                 anchors.horizontalCenter: firstRect.horizontalCenter
                 anchors.bottom: connectionLabel.top
+                font.pixelSize: window.height/30
                 text: connhandling.connected? "Connected to " + connhandling.devicename
                                             +" "+connhandling.deviceaddress
                                             :"Disconnected"
@@ -127,7 +133,8 @@ Page{
             Label{
                 id: connectionLabel
                 anchors.horizontalCenter: firstRect.horizontalCenter
-                y:firstRect.height - (firstRect.height * 0.1)
+                font.pixelSize: window.height/30
+                anchors.bottom: parent.bottom
                 text: connhandling.connecting? "Connecting to " + connhandling.devicename
                                             +" "+connhandling.deviceaddress
                                             :""

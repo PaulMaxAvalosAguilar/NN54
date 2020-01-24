@@ -25,6 +25,7 @@ Page{
                 anchors.bottom: firstRect.bottom
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+                font.pixelSize: window.height / 30
                 text:"Home Page\nClick to open action selection"
                 MouseArea{
                     anchors.fill: parent

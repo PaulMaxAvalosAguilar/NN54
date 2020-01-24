@@ -1,6 +1,6 @@
-import QtQuick 2.7
+import QtQuick 2.0
 import QtQuick.Window 2.2
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.12
 import QtCharts 2.0
 
 ApplicationWindow {
@@ -17,8 +17,7 @@ ApplicationWindow {
         height: headerLabel.height
         anchors.left: parent.left
         anchors.right: parent.right
-        color: "#dd248d"
-        border.color: "#256fdd"
+        color: "black"
 
         ToolButton{
             id: backImgbutton
@@ -60,10 +59,11 @@ ApplicationWindow {
             id: headerLabel
             text:"VBT App"
             clip: true
+            color: "yellow"
             anchors.left: parent.left
             anchors.right: parent.right
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize:  window.height / 30
+            font.pixelSize: window.height / 20
         }
     }
 
@@ -90,14 +90,15 @@ ApplicationWindow {
 
     Rectangle{
         id: footerRectangle
-        color: "#00ff1b"
+        color: "black"
         height: footerLabel.height
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         Label{
             id: footerLabel
-            font.pointSize: window.height / 40
+            color: "yellow"
+            font.pixelSize: window.height / 25
             anchors.left: parent.left
             anchors.right: parent.right
             text: "V.B.T Encoder by S(T)"
@@ -116,11 +117,12 @@ ApplicationWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            color:"#3548f2"
+            color:"black"
             Label{
                 id: textLabel
+                color: "yellow"
                 text: "App to open:"
-                font.pointSize: 17
+                font.pixelSize: window.height/20
                 anchors.left: parent.left
                 anchors.right: parent.right
                 horizontalAlignment: Text.AlignHCenter
@@ -139,6 +141,7 @@ ApplicationWindow {
             delegate: ItemDelegate {
                 width: parent.width
                 text: model.text
+                font.pixelSize: window.height/25
                 highlighted: ListView.isCurrentItem
                 onClicked: {
                     drawer.close()

@@ -72,7 +72,7 @@ Page{
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
                 width:  (parent.width/5)*2 + height
-                height: parent.height/15
+                height: window.height/20
 
                 Button{
                     id:settingsButton
@@ -90,7 +90,7 @@ Page{
 
                 Label{
                     id:soundLabel
-                    color: "white"
+                    color: "yellow"
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.right: soundCheckbox.left
@@ -98,7 +98,7 @@ Page{
                     horizontalAlignment: Text.AlignRight
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: parent.height/1.5
-                    text: "Sound:"
+                    text: "SOUND:"
                 }
 
 
@@ -127,9 +127,8 @@ Page{
                 width: firstRect.width
                 anchors.top: quickSettingsLayout.bottom
                 anchors.topMargin: firstRect.height/85
-                height:startButtonBottPosition - startbutton.height/2 - quickSettingsLayout.height
-                opacity: 0
-
+                height:startButtonBottPosition - quickSettingsLayout.height - anchors.topMargin - anchors.topMargin
+                opacity: 1
 
                 ChartView {
                     id: chart
@@ -178,7 +177,7 @@ Page{
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        height: parent.height/10
+                        height: parent.height/7
 
                         rowSpacing: 0
                         columns: 4
@@ -196,7 +195,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "cm"
                                 clip: true
-                                font.pointSize: window.height / 70
+                                font.pixelSize: parent.height / 1.5
                             }
                         }
 
@@ -213,7 +212,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "m/s"
                                 clip: true
-                                font.pointSize: window.height / 70
+                                font.pixelSize: parent.height / 1.5
                             }
                         }
 
@@ -230,7 +229,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "m/s"
                                 clip: true
-                                font.pointSize: window.height / 70
+                                font.pixelSize: parent.height / 1.5
                             }
                         }
 
@@ -247,7 +246,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "%"
                                 clip: true
-                                font.pointSize: window.height / 70
+                                font.pixelSize: parent.height / 1.5
                             }
                         }
 
@@ -264,7 +263,7 @@ Page{
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 70
+                               font.pixelSize: parent.height / 1.5
                             }
                         }
 
@@ -280,7 +279,7 @@ Page{
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 70
+                                font.pixelSize: parent.height / 1.5
                             }
                         }
 
@@ -296,7 +295,7 @@ Page{
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 70
+                                font.pixelSize: parent.height / 1.5
                             }
                         }
 
@@ -313,7 +312,7 @@ Page{
                                 verticalAlignment: Text.AlignVCenter
                                 text: "nA"
                                 wrapMode: Text.Wrap
-                                font.pointSize: window.height / 70
+                                font.pixelSize: parent.height / 1.5
                             }
                         }
                     }
@@ -332,7 +331,7 @@ Page{
                 text: started? "Stop": "Start"
                 //enabled: false
                 enabled: true
-                font.pointSize: window.height/60
+                font.pixelSize: parent.height/25
                 onClicked: {
                     started? connhandling.sendStop() : ""
                     started? y = Qt.binding(function(){return startButtonTopPosition}) :
@@ -372,7 +371,7 @@ Page{
             Text{
                 id: timerText
                 anchors.fill: parent
-                font.pixelSize: parent.height/2.5
+                font.pixelSize: window.height/2.5
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: timerCount
@@ -422,7 +421,7 @@ Page{
                 spacing: 0
 
                 height: numberOfElements * elementsHeight
-                property var elementsHeight:  parent.height/10
+                property var elementsHeight:  window.height/10
                 property var numberOfElements: 6
 
                 Rectangle{
@@ -439,6 +438,7 @@ Page{
                         border.width: 3
                         Label{
                             text: "Desired Count Direction:"
+                            font.pixelSize: window.height/25
                             wrapMode: Text.Wrap
                             clip: true
                             horizontalAlignment: Text.AlignHCenter
@@ -449,6 +449,7 @@ Page{
 
                     ComboBox{
                         id:modeTextField
+                        font.pixelSize: window.height/25
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -472,6 +473,7 @@ Page{
                         border.width: 3
                         Label{
                             text: "Min Dist To Travel:"
+                            font.pixelSize: window.height/25
                             wrapMode: Text.Wrap
                             clip: true
                             horizontalAlignment: Text.AlignHCenter
@@ -482,6 +484,7 @@ Page{
 
                     SpinBox{
                         id: minDistToTravelTextField
+                        font.pixelSize: window.height/25
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -507,6 +510,7 @@ Page{
                         border.width: 3
                         Label{
                             text: "Desired Count Direction:"
+                            font.pixelSize: window.height/25
                             wrapMode: Text.Wrap
                             clip: true
                             horizontalAlignment: Text.AlignHCenter
@@ -517,6 +521,7 @@ Page{
 
                     ComboBox{
                         id:desiredCountDirTextField
+                        font.pixelSize: window.height/25
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -540,6 +545,7 @@ Page{
                         border.width: 3
                         Label{
                             text: "Desired Rep Direction:"
+                            font.pixelSize: window.height/25
                             wrapMode: Text.Wrap
                             clip: true
                             horizontalAlignment: Text.AlignHCenter
@@ -550,6 +556,7 @@ Page{
 
                     ComboBox{
                         id: desiredRepDirTextField
+                        font.pixelSize: window.height/25
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -574,6 +581,7 @@ Page{
                         border.width: 3
                         Label{
                             text: "Fatigue:"
+                            font.pixelSize: window.height/25
                             wrapMode: Text.Wrap
                             clip: true
                             horizontalAlignment: Text.AlignHCenter
@@ -584,6 +592,7 @@ Page{
 
                     SpinBox{
                         id: fatigueTextField
+                        font.pixelSize: window.height/25
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -609,6 +618,7 @@ Page{
                         border.width: 3
                         Label{
                             text: "Timer:"
+                            font.pixelSize: window.height/25
                             wrapMode: Text.Wrap
                             clip: true
                             horizontalAlignment: Text.AlignHCenter
@@ -619,6 +629,7 @@ Page{
 
                     SpinBox{
                         id: timerCountTextField
+                        font.pixelSize: window.height/25
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -633,6 +644,7 @@ Page{
 
             Button{
                 text: "OK"
+                font.pixelSize: window.height/30
                 anchors.top: settingsLayout.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.topMargin: parent.height/20
