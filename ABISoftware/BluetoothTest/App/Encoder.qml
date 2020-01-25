@@ -9,6 +9,11 @@ Page{
     property var meanPropVel: connhandling.meanPropVel
     property var peakVel: connhandling.peakVel
 
+    property var repetitions: 0
+    property var traveledDistances: []
+    property var meanPropVelocities: []
+    property var peakVelocities: []
+
     property var currentView: homePageView
     property int connected: connhandling.connected
     property var started: 0
@@ -26,6 +31,8 @@ Page{
     property var startButtonBottPosition: scrollingArea.height - startbutton.height - scrollingArea.height/60
 
     property var timerCount: timerCountTextField.value
+
+
 
     onConnectedChanged: {
         connected? "": startbutton.y = startButtonTopPosition
@@ -50,10 +57,12 @@ Page{
 
     ScrollView {
         id: scrollingArea
-        anchors.fill: parent
-        clip: false
-        contentWidth: window.width
-        contentHeight: (window.height - footerRectangle.height -headerRectangle.height)*1
+        anchors.centerIn: parent.Center
+        clip: true
+        width: viewRectangle.width
+        height:  viewRectangle.height
+        contentWidth: viewRectangle.width
+        contentHeight: viewRectangle.height
         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
@@ -352,10 +361,17 @@ Page{
                     started? "": maxVel = 0
                     started? "": fatigue = 0
 
+                    started? "": repetitions = 0
+                    started? "": traveledDistances.length = 0;
+                    started? "": meanPropVelocities.length = 0;
+                    started? "": peakVelocities.length = 0;
+
                     started? timerCount = Qt.binding(function(){return timerCountTextField.value}) : ""
                     started? timerText.opacity = 0 : timerText.opacity = 1;
                     started? "": connhandling.sayCount(timerCountTextField.value);
                     started? timer.stop() : timer.start()
+
+
 
                     modeTextField.currentIndex? graphNameText = "MPV" :graphNameText = "PV"
 
@@ -365,7 +381,7 @@ Page{
 
                 Behavior on y {
                     NumberAnimation {duration:250}
-                }                
+                }
             }
 
             Text{
@@ -392,13 +408,166 @@ Page{
                         }
                     }
 
-                    if(timerCount == 0){                                            
+                    if(timerCount == 0){
                         connhandling.sendStart(minDistToTravelTextField.value,
                                                desiredCountDirTextField.currentIndex,
                                                desiredRepDirTextField.currentIndex);
 
                         timerText.opacity  = 0
                         dataRectangle.opacity = 1
+                    }
+                }
+            }
+        }
+
+        Rectangle{
+            id:thirdRect
+            anchors.top: parent.top
+            height: viewRectangle.height
+            width: viewRectangle.width
+            visible: true
+            color: "red"
+
+            Rectangle{
+                id: titleRectangle
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: parent.width/15
+                anchors.rightMargin: parent.width/15
+                height: window.height/10
+
+                Rectangle{
+                    id: repLabel
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+                    width: parent.width/4
+                    border.color: "black"
+                    border.width: 3
+                    Label{
+                        text: "#Rep"
+                        font.pixelSize: window.height/25
+                        wrapMode: Text.Wrap
+                        clip: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.fill: parent
+                    }
+                }
+
+                Rectangle{
+                    id: traveledDistanceLabel
+                    anchors.top: parent.top
+                    anchors.left: repLabel.right
+                    anchors.bottom: parent.bottom
+                    width: parent.width/4
+                    border.color: "black"
+                    border.width: 3
+                    Label{
+                        text: "TravelDist"
+                        font.pixelSize: window.height/25
+                        wrapMode: Text.Wrap
+                        clip: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.fill: parent
+                    }
+                }
+
+                Rectangle{
+                    id: peakVelLabel
+                    anchors.top: parent.top
+                    anchors.left: traveledDistanceLabel.right
+                    anchors.bottom: parent.bottom
+                    width: parent.width/4
+                    border.color: "black"
+                    border.width: 3
+                    Label{
+                        text: "PeakVel"
+                        font.pixelSize: window.height/25
+                        wrapMode: Text.Wrap
+                        clip: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.fill: parent
+                    }
+                }
+
+                Rectangle{
+                    id: meanPropulsiveVelLabel
+                    anchors.top: parent.top
+                    anchors.left: peakVelLabel.right
+                    anchors.bottom: parent.bottom
+                    width: parent.width/4
+                    border.color: "black"
+                    border.width: 3
+                    Label{
+                        text: "MeanPropVel"
+                        font.pixelSize: window.height/25
+                        wrapMode: Text.Wrap
+                        clip: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.fill: parent
+                    }
+                }
+            }
+
+            /*
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    for(var i = 0; i < 15; i++)
+                    scrollingArea.createElement()
+                }
+            }
+            */
+
+            Rectangle{
+                id: scrollViewRect
+                anchors.top: titleRectangle.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: parent.width/15
+                anchors.rightMargin: parent.width/15
+                anchors.bottom: parent.bottom
+
+                ScrollView{
+                    id: repsScrollView
+                    clip:true
+                    anchors.centerIn: scrollViewRect.Center
+                    width: scrollViewRect.width
+                    height: scrollViewRect.height
+                    contentWidth: scrollViewRect.width
+                    contentHeight: scrollViewRect.height
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+
+                    ColumnLayout{
+                        id: repsLayout
+
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.left: parent.left
+                        spacing: 0
+
+                        height: numberOfElements * elementsHeight
+                        property var elementsHeight:  window.height/10
+                        property var numberOfElements: 0
+                        property var elementsSurpassed: 0
+
+                        onHeightChanged: {
+
+                            if(elementsSurpassed){
+                                repsScrollView.contentHeight = (height + elementsHeight*2)
+                            }
+
+                            if(height > scrollViewRect.height){
+                                elementsSurpassed = 1;
+                            }
+
+                        }
                     }
                 }
             }
@@ -653,7 +822,6 @@ Page{
                     scrollingArea.changeView(firstRect)
                 }
             }
-
         }
 
         function changeView(view){
@@ -689,12 +857,46 @@ Page{
                         connhandling.saySpeed(vel)
                     }
                 }
+
+                repetitions++;
+                traveledDistances.push(traveledDist)
+                meanPropVelocities.push(meanPropVel)
+                peakVelocities.push(peakVelocities)
             }
 
             scatterseries.append(valx, valy)
             lineseries.append(valx++, valy)
             axisX.max = (scatterseries.at(scatterseries.count-1).x)+1
             axisX.applyNiceNumbers()
+        }
+
+
+        function createTable(){
+            for(var i = 0; i < repetitions; i++){
+
+            }
+        }
+
+        property var component;
+        function createElement(){
+            component = Qt.createComponent("RepsRectangle.qml");
+            if(component.status === Component.Ready || component.status === Component.Error) {
+                finishCreation();
+            }else{
+                component.statusChanged.connect(finishCreation());
+            }
+        }
+
+        function finishCreation(){
+            if(component.status === Component.Ready) {
+                var rectangle = component.createObject(repsLayout, {});
+                repsLayout.numberOfElements++;
+                if(rectangle ===null) {
+                    console.log("Error creating image");
+                }
+            }else if(component.status === Component.Error) {
+                console.log("Error loading component:", component.errorString());
+            }
         }
     }
 }

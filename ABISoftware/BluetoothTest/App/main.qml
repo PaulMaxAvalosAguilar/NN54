@@ -68,6 +68,7 @@ ApplicationWindow {
     }
 
     Rectangle{
+        id: viewRectangle
         anchors.top: headerRectangle.bottom
         anchors.bottom: footerRectangle.top
         width: window.width

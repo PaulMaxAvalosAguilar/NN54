@@ -7,5 +7,6 @@
         <file>Images/flecha-hacia-la-izquierda.svg</file>
         <file>Encoder.qml</file>
         <file>SoundEffects/fatigue-alert.wav</file>
+        <file>RepsRectangle.qml</file>
     </qresource>
 </RCC>
