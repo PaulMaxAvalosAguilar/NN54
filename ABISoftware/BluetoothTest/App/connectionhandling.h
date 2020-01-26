@@ -20,10 +20,14 @@ class ConnectionHandling : public QObject
 
     //QML Properties related
     Q_PROPERTY(int connected READ getConnected WRITE setConnected NOTIFY connectedChanged)
+    Q_PROPERTY(int activated READ getActivated WRITE setActivated NOTIFY activatedChanged)
     Q_PROPERTY(int connecting READ getConnecting WRITE setConnecting NOTIFY connectingChanged)
     Q_PROPERTY(QString devicename READ getDevicename WRITE setDevicename NOTIFY devicenameChanged)
     Q_PROPERTY(QString deviceaddress READ getDeviceaddress
                WRITE setDeviceaddress NOTIFY deviceadressChanged)
+
+    Q_PROPERTY(int encoderStartMessage READ getEncoderStartMessage WRITE setEncoderStartMessage NOTIFY encoderStartMessageChanged)
+
     Q_PROPERTY(uint traveledDistance READ getTraveledDist WRITE setTraveledDist NOTIFY traveledDistanceChanged)
     Q_PROPERTY(uint meanPropVel READ getMeanPropVel WRITE setMeanPropVel NOTIFY meanPropVelChanged)
     Q_PROPERTY(uint peakVel READ getPeakVel WRITE setPeakVel NOTIFY peakVelChanged)
@@ -39,6 +43,9 @@ public:
     int getConnected() const;
     void setConnected(int value);
 
+    int getActivated() const;
+    void setActivated(int value);
+
     int getConnecting() const;
     void setConnecting(int value);
 
@@ -47,6 +54,9 @@ public:
 
     QString getDeviceaddress() const;
     void setDeviceaddress(const QString &value);
+
+    int getEncoderStartMessage() const;
+    void setEncoderStartMessage(int value);
 
     uint getTraveledDist() const;
     void setTraveledDist(const uint &value);
@@ -61,9 +71,11 @@ public:
 signals:
     //QML Properties related
     void connectedChanged();
+    void activatedChanged();
     void connectingChanged();
     void devicenameChanged();
     void deviceadressChanged();
+    void encoderStartMessageChanged();
     void traveledDistanceChanged();
     void meanPropVelChanged();
     void peakVelChanged();
@@ -99,9 +111,13 @@ private:
 
     //QML Properties related
     int connected;
+    int activated;
     int connecting;
     QString devicename;
     QString deviceaddress;
+
+    int encoderStartMessage;
+
     uint traveledDist;
     uint meanPropVel;
     uint peakVel;

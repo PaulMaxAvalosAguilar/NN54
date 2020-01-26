@@ -5,9 +5,11 @@
 ConnectionHandling::ConnectionHandling(QObject *parent):
     QObject(parent),
     connected(false),
+    activated(false),
     connecting(false),
     devicename(""),
     deviceaddress(""),
+    encoderStartMessage(),
     traveledDist(),
     meanPropVel(),
     peakVel(),
@@ -79,6 +81,18 @@ void ConnectionHandling::setConnected(int value)
     emit connectedChanged();
 }
 
+int ConnectionHandling::getActivated() const
+{
+    return activated;
+}
+
+void ConnectionHandling::setActivated(int value)
+{
+    activated = value;
+    emit activatedChanged();
+}
+
+
 int ConnectionHandling::getConnecting() const
 {
     return connecting;
@@ -99,7 +113,7 @@ QString ConnectionHandling::getDevicename() const
 void ConnectionHandling::setDevicename(const QString &value)
 {
     devicename = value;
-    devicenameChanged();
+    emit devicenameChanged();
 }
 
 QString ConnectionHandling::getDeviceaddress() const
@@ -110,7 +124,18 @@ QString ConnectionHandling::getDeviceaddress() const
 void ConnectionHandling::setDeviceaddress(const QString &value)
 {
     deviceaddress = value;
-    deviceadressChanged();
+    emit deviceadressChanged();
+}
+
+int ConnectionHandling::getEncoderStartMessage() const
+{
+    return encoderStartMessage;
+}
+
+void ConnectionHandling::setEncoderStartMessage(int value)
+{
+    encoderStartMessage = value;
+    emit encoderStartMessageChanged();
 }
 
 uint ConnectionHandling::getTraveledDist() const
@@ -238,7 +263,8 @@ void ConnectionHandling::deviceDisconnected()
 {
     qDebug()<<"Device is disconnected";
     setConnecting(false);
-    setConnected(false);    
+    setConnected(false);
+    setActivated(false);
     timer->stop();
 }
 
@@ -351,7 +377,7 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
             parsedValue.clear();
             setPeakVel(uvalue);
         }else if(uvalue == 200){
-            soundeffect();
+            setEncoderStartMessage(encoderStartMessage++);
         }
     }
 }
@@ -360,6 +386,10 @@ void ConnectionHandling::confirmedDescriptorWritten(const QLowEnergyDescriptor &
 {
     if (d.isValid() && d == batteryDescriptor && value == QByteArray::fromHex("0100")) {
         qDebug() <<"Notifications activated";
+        setActivated(true);
     }
 }
+
+
+
 

@@ -5,6 +5,8 @@ import QtCharts 2.3
 
 Page{
 
+    property var encoderStartMessage: connhandling.encoderStartMessage
+
     property var traveledDist: connhandling.traveledDistance
     property var meanPropVel: connhandling.meanPropVel
     property var peakVel: connhandling.peakVel
@@ -15,7 +17,7 @@ Page{
     property var peakVelocities: []
 
     property var currentView: homePageView
-    property int connected: connhandling.connected
+    property int activated: connhandling.activated
     property var started: 0
     property var soundEnabled: true
 
@@ -32,10 +34,12 @@ Page{
 
     property var timerCount: timerCountTextField.value
 
-    onConnectedChanged: {
-        connected? "": startbutton.y = startButtonTopPosition
-        //connected? startbutton.enabled = true : startbutton.enabled = false
-        connected? started = 0 : started  = false
+    onEncoderStartMessageChanged:function(){
+        if(soundEnabled && started){
+            connhandling.soundeffect()
+            dataRectangle.opacity = 1
+            timerText.opacity  = 0
+        }
     }
 
     onTraveledDistChanged: {
@@ -53,6 +57,12 @@ Page{
         peaklabel.text = peakVel/100
                 !modeTextField.currentIndex? scrollingArea.addToChart(peakVel): ""
         peakVelocities.push(peakVel)
+    }
+
+    onActivatedChanged: {
+        activated? "": startbutton.y = startButtonTopPosition
+        activated? startbutton.enabled = true : startbutton.enabled = false
+        activated? started = 0 : started  = false
     }
 
     ScrollView {
@@ -153,7 +163,7 @@ Page{
                 anchors.top: quickSettingsLayout.bottom
                 anchors.topMargin: firstRect.height/85
                 height:startButtonBottPosition - quickSettingsLayout.height - anchors.topMargin - anchors.topMargin
-                opacity: 1
+                opacity: 0
 
                 ChartView {
                     id: chart
@@ -354,8 +364,7 @@ Page{
                 height: window.height/8
                 width: height
                 text: started? "Stop": "Start"
-                //enabled: false
-                enabled: true
+                enabled: false
                 font.pixelSize: parent.height/25
                 onClicked: {
                     started? connhandling.sendStop() : ""
@@ -435,8 +444,7 @@ Page{
                                                desiredCountDirTextField.currentIndex,
                                                desiredRepDirTextField.currentIndex);
 
-                        timerText.opacity  = 0
-                        dataRectangle.opacity = 1
+
                     }
                 }
             }

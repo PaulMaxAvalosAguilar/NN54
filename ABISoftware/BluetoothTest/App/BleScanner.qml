@@ -125,20 +125,28 @@ Page{
                 anchors.horizontalCenter: firstRect.horizontalCenter
                 anchors.bottom: connectionLabel.top
                 font.pixelSize: window.height/30
-                text: connhandling.connected? "Connected to " + connhandling.devicename
-                                            +" "+connhandling.deviceaddress
-                                            :"Disconnected"
+                text:{
+                    if(connhandling.connected){
+                        if(connhandling.activated){
+                            "Activated " + connhandling.devicename +" "+connhandling.deviceaddress
+                        }else{
+                            "Connected to " + connhandling.devicename +" "+connhandling.deviceaddress
+                        }
+                    }else{
+                        "Disconnected"
+                    }
+                }
             }
 
             Label{
                 id: connectionLabel
                 anchors.horizontalCenter: firstRect.horizontalCenter
                 font.pixelSize: window.height/30
-                anchors.bottom: parent.bottom
+                anchors.bottom: firstRect.bottom
                 text: connhandling.connecting? "Connecting to " + connhandling.devicename
                                             +" "+connhandling.deviceaddress
                                             :""
-            }
+            }           
         }
     }
 }
