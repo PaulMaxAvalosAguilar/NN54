@@ -199,18 +199,16 @@ static void communicationTask(void *args __attribute__((unused))) {
     if( xHandle == ( QueueSetMemberHandle_t ) communicationQueue){
       xQueueReceive(communicationQueue, &dataStruct,0);//Should go first
       
-      if(dataStruct.eDataSource == adcSender){
-	sendToLCDQueue(batteryLevel,dataStruct.traveledDistanceOrADC);
-
-      }else if(dataStruct.eDataSource == encoderSender){
+      
+      if(dataStruct.eDataSource == encoderSender){
 	sendToLCDQueue(encoder, dataStruct.meanPropulsiveVelocity);
 	writeEncoderValues(dataStruct.traveledDistanceOrADC,
 			   dataStruct.meanPropulsiveVelocity,
 			   dataStruct.peakVelocity);
 
+      }else if(dataStruct.eDataSource == adcSender){
+	sendToLCDQueue(batteryLevel,dataStruct.traveledDistanceOrADC);
       }
-
-
       
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
       xSemaphoreTake(communicationSemaphore,0);//Should go first
@@ -219,7 +217,6 @@ static void communicationTask(void *args __attribute__((unused))) {
 	genericLineParsing(charLineBuffer);
       }
     }
-
 
   }
 }

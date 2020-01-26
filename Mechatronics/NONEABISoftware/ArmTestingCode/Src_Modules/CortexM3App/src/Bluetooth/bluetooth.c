@@ -74,7 +74,7 @@ void setName(char *string);//No >  6 bytes when using private serviceo
 void turnOffSubscription(void);
 void startTimers(void);
 void stopTimers(void);
-
+void writeEncoderStartValue(void);
 
 //-------------- USART PARSING FUNCTIONS----------
 int parseWVLine(const char* line);
@@ -373,6 +373,14 @@ void stopTimers(){
     nvic_disable_irq(NVIC_TIM1_UP_IRQ);
 }
 
+void writeEncoderStartValue(){
+  runLockingCOMMAND(&characteristicStatus.isNotifying
+		    ,"SHW,%04X,"
+		    "%02X\n",
+		    characteristicStatus.handle,
+		    200);
+}
+
 int parseWVLine(const char* line){
   if(strncmp(line,"WV,",3) != 0){
     return 0;
@@ -408,6 +416,7 @@ int parseWVLine(const char* line){
     //Get desiredRepDir
 
     startTimers();
+    writeEncoderStartValue();
 
   }else if(messageType ==2){
     stopTimers();

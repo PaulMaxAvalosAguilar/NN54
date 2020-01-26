@@ -430,6 +430,7 @@ Page{
                     }
 
                     if(timerCount == 0){
+                        timer.stop()
                         connhandling.sendStart(minDistToTravelTextField.value,
                                                desiredCountDirTextField.currentIndex,
                                                desiredRepDirTextField.currentIndex);

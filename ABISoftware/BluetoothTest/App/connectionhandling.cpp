@@ -180,7 +180,6 @@ void ConnectionHandling::sendStart(uint minDistToTravel, uint desiredCountDir, u
         c.append(static_cast<char>(desiredCountDir));
         c.append(static_cast<char>(desiredRepDir));
         encoderService->writeCharacteristic(encoderCharacteristic, c);
-
     }
 }
 
@@ -351,6 +350,8 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
             uvalue = parsedValue.toUInt(nullptr,16);
             parsedValue.clear();
             setPeakVel(uvalue);
+        }else if(uvalue == 200){
+            soundeffect();
         }
     }
 }
