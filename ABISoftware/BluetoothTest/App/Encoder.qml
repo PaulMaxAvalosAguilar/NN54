@@ -32,8 +32,6 @@ Page{
 
     property var timerCount: timerCountTextField.value
 
-
-
     onConnectedChanged: {
         connected? "": startbutton.y = startButtonTopPosition
         //connected? startbutton.enabled = true : startbutton.enabled = false
@@ -42,17 +40,19 @@ Page{
 
     onTraveledDistChanged: {
         travellabel.text = traveledDist
-
+        traveledDistances.push(traveledDist)
     }
 
     onMeanPropVelChanged: {
         mpvlabel.text = meanPropVel/100
         modeTextField.currentIndex? scrollingArea.addToChart(meanPropVel) :""
+        meanPropVelocities.push(meanPropVel)
     }
 
     onPeakVelChanged: {
         peaklabel.text = peakVel/100
                 !modeTextField.currentIndex? scrollingArea.addToChart(peakVel): ""
+        peakVelocities.push(peakVel)
     }
 
     ScrollView {
@@ -80,7 +80,7 @@ Page{
                 color: "red"
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                width:  (parent.width/5)*2 + height
+                width:  (firstRect.width/6)*4
                 height: window.height/20
 
                 Button{
@@ -88,12 +88,27 @@ Page{
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
-                    width: firstRect.width/5
+                    width: firstRect.width/6
                     font.pixelSize: parent.height/1.5
                     text: "Settings"
 
                     onClicked:{
                         scrollingArea.changeView(secondRect)
+                    }
+                }
+
+                Button{
+                    id: repsButton
+                    anchors.top: parent.top
+                    anchors.left: settingsButton.right
+                    anchors.leftMargin: firstRect.width/15
+                    anchors.bottom: parent.bottom
+                    width: firstRect.width/6
+                    font.pixelSize: parent.height/1.5
+                    text: "Reps"
+
+                    onClicked:{
+                        scrollingArea.changeView(thirdRect)
                     }
                 }
 
@@ -103,10 +118,11 @@ Page{
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.right: soundCheckbox.left
-                    width: firstRect.width/5
+                    anchors.left: repsButton.right
                     horizontalAlignment: Text.AlignRight
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: parent.height/1.5
+                    clip: true
                     text: "SOUND:"
                 }
 
@@ -368,10 +384,15 @@ Page{
 
                     started? timerCount = Qt.binding(function(){return timerCountTextField.value}) : ""
                     started? timerText.opacity = 0 : timerText.opacity = 1;
-                    started? "": connhandling.sayCount(timerCountTextField.value);
+
+                    if(soundEnabled){
+                        started? "": connhandling.sayCount(timerCountTextField.value);
+                    }
+
                     started? timer.stop() : timer.start()
 
-
+                    started? scrollingArea.createTable() : scrollingArea.deleteTable()
+                    started? repsButton.enabled = true : repsButton.enabled = false
 
                     modeTextField.currentIndex? graphNameText = "MPV" :graphNameText = "PV"
 
@@ -425,7 +446,7 @@ Page{
             anchors.top: parent.top
             height: viewRectangle.height
             width: viewRectangle.width
-            visible: true
+            visible: false
             color: "red"
 
             Rectangle{
@@ -531,7 +552,7 @@ Page{
                 anchors.right: parent.right
                 anchors.leftMargin: parent.width/15
                 anchors.rightMargin: parent.width/15
-                anchors.bottom: parent.bottom
+                anchors.bottom: thirdRectBackButton.top
 
                 ScrollView{
                     id: repsScrollView
@@ -569,6 +590,19 @@ Page{
 
                         }
                     }
+                }
+            }
+
+            Button{
+                id:thirdRectBackButton
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: window.height/50
+                height: window.height/17
+                font.pixelSize: window.height/30
+                text: "Ok"
+                onClicked: {
+                    scrollingArea.changeView(firstRect)
                 }
             }
         }
@@ -857,11 +891,7 @@ Page{
                         connhandling.saySpeed(vel)
                     }
                 }
-
-                repetitions++;
-                traveledDistances.push(traveledDist)
-                meanPropVelocities.push(meanPropVel)
-                peakVelocities.push(peakVelocities)
+                repetitions++;                
             }
 
             scatterseries.append(valx, valy)
@@ -870,26 +900,39 @@ Page{
             axisX.applyNiceNumbers()
         }
 
+        function deleteTable(){
+
+            repsLayout.numberOfElements = 0;
+            for(var i = repsLayout.children.length; i > 0 ; i--) {
+                console.log("destroying: " + i)
+                repsLayout.children[i-1].destroy()
+            }
+        }
 
         function createTable(){
             for(var i = 0; i < repetitions; i++){
-
+                createElement(i)
             }
         }
 
         property var component;
-        function createElement(){
+        function createElement(elementNumber){
             component = Qt.createComponent("RepsRectangle.qml");
             if(component.status === Component.Ready || component.status === Component.Error) {
-                finishCreation();
+                finishCreation(elementNumber);
             }else{
-                component.statusChanged.connect(finishCreation());
+                component.statusChanged.connect(finishCreation(elementNumber));
             }
         }
 
-        function finishCreation(){
+        function finishCreation(elementNumber){
             if(component.status === Component.Ready) {
-                var rectangle = component.createObject(repsLayout, {});
+                var rectangle = component.createObject(repsLayout, {
+                                                           "rep": elementNumber +1,
+                                                           "traveledDistance": traveledDistances[elementNumber]/100,
+                                                           "meanPropulsiveVel": meanPropVelocities[elementNumber]/100,
+                                                           "peakVel": peakVelocities[elementNumber]/100
+                                                       });
                 repsLayout.numberOfElements++;
                 if(rectangle ===null) {
                     console.log("Error creating image");
