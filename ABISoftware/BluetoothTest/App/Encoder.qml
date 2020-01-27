@@ -15,6 +15,7 @@ Page{
     property var traveledDistances: []
     property var meanPropVelocities: []
     property var peakVelocities: []
+    property var fatigues: []
 
     property var currentView: homePageView
     property int activated: connhandling.activated
@@ -228,7 +229,7 @@ Page{
                                 anchors.fill: parent
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
-                                text: "cm"
+                                text: "Cm"
                                 clip: true
                                 font.pixelSize: parent.height / 1.5
                             }
@@ -245,7 +246,7 @@ Page{
                                 anchors.fill: parent
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
-                                text: "m/s"
+                                text: "MPV m/s"
                                 clip: true
                                 font.pixelSize: parent.height / 1.5
                             }
@@ -262,7 +263,7 @@ Page{
                                 anchors.fill: parent
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
-                                text: "m/s"
+                                text: "PV m/s"
                                 clip: true
                                 font.pixelSize: parent.height / 1.5
                             }
@@ -279,7 +280,7 @@ Page{
                                 anchors.fill: parent
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
-                                text: "%"
+                                text: "F %"
                                 clip: true
                                 font.pixelSize: parent.height / 1.5
                             }
@@ -345,7 +346,6 @@ Page{
                                 anchors.fill: parent
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
-                                text: "nA"
                                 wrapMode: Text.Wrap
                                 font.pixelSize: parent.height / 1.5
                             }
@@ -381,7 +381,7 @@ Page{
                     started? "": travellabel.text = 0
                     started? "": mpvlabel.text = 0
                     started? "": peaklabel.text = 0
-                    started? "": fatiguelabel.text = "nA"
+                    started? "": fatiguelabel.text = "0"
 
                     started? "": maxVel = 0
                     started? "": fatigue = 0
@@ -390,6 +390,7 @@ Page{
                     started? "": traveledDistances.length = 0;
                     started? "": meanPropVelocities.length = 0;
                     started? "": peakVelocities.length = 0;
+                    started? "": fatigues.length = 0;
 
                     started? timerCount = Qt.binding(function(){return timerCountTextField.value}) : ""
                     started? timerText.opacity = 0 : timerText.opacity = 1;
@@ -443,8 +444,6 @@ Page{
                         connhandling.sendStart(minDistToTravelTextField.value,
                                                desiredCountDirTextField.currentIndex,
                                                desiredRepDirTextField.currentIndex);
-
-
                     }
                 }
             }
@@ -472,11 +471,11 @@ Page{
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
-                    width: parent.width/4
+                    width: parent.width/5
                     border.color: "black"
                     border.width: 3
                     Label{
-                        text: "#Rep"
+                        text: "#"
                         font.pixelSize: window.height/25
                         wrapMode: Text.Wrap
                         clip: true
@@ -491,11 +490,11 @@ Page{
                     anchors.top: parent.top
                     anchors.left: repLabel.right
                     anchors.bottom: parent.bottom
-                    width: parent.width/4
+                    width: parent.width/5
                     border.color: "black"
                     border.width: 3
                     Label{
-                        text: "TravelDist"
+                        text: "Cm"
                         font.pixelSize: window.height/25
                         wrapMode: Text.Wrap
                         clip: true
@@ -510,11 +509,11 @@ Page{
                     anchors.top: parent.top
                     anchors.left: traveledDistanceLabel.right
                     anchors.bottom: parent.bottom
-                    width: parent.width/4
+                    width: parent.width/5
                     border.color: "black"
                     border.width: 3
                     Label{
-                        text: "PeakVel"
+                        text: "PV m/s"
                         font.pixelSize: window.height/25
                         wrapMode: Text.Wrap
                         clip: true
@@ -529,11 +528,30 @@ Page{
                     anchors.top: parent.top
                     anchors.left: peakVelLabel.right
                     anchors.bottom: parent.bottom
-                    width: parent.width/4
+                    width: parent.width/5
                     border.color: "black"
                     border.width: 3
                     Label{
-                        text: "MeanPropVel"
+                        text: "MPV m/s"
+                        font.pixelSize: window.height/25
+                        wrapMode: Text.Wrap
+                        clip: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.fill: parent
+                    }
+                }
+
+                Rectangle{
+                    id: repsfatigueLabel
+                    anchors.top: parent.top
+                    anchors.left: meanPropulsiveVelLabel.right
+                    anchors.bottom: parent.bottom
+                    width: parent.width/5
+                    border.color: "black"
+                    border.width: 3
+                    Label{
+                        text: "F %"
                         font.pixelSize: window.height/25
                         wrapMode: Text.Wrap
                         clip: true
@@ -885,10 +903,12 @@ Page{
             //Fatigue Calculation
             if(valy > maxVel){
                 maxVel = valy
-                fatiguelabel.text = "nA"
+                fatiguelabel.text = "0"
+                fatigues.push(0)
             }else{
                 fatigue = (  (1-(valy/maxVel))*100 )
                 fatiguelabel.text = fatigue
+                fatigues.push(fatigue)
             }
 
             //Sound Effects
@@ -913,7 +933,6 @@ Page{
 
             repsLayout.numberOfElements = 0;
             for(var i = repsLayout.children.length; i > 0 ; i--) {
-                console.log("destroying: " + i)
                 repsLayout.children[i-1].destroy()
             }
         }
@@ -936,11 +955,18 @@ Page{
 
         function finishCreation(elementNumber){
             if(component.status === Component.Ready) {
+                var fatigue = fatigues[elementNumber]
+                if(fatigue === -1){
+                    fatigue = "0";
+                }
+                var color = (fatigue === 0)? "yellow":"white"
                 var rectangle = component.createObject(repsLayout, {
                                                            "rep": elementNumber +1,
                                                            "traveledDistance": traveledDistances[elementNumber]/100,
                                                            "meanPropulsiveVel": meanPropVelocities[elementNumber]/100,
-                                                           "peakVel": peakVelocities[elementNumber]/100
+                                                           "peakVel": peakVelocities[elementNumber]/100,
+                                                           "fatigue": fatigue,
+                                                           "backColor":color
                                                        });
                 repsLayout.numberOfElements++;
                 if(rectangle ===null) {

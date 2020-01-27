@@ -359,6 +359,7 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
             }
             uvalue = parsedValue.toUInt(nullptr,16);
             parsedValue.clear();
+            qDebug()<< uvalue;
             setTraveledDist( ( (abs(uvalue-32767))*4084 )/10000 );
 
             for(auto iterator = hexValue.begin()+6; iterator < hexValue.begin() + 10;

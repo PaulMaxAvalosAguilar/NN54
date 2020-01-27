@@ -303,7 +303,7 @@ static void encoderTask(void *args __attribute__((unused))){
   uint8_t desiredDirFollowed = 0;
 
   //Velocity Calulcation Variables
-  uint16_t lastMaxCounter = 0;
+  uint16_t lastMaxCounter = ENCODERINITIAL_VALUE;
   uint32_t lastVelocity = 0;
   uint32_t currentVelocity = 0;
   
@@ -330,7 +330,7 @@ static void encoderTask(void *args __attribute__((unused))){
       lastPosition = ENCODERINITIAL_VALUE;
       lastTime = 0;
 
-      lastMaxCounter = 0;
+      lastMaxCounter = ENCODERINITIAL_VALUE;
       lastVelocity = 0;
 
       meanPropVelCount = 0;
@@ -401,7 +401,7 @@ static void encoderTask(void *args __attribute__((unused))){
 	canCountRep = 0;
 
 	//Reset Velocity Calculation Variables
-	lastMaxCounter = 0;
+	lastMaxCounter = ENCODERINITIAL_VALUE;
 	lastVelocity = 0;
 	
 	meanPropVelCount = 0;
