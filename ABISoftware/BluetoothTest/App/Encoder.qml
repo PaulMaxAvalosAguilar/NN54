@@ -962,7 +962,7 @@ Page{
                 var color = (fatigue === 0)? "yellow":"white"
                 var rectangle = component.createObject(repsLayout, {
                                                            "rep": elementNumber +1,
-                                                           "traveledDistance": traveledDistances[elementNumber]/100,
+                                                           "traveledDistance": traveledDistances[elementNumber],
                                                            "meanPropulsiveVel": meanPropVelocities[elementNumber]/100,
                                                            "peakVel": peakVelocities[elementNumber]/100,
                                                            "fatigue": fatigue,

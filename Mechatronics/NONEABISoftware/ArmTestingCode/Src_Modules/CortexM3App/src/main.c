@@ -46,12 +46,15 @@ uint8_t minDistTraveledDes(uint16_t counter, uint16_t minDistToTravel);
 uint8_t minDistTraveledAs(uint16_t counter, uint16_t minDistToTravel);
 uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel);
 uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel);
+uint8_t maxDistAs(uint16_t counter, uint16_t lastMaxDist);
+uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist);
 
 uint8_t (*goingDesiredCountDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
 uint8_t (*hasTraveledMinDist[2])(uint16_t, uint16_t) = {minDistTraveledDes,
 						      minDistTraveledAs};
 uint8_t (*hasReturnedToInitial[2])(uint16_t, uint16_t) =
   {returnToInitialDes,returnToInitialAs};
+uint8_t (*canCountMaxDist[2])(uint16_t,uint16_t) = {maxDistDes, maxDistAs};
 
 uint8_t descendente(uint16_t a, uint16_t b){
   return a<b;
@@ -75,6 +78,14 @@ uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel){
 
 uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel){
   return (counter < ENCODERINITIAL_VALUE + minDistToTravel);
+}
+
+uint8_t maxDistAs(uint16_t counter, uint16_t lastMaxDist){
+  return (counter > lastMaxDist);
+}
+
+uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist){
+  return (counter < lastMaxDist);
 }
 
 static void configurePeriphereals(void){
@@ -346,19 +357,18 @@ static void encoderTask(void *args __attribute__((unused))){
 	desiredDirFollowed = 1;
 	if(desiredCountDir){
 	  elapsedPosition = receiveEncValues.encoderCounter - lastPosition;
-	  if(receiveEncValues.encoderCounter > lastMaxCounter){
-	    lastMaxCounter = receiveEncValues.encoderCounter;
-	  }
 	}else{
-	  elapsedPosition = lastPosition - receiveEncValues.encoderCounter; 
-	  if(receiveEncValues.encoderCounter < lastMaxCounter){
-	    lastMaxCounter = receiveEncValues.encoderCounter;
-	  }
+	  elapsedPosition = lastPosition - receiveEncValues.encoderCounter;
 	}
       }else{
 	desiredDirFollowed = 0;
       }
-      
+
+      if( (*canCountMaxDist[desiredRepDir])(receiveEncValues.encoderCounter,
+					    lastMaxCounter) ){
+	lastMaxCounter = receiveEncValues.encoderCounter;
+      }
+
       lastPosition = receiveEncValues.encoderCounter;
       elapsedTime = receiveEncValues.inputCapture - lastTime;
       lastTime = receiveEncValues.inputCapture;
