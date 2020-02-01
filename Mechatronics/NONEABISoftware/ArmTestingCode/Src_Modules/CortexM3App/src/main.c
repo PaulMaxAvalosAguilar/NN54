@@ -99,6 +99,7 @@ static void configurePeriphereals(void){
   rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN); //ADC
   rcc_periph_clock_enable(RCC_DMA1);    // DMA
 
+
   //I2C
   gpio_set_mode(GPIOB,
 		GPIO_MODE_OUTPUT_50_MHZ,
@@ -129,8 +130,6 @@ static void configurePeriphereals(void){
   adc_set_single_conversion_mode(ADC1);// Continous mode disabled
   adc_enable_temperature_sensor();
 
-
-
   adc_power_on(ADC1);
   adc_reset_calibration(ADC1);
   adc_calibrate_async(ADC1);
@@ -148,8 +147,7 @@ static void configurePeriphereals(void){
   gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
 		     AFIO_MAPR_I2C1_REMAP |  //I2C PB8 + PB9
 		     AFIO_MAPR_TIM2_REMAP_PARTIAL_REMAP1 |
-		     AFIO_MAPR_USART1_REMAP  ); //USART PB6 + PB7
-  
+		     AFIO_MAPR_USART1_REMAP  ); //USART PB6 + PB7  
 
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
@@ -212,11 +210,9 @@ static void communicationTask(void *args __attribute__((unused))) {
       
       
       if(dataStruct.eDataSource == encoderSender){
-	sendToLCDQueue(encoder, dataStruct.meanPropulsiveVelocity);
 	writeEncoderValues(dataStruct.traveledDistanceOrADC,
 			   dataStruct.meanPropulsiveVelocity,
 			   dataStruct.peakVelocity);
-
       }else if(dataStruct.eDataSource == adcSender){
 	sendToLCDQueue(batteryLevel,dataStruct.traveledDistanceOrADC);
       }
@@ -327,6 +323,8 @@ static void encoderTask(void *args __attribute__((unused))){
   uint8_t  minDistTraveled= 0;
 
   for(;;){
+    
+
 
     if(getENCODERStarted()){
 
@@ -375,7 +373,6 @@ static void encoderTask(void *args __attribute__((unused))){
       
       if(desiredDirFollowed){
 	elapsedDistance = 4084 * elapsedPosition;
-	if(elapsedPosition >1) goto a;
 	currentVelocity = (elapsedDistance * 100) / elapsedTime;
 
 	//Peak Velocity Calculation
@@ -390,7 +387,6 @@ static void encoderTask(void *args __attribute__((unused))){
       }
       //VELOCITY ALGORITHM
 
-    a:
       //REPETITION ALGORITHM
       if((*hasTraveledMinDist[desiredRepDir])
 	(receiveEncValues.encoderCounter, minDistToTravel)){
@@ -420,28 +416,68 @@ static void encoderTask(void *args __attribute__((unused))){
       }
       //REPETITION ALGORITHM
     }
+
+
     vTaskDelay(pdMS_TO_TICKS(50));
+    
   }
 }
 
 void tim1_cc_isr(){
 
-  //  tim2Counter = (uint16_t)TIM2_CNT - (int16_t)32767;
-  tim2Counter = (uint16_t)TIM2_CNT;
-  
   if(TIM1_SR & TIM_SR_CC1IF){
+    //Rising Edge B
+#ifdef SOFTWARE_ENC
+    if(gpio_get(GPIOA, GPIO15)){
+      tim2Counter++;
+    }else{
+      tim2Counter--;
+    }
+#endif
     capturedTime = (overflowCounter << 16) | TIM1_CCR1;
   }else if(TIM1_SR & TIM_SR_CC2IF){
+    //Falling Edge B
+#ifdef SOFTWARE_ENC
+    if(!gpio_get(GPIOA, GPIO15)){
+      tim2Counter++;
+    }else{
+      tim2Counter--;
+    }
+#endif
     capturedTime = (overflowCounter << 16) | TIM1_CCR2;
   }else if(TIM1_SR & TIM_SR_CC3IF){
+    //Rising Edge A
+#ifdef SOFTWARE_ENC
+    if(!gpio_get(GPIOB, GPIO3)){
+      tim2Counter++;
+    }else{
+      tim2Counter--;
+    }
+#endif
     capturedTime = (overflowCounter << 16) | TIM1_CCR3;
   }else if(TIM1_SR & TIM_SR_CC4IF){
+    //Falling Edge A
+#ifdef SOFTWARE_ENC
+    if(gpio_get(GPIOB, GPIO3)){
+      tim2Counter++;
+    }else{
+      tim2Counter--;
+    }
+#endif    
     capturedTime = (overflowCounter << 16) | TIM1_CCR4;
   }
 
-  encInterruptValues.encoderCounter = tim2Counter;
   encInterruptValues.inputCapture = capturedTime;
-
+#ifdef SOFTWARE_ENC
+  encInterruptValues.encoderCounter = tim2Counter;
+#endif
+  
+#ifndef SOFTWARE_ENC
+  while((uint16_t)TIM2_CNT == tim2Counter);
+  tim2Counter = (uint16_t)TIM2_CNT;
+  encInterruptValues.encoderCounter = tim2Counter;
+#endif
+  
   ring_buffer_put(&encoder_ring, (encoderValues_t*)&encInterruptValues);
 }
 
