@@ -11,6 +11,7 @@
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/exti.h>
 #include "printf.h"
 #include "lcd.h"
 #include "uart.h"
@@ -50,6 +51,8 @@ uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel);
 uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel);
 uint8_t maxDistAs(uint16_t counter, uint16_t lastMaxDist);
 uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist);
+
+void lcdPutsBlinkFree(const char *g, int ypos);
 
 uint8_t (*goingDesiredCountDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
 uint8_t (*hasTraveledMinDist[2])(uint16_t, uint16_t) = {minDistTraveledDes,
@@ -92,7 +95,7 @@ uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist){
 
 static void configurePeriphereals(void){
 
-  rcc_periph_clock_enable(RCC_AFIO);    // I2C UART ADC
+  rcc_periph_clock_enable(RCC_AFIO);    // I2C UART ADC EXTI
   rcc_periph_clock_enable(RCC_GPIOA);   // TIM1 TIM2 ADC
   rcc_periph_clock_enable(RCC_GPIOB);	// I2C TIM2 UART
   rcc_periph_clock_enable(RCC_GPIOC);	// I2C TIM2
@@ -101,6 +104,15 @@ static void configurePeriphereals(void){
   rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN); //ADC
   rcc_periph_clock_enable(RCC_DMA1);    // DMA
 
+  //EXTI
+
+
+  gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO12);
+
+  exti_select_source(EXTI12, GPIOB);
+  exti_set_trigger(EXTI12, EXTI_TRIGGER_BOTH);
+  exti_enable_request(EXTI12);
+  //EXTI
 
   //I2C
   gpio_set_mode(GPIOB,
@@ -153,10 +165,12 @@ static void configurePeriphereals(void){
     
   
   nvic_enable_irq(NVIC_USART1_IRQ);
+  nvic_enable_irq(NVIC_EXTI15_10_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM3_IRQ,(0 << 4));
   nvic_set_priority(NVIC_USART1_IRQ,(1 << 4));
+  nvic_set_priority(NVIC_EXTI15_10_IRQ, (2 << 4));
 
 }
 
@@ -236,6 +250,8 @@ static void lcdTask(void *args __attribute__((unused))){
   lcdData_t receivedData;
   char buffer[22];
   lcd_init(LCD_DISP_ON);
+  uint16_t lineState = 0;
+  uint32_t lastVoltage = 0;
   
   for(;;){
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
@@ -251,14 +267,21 @@ static void lcdTask(void *args __attribute__((unused))){
 		       2);
       
     }else if(receivedData.messageType == batteryLevel){
-      sprintf(buffer,"    Battery: %lu", receivedData.displayValue);
-      lcdPutsBlinkFree(buffer,7);
+      lineState = GPIOB_IDR;
+      if( (lineState & (1 <<12)) !=0){
+	sprintf(buffer,"    ** Batt: %lu", receivedData.displayValue);
+	lcdPutsBlinkFree(buffer,7);
+      }else{
+	sprintf(buffer,"       Batt: %lu", receivedData.displayValue);
+	lcdPutsBlinkFree(buffer,7);
+      }
+      lastVoltage = receivedData.displayValue;
       
     }else if(receivedData.messageType == chargingStatus){
-      lcdPutsBlinkFree(receivedData.displayValue?
-		       "Charging":
-		       "Not Charging",
-		       4);
+      sprintf(buffer, receivedData.displayValue?
+	      "    ** Batt: %lu":
+	      "       Batt: %lu", lastVoltage);
+      lcdPutsBlinkFree(buffer, 7);
       
     }else if(receivedData.messageType == encoder){
       sprintf(buffer, "%lu", receivedData.displayValue);
@@ -487,6 +510,27 @@ void tim1_cc_isr(){
 void tim1_up_isr(){
   TIM1_SR &= ~TIM_SR_UIF;//Should go first
   overflowCounter++;  
+}
+
+void exti15_10_isr(){
+  exti_reset_request(EXTI12);
+  uint16_t lineState = GPIOB_IDR;
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  lcdData_t dataToSend;
+
+  if( (lineState & (1 <<12)) != 0){
+    dataToSend.messageType = chargingStatus;
+    dataToSend.displayValue = 1;
+    xQueueSendToBackFromISR(lcdQueue, &dataToSend,&xHigherPriorityTaskWoken);
+  }else{
+    dataToSend.messageType = chargingStatus;
+    dataToSend.displayValue = 0;
+    xQueueSendToBackFromISR(lcdQueue, &dataToSend,&xHigherPriorityTaskWoken);
+  }
+
+
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
 }
 
 int main(void)
