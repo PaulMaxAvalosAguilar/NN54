@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/">
+        <file alias="Images/baseline-menu-24px.svg">../src/Images/baseline-menu-24px.svg</file>
+        <file alias="Images/flecha-hacia-la-izquierda.svg">../src/Images/flecha-hacia-la-izquierda.svg</file>
+        <file alias="SoundEffects/fatigue-alert.wav">../src/SoundEffects/fatigue-alert.wav</file>
+    </qresource>
+</RCC>

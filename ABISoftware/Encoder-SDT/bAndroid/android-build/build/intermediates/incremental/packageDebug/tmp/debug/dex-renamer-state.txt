@@ -1,0 +1,4 @@
+#Mon Jan 27 21:55:54 CST 2020
+base.0=D\:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

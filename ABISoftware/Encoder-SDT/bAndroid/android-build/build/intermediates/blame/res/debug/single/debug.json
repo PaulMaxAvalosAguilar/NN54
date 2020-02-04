@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "D:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi_icon.png.flat",
+        "source": "D:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\res\\drawable-mdpi\\icon.png"
+    },
+    {
+        "merged": "D:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi_icon.png.flat",
+        "source": "D:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\res\\drawable-ldpi\\icon.png"
+    },
+    {
+        "merged": "D:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\build\\intermediates\\res\\merged\\debug\\layout_splash.xml.flat",
+        "source": "D:\\Qt\\5.14.0\\android\\src\\android\\java\\res\\layout\\splash.xml"
+    },
+    {
+        "merged": "D:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_icon.png.flat",
+        "source": "D:\\pauld\\Programming\\NN54\\ABISoftware\\Encoder-SDT\\bAndroid\\android-build\\res\\drawable-hdpi\\icon.png"
+    }
+]

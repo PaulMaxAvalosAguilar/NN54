@@ -68,7 +68,7 @@
 #define configUSE_QUEUE_SETS            1
 
 
-#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP  (8000 * configTICK_RATE_HZ)/1000
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP  (1000 * configTICK_RATE_HZ)/1000
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
@@ -94,12 +94,6 @@ priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
-
-void myConfigPRE_SLEEP_PROCESSING(void);
-#define configPRE_SLEEP_PROCESSING(x); myConfigPRE_SLEEP_PROCESSING()
-
-void myConfigPOST_SLEEP_PROCESSING(void);
-#define configPOST_SLEEP_PROCESSING(x) myConfigPOST_SLEEP_PROCESSING()
 
 #endif /* FREERTOS_CONFIG_H */
 

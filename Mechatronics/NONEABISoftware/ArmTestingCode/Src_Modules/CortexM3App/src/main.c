@@ -1,4 +1,6 @@
 #include "FreeRTOS.h"
+#include "portable.h"
+#include "portmacro.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
@@ -148,10 +150,12 @@ static void configurePeriphereals(void){
 		     AFIO_MAPR_I2C1_REMAP |  //I2C PB8 + PB9
 		     AFIO_MAPR_TIM2_REMAP_PARTIAL_REMAP1 |
 		     AFIO_MAPR_USART1_REMAP  ); //USART PB6 + PB7  
-
+    
+  
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
+  nvic_set_priority(NVIC_TIM3_IRQ,(0 << 4));
   nvic_set_priority(NVIC_USART1_IRQ,(1 << 4));
 
 }
@@ -168,7 +172,7 @@ read_adc(uint8_t channel) {
 }
 
 
-static void lcdPutsBlinkFree(const char *g, int ypos){
+void lcdPutsBlinkFree(const char *g, int ypos){
   int i = 0;
   char text[22];//max used characters used plus null terminator
   int blankchars;
@@ -267,17 +271,11 @@ static void adcTask(void *args __attribute__((unused))) {
 
   uint16_t voltageSupply = 0;
   uint16_t adc1Voltage = 0;
-
   adc_start_conversion_direct(ADC1);
+  voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
+  adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
   
   for(;;){
-
-
-    if(getBLEConnected()){
-      xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
-    }else{
-      vTaskDelay(pdMS_TO_TICKS(2000));
-    }
     
     //1.20 - 4095             INVERSE RULE OF 3
     //V+   - ADC_CHANNEL_VREF
@@ -289,6 +287,13 @@ static void adcTask(void *args __attribute__((unused))) {
     adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
 
     sendToCommunicationQueue(adcSender,adc1Voltage,0,0);
+
+    if(getBLEConnected()){
+      xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
+    }else{
+      vTaskDelay(pdMS_TO_TICKS(4000));
+    }
+
   }
 }
 
@@ -323,8 +328,6 @@ static void encoderTask(void *args __attribute__((unused))){
   uint8_t  minDistTraveled= 0;
 
   for(;;){
-    
-
 
     if(getENCODERStarted()){
 
@@ -484,15 +487,6 @@ void tim1_cc_isr(){
 void tim1_up_isr(){
   TIM1_SR &= ~TIM_SR_UIF;//Should go first
   overflowCounter++;  
-}
-
-void myConfigPRE_SLEEP_PROCESSING(){
-  //  lcdPutsBlinkFree("SLEEP", 4);
-}
-
-void myConfigPOST_SLEEP_PROCESSING(){
-
-  //    lcdPutsBlinkFree("----------------------------", 4);
 }
 
 int main(void)

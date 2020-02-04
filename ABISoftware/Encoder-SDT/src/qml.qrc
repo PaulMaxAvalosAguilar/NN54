@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>BleScanner.qml</file>
+        <file>HomePage.qml</file>
+        <file>Images/baseline-menu-24px.svg</file>
+        <file>Images/flecha-hacia-la-izquierda.svg</file>
+        <file>Encoder.qml</file>
+        <file>SoundEffects/fatigue-alert.wav</file>
+        <file>RepsRectangle.qml</file>
+    </qresource>
+</RCC>
