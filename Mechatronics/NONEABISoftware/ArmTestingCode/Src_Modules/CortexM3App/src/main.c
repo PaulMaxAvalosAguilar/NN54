@@ -453,56 +453,23 @@ void tim1_cc_isr(){
 
   if(TIM1_SR & TIM_SR_CC1IF){
     //Rising Edge B
-#ifdef SOFTWARE_ENC
-    if(gpio_get(GPIOA, GPIO15)){
-      tim2Counter++;
-    }else{
-      tim2Counter--;
-    }
-#endif
     capturedTime = (overflowCounter << 16) | TIM1_CCR1;
   }else if(TIM1_SR & TIM_SR_CC2IF){
     //Falling Edge B
-#ifdef SOFTWARE_ENC
-    if(!gpio_get(GPIOA, GPIO15)){
-      tim2Counter++;
-    }else{
-      tim2Counter--;
-    }
-#endif
     capturedTime = (overflowCounter << 16) | TIM1_CCR2;
   }else if(TIM1_SR & TIM_SR_CC3IF){
     //Rising Edge A
-#ifdef SOFTWARE_ENC
-    if(!gpio_get(GPIOB, GPIO3)){
-      tim2Counter++;
-    }else{
-      tim2Counter--;
-    }
-#endif
     capturedTime = (overflowCounter << 16) | TIM1_CCR3;
   }else if(TIM1_SR & TIM_SR_CC4IF){
     //Falling Edge A
-#ifdef SOFTWARE_ENC
-    if(gpio_get(GPIOB, GPIO3)){
-      tim2Counter++;
-    }else{
-      tim2Counter--;
-    }
-#endif    
     capturedTime = (overflowCounter << 16) | TIM1_CCR4;
   }
 
   encInterruptValues.inputCapture = capturedTime;
-#ifdef SOFTWARE_ENC
-  encInterruptValues.encoderCounter = tim2Counter;
-#endif
   
-#ifndef SOFTWARE_ENC
-  while((uint16_t)TIM2_CNT == tim2Counter);
+  // while((uint16_t)TIM2_CNT == tim2Counter);
   tim2Counter = (uint16_t)TIM2_CNT;
   encInterruptValues.encoderCounter = tim2Counter;
-#endif
   
   ring_buffer_put(&encoder_ring, (encoderValues_t*)&encInterruptValues);
 }

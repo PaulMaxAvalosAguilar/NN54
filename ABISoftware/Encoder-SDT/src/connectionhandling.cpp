@@ -205,6 +205,8 @@ void ConnectionHandling::sendStart(uint minDistToTravel, uint desiredCountDir, u
         c.append(static_cast<char>(desiredCountDir));
         c.append(static_cast<char>(desiredRepDir));
         encoderService->writeCharacteristic(encoderCharacteristic, c);
+        timer->stop();
+        qDebug() << "Start Sended";
     }
 }
 
@@ -218,6 +220,8 @@ void ConnectionHandling::sendStop()
         c.append(a);
         c.append(b);
         encoderService->writeCharacteristic(encoderCharacteristic, c);
+        timer->start();
+        qDebug() << "Stop Sended";
     }
 }
 
@@ -343,6 +347,7 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
     if (c.uuid() == encoderCharacteristic.uuid()){
 
         QString hexValue = value.toHex();
+        qDebug() << hexValue;
 
         for(auto iterator = hexValue.begin(); iterator < hexValue.begin() + 2;
             iterator++){
@@ -359,7 +364,6 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
             }
             uvalue = parsedValue.toUInt(nullptr,16);
             parsedValue.clear();
-            qDebug()<< uvalue;
             setTraveledDist( ( (abs(uvalue-32767))*4084 )/10000 );
 
             for(auto iterator = hexValue.begin()+6; iterator < hexValue.begin() + 10;

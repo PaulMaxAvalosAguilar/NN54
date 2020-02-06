@@ -372,8 +372,8 @@ void stopTimers(){
   gpio_set(GPIOA, GPIO4);
   nvic_disable_irq(NVIC_TIM1_CC_IRQ);
   nvic_disable_irq(NVIC_TIM1_UP_IRQ);
-  rcc_periph_clock_enable(RCC_TIM1);    // TIM1
-  rcc_periph_clock_enable(RCC_TIM2);    // TIM2
+  rcc_periph_clock_disable(RCC_TIM1);    // TIM1
+  rcc_periph_clock_disable(RCC_TIM2);    // TIM2
 }
 
 void writeEncoderStartValue(){
