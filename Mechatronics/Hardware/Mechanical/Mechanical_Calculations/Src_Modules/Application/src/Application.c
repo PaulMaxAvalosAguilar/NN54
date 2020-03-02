@@ -46,8 +46,8 @@ int main(int argc, char *argv[]){
   soporteGlobal.extradioExterno = 3.0;
 
   //PosSensores
-  posSensoresGlobal.n1 = 2;
-  posSensoresGlobal.n2 = 2;
+  posSensoresGlobal.n1 = 3;
+  posSensoresGlobal.n2 = 3;
   posSensoresGlobal.x = 0;
 
   //CajaResorte

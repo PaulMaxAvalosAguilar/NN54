@@ -166,7 +166,9 @@ void SoportesSensores(int print){
   int *n2 = &posSensoresGlobal.n2;
   double *x = &posSensoresGlobal.x;
   double *radioInternoDisco = &discoGlobal.radiointerno;
-  double *angulo = &discoGlobal.angulo_desfases;
+  double ang = 15;
+  //  double *angulo = &discoGlobal.angulo_desfases;
+  double *angulo = &ang;
   double *anchoSensor = &sensorGlobal.AnchoempaqueSensor;
   double *altoempaqueSensor = &sensorGlobal.AltoempaqueSensor;
   double *anchoSopBaleros = &soporteGlobal.anchoSoporte;
