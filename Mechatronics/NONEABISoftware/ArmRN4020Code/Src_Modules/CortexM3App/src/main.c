@@ -20,6 +20,38 @@
 #include "bluetooth.h"
 #include <string.h>
 
+/* DWT (Data Watchpoint and Trace) registers, only exists on ARM Cortex with a DWT unit */
+#define KIN1_DWT_CONTROL             (*((volatile uint32_t*)0xE0001000))
+/*!< DWT Control register */
+#define KIN1_DWT_CYCCNTENA_BIT       (1UL<<0)
+/*!< CYCCNTENA bit in DWT_CONTROL register */
+#define KIN1_DWT_CYCCNT              (*((volatile uint32_t*)0xE0001004))
+/*!< DWT Cycle Counter register */
+#define KIN1_DEMCR                   (*((volatile uint32_t*)0xE000EDFC))
+/*!< DEMCR: Debug Exception and Monitor Control Register */
+#define KIN1_TRCENA_BIT              (1UL<<24)
+/*!< Trace enable bit in DEMCR register */
+
+#define KIN1_InitCycleCounter()			\
+  KIN1_DEMCR |= KIN1_TRCENA_BIT
+/*!< TRCENA: Enable trace and debug block DEMCR (Debug Exception and Monitor Control Register */
+ 
+#define KIN1_ResetCycleCounter()		\
+  KIN1_DWT_CYCCNT = 0
+/*!< Reset cycle counter */
+ 
+#define KIN1_EnableCycleCounter()		\
+  KIN1_DWT_CONTROL |= KIN1_DWT_CYCCNTENA_BIT
+/*!< Enable cycle counter */
+ 
+#define KIN1_DisableCycleCounter()		\
+  KIN1_DWT_CONTROL &= ~KIN1_DWT_CYCCNTENA_BIT
+/*!< Disable cycle counter */
+ 
+#define KIN1_GetCycleCounter()			\
+  KIN1_DWT_CYCCNT
+/*!< Read cycle counter register */
+
 //encoderTask -------------------------------
 typedef struct encoderValues_t{
   uint16_t encoderCounter;
@@ -171,6 +203,10 @@ static void configurePeriphereals(void){
   nvic_set_priority(NVIC_TIM3_IRQ,(0 << 4));
   nvic_set_priority(NVIC_USART1_IRQ,(1 << 4));
   nvic_set_priority(NVIC_EXTI15_10_IRQ, (2 << 4));
+
+  KIN1_InitCycleCounter(); /* enable DWT hardware */
+  KIN1_ResetCycleCounter(); /* reset cycle counter */
+  KIN1_EnableCycleCounter(); /* start counting */
 
 }
 
@@ -350,6 +386,12 @@ static void encoderTask(void *args __attribute__((unused))){
   uint8_t canCountRep = 0;
   uint8_t  minDistTraveled= 0;
 
+  /*
+  uint32_t cyclesBefore = 0;
+  uint32_t cyclesAfter = 0;
+  uint32_t cyclesDif = 0;
+  */
+
   for(;;){
 
     if(getENCODERStarted()){
@@ -372,7 +414,13 @@ static void encoderTask(void *args __attribute__((unused))){
       meanPropVel = 0;
       peakVel = 0;
     }
-    
+
+    /*
+    cyclesBefore = KIN1_GetCycleCounter();
+    int returned = ring_buffer_get(&encoder_ring, &receiveEncValues);
+    while( returned != -1){
+    */
+
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
 
       //VELOCITY ALGORITHM
@@ -441,6 +489,18 @@ static void encoderTask(void *args __attribute__((unused))){
 	peakVel = 0;
       }
       //REPETITION ALGORITHM
+
+
+      /*
+      cyclesAfter = KIN1_GetCycleCounter();
+      cyclesDif = cyclesAfter - cyclesBefore;
+
+      char buffer[22];  
+      sprintf(buffer,  "%lu", cyclesDif);
+      lcdPutsBlinkFree(buffer, 5);
+
+      returned = ring_buffer_get(&encoder_ring, &receiveEncValues);
+      */
     }
 
 
@@ -450,6 +510,8 @@ static void encoderTask(void *args __attribute__((unused))){
 }
 
 void tim1_cc_isr(){
+
+  //  uint32_t cyclesBefore = KIN1_GetCycleCounter();
 
   if(TIM1_SR & TIM_SR_CC1IF){
     //Rising Edge B
@@ -472,6 +534,16 @@ void tim1_cc_isr(){
   encInterruptValues.encoderCounter = tim2Counter;
   
   ring_buffer_put(&encoder_ring, (encoderValues_t*)&encInterruptValues);
+
+  /*
+  uint32_t cyclesAfter = KIN1_GetCycleCounter();
+  uint32_t cycleDiff = cyclesAfter - cyclesBefore;
+
+  char buffer[22];  
+  sprintf(buffer,  "%lu", cycleDiff);
+  lcdPutsBlinkFree(buffer, 5);
+  */
+
 }
 
 void tim1_up_isr(){
