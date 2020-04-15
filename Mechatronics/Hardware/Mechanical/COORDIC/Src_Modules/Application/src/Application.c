@@ -24,11 +24,12 @@ int main(int argc, char *argv[]){
 	 atan2((double)y, (double)x) * 180/PI );
   */
 
-  double angleA = 45;
-  double angleB = 45;
+  double angleA = 45.10;
+  double angleB = 44.66;
   
   double phiAngle = acos(1/sqrt(tan(angleA * PI/180) *tan(angleA * PI/180) + tan(angleB * PI/180) * tan(angleB * PI/180) +1)) * 180/PI;
-  double myPhiAngle = atan( sqrt( tan(angleA * PI/180) *tan(angleA * PI/180) + tan(angleB * PI/180) * tan(angleB * PI/180)  ) ) * 180/PI ;
+  //  double myPhiAngle = atan(sqrt(tan(angleA * PI/180) *tan(angleA * PI/180) + tan(angleB * PI/180) * tan(angleB * PI/180) )) * 180/PI ;
+  double myPhiAngle = acos( cos(angleA * PI/180) * cos(angleB * PI/180))  * 180/PI;
 
   printf("%.3f %.3f", phiAngle, myPhiAngle);
   
