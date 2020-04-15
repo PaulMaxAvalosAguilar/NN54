@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
   double angleB = 45;
   
   double phiAngle = acos(1/sqrt(tan(angleA * PI/180) *tan(angleA * PI/180) + tan(angleB * PI/180) * tan(angleB * PI/180) +1)) * 180/PI;
-  double myPhiAngle = acos( ((angleB * (1/90)) * cos(angleA) )/1 ) * 180/PI ;
+  double myPhiAngle = atan( sqrt( tan(angleA * PI/180) *tan(angleA * PI/180) + tan(angleB * PI/180) * tan(angleB * PI/180)  ) ) * 180/PI ;
 
   printf("%.3f %.3f", phiAngle, myPhiAngle);
   
