@@ -5,9 +5,11 @@
 #include "fixmath.h"
 
 int32_t catan2(int32_t xvalue, int32_t yvalue);
+int32_t cCos(int32_t desiredAngle);
+double arccos_cordic ( double t, int n );
 
 int main(int argc, char *argv[]){
-
+  /*
   int32_t y = 10;
   int32_t x = 42;
   int32_t angle = catan2(y,x);
@@ -17,6 +19,7 @@ int main(int argc, char *argv[]){
   fix16_t angleFix = 0;
 
   angleFix = fix16_atan2(y,x);
+  */
 
   /*
   printf("%.3f %.3f\n", fix16_to_float(angleFix), atan2((double)y, (double)x) );
@@ -31,7 +34,9 @@ int main(int argc, char *argv[]){
   //  double myPhiAngle = atan(sqrt(tan(angleA * PI/180) *tan(angleA * PI/180) + tan(angleB * PI/180) * tan(angleB * PI/180) )) * 180/PI ;
   double myPhiAngle = acos( cos(angleA * PI/180) * cos(angleB * PI/180))  * 180/PI;
 
-  printf("%.3f %.3f", phiAngle, myPhiAngle);
+  int angle = 800000;
+
+  printf("%.6f %.6f", cCos(angle)/1000000.0, cos((angle/ 1000000.0) * PI/180));
   
   return 0;
 }
@@ -80,6 +85,50 @@ int32_t catan2(int32_t xvalue, int32_t yvalue){
   }
 
   return sum;
+}
+
+int32_t cCos(int32_t desiredAngle){
+
+  int32_t currentAngle = 0;
+
+  int32_t y = 0;
+  int32_t x = 607252;
+
+  int32_t iterations = 0;
+
+  int32_t xRotationResult = x;
+  int32_t yRotationResult = y;
+    
+  int32_t angles[16] = {
+			 45000000, 26565000, 14036000, 7125000, 3576000, 1790000, 895000, 448000, 224000, 112000, 56000, 28000, 14000, 7000, 3000
+  };
+
+  while( iterations < 16){
+
+    if( currentAngle > desiredAngle){
+      
+      xRotationResult = x + (y >>  iterations);
+      yRotationResult = y - (x >>  iterations);
+
+      x = xRotationResult;
+      y = yRotationResult;
+
+      currentAngle = currentAngle - angles[iterations];
+
+    }else{
+
+      xRotationResult = x - (y >> iterations);
+      yRotationResult = y + (x >> iterations);
+      x = xRotationResult;
+      y = yRotationResult;
+
+      currentAngle = currentAngle + angles[iterations];
+    }
+
+    iterations++;
+  }
+
+  return xRotationResult;
 }
 
 
