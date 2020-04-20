@@ -40,7 +40,7 @@ Application:
 
 	@make -C ./$(SRC_MODULES_DIR)/$(MAINMODULE)
 
-run:	
+run:	Application
 	./$(TARGETDIRECTORY)/$(VERSION)/$(TARGET)
 
 sync: 

@@ -1,4 +1,3 @@
-
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
@@ -43,6 +42,8 @@
 /*!< Read cycle counter register */
 
 int32_t catan2(int32_t xvalue, int32_t yvalue);
+int32_t arccos_cordic ( int32_t t);
+int32_t fixMultiply(int32_t a, int32_t b);
 
 int main(void)
 {
@@ -63,14 +64,25 @@ int main(void)
   double angleDouble = 0;
   double angleFloat = 0;
 
+  double val = .9;
+
   for(;;){
-    angle = catan2(y,x);
 
-    angleFix = fix16_atan2(y,x);
+    /*
+    val += .1;
+    angleDouble = sqrt(val);
 
-    angleDouble = atan2((double)y, (double) x);
+    angleDouble = sqrtf(val);
+    */
 
-    angleFloat = atan2f((float)y, (float) x);
+    val += .0001;
+    angleDouble = acosf(val);
+
+    /*
+    yFix = fix16_from_float(.5);
+    angleFix = fix16_sqrt(yFix);
+    float d = fix16_to_float(angleFix);
+    */
 
     y++;
     x++;
@@ -123,5 +135,88 @@ int32_t catan2(int32_t xvalue, int32_t yvalue){
   }
 
   return sum;
+}
+
+int32_t arccos_cordic ( int32_t cosine){
+  int32_t angle;
+  
+  int32_t i;
+  int32_t j;
+  int32_t poweroftwo;
+  int32_t sigma;
+  int32_t sign_z2;
+  int32_t theta;
+  int32_t x1;
+  int32_t x2;
+  int32_t y1;
+  int32_t y2;
+
+  /*
+  double angles[27]= {  45,       26.565051, 14.036243, 7.125016, 3.576334,
+		      1.789910, 0.895173,  0.447585,  0.223796, 0.111898,
+		      0.055977, 0.027960,  0.013980,  0.006990, 0.003495,
+		      0.001776, 0.000859,  0.000458,  0.000229, 0.000114,
+		      0.000057, 0.000027,  0.000014,  0.000007, 0.00003,
+		      0.000002, 0.000001};
+*/
+
+  /*
+  double angles[27] = {
+		       44.999895 ,26.564989 ,14.036211 ,7.125000 ,3.576326 ,1.789906 ,0.895172 ,0.447613 ,0.223810 ,0.111905 ,0.055953 ,0.027976 ,0.013988 ,0.006994 ,0.003497 ,0.001749 ,0.000874 ,0.000437 ,0.000219 ,0.000109 ,0.000055 ,0.000027 ,0.000014 ,0.000007 ,0.000003 ,0.000002 ,0.000001 };
+  */
+
+  int32_t angles[27] = {
+		       44999895 ,26564989 ,14036211 ,7125000 ,3576326 ,1789906 ,895172 ,447613 ,223810 ,111905 ,55953 ,27976 ,13988 ,6994 ,3497 , 1749 ,874 ,437 ,219 ,109 ,55 ,27 ,14 ,7 ,3 ,2 ,1 };
+
+
+  theta = 0;
+  x1 = 1000000;
+  y1 = 0;
+  poweroftwo = 1000000;
+
+  for ( j = 0; j < 16; j++ )
+  {
+    if ( y1 < 0 )
+    {
+      sign_z2 = -1000000;
+    }
+    else
+    {
+      sign_z2 = +1000000;
+    }
+
+    if ( cosine <= x1 )
+    {
+      sigma = + sign_z2;
+    }
+    else
+    {
+      sigma = - sign_z2;
+    }
+
+    angle = angles[j];
+
+    for ( i = 0; i < 2; i++ )
+    {
+      x2 = x1 - fixMultiply( sigma, fixMultiply( poweroftwo, y1));
+      y2 = fixMultiply( sigma, fixMultiply( poweroftwo, x1)) + y1;
+
+      x1 = x2;
+      y1 = y2;
+    }
+
+    theta = theta + fixMultiply(2000000, fixMultiply(sigma, angle));
+    cosine = cosine + fixMultiply(cosine, fixMultiply(poweroftwo, poweroftwo));
+    
+    poweroftwo = poweroftwo / 2;
+  }
+
+  return theta;
+}
+
+int32_t fixMultiply(int32_t a, int32_t b){
+  int64_t mul = (int64_t)a * (int64_t)b;
+  int32_t result = mul/1000000;
+  return result;
 }
 
