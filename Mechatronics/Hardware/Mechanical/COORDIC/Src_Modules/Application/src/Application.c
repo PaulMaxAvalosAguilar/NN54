@@ -38,7 +38,8 @@ int main(int argc, char *argv[]){
   int angle = 4500000;
 
   //    printf("%.6f %.6f", cCos(angle)/1000000.0, cos((angle/ 1000000.0) * PI/180));
-  printf("%d %.6f", arccos_cordic(-.5), acos(-.5) * 180/PI);
+  //  printf("%d %.6f", arccos_cordic(-.5), acos(-.5) * 180/PI);
+  printf("%.3f ", atan2(4,-9) * 180/PI);
 
   //  printf("%.6f", fixMultiply(5000000,5000000) / 1000000.0);
 

@@ -1,4 +1,4 @@
-16365818429177974
+16367407243124886
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -44533,6 +44533,13 @@ http://ww1.microchip.com/downloads/en/DeviceDoc/50002279B.pdf
 0
 22
 22
+Encoder
+Bluetooth_Module_RN4871
+
+
+0
+16
+16
 Encoder
 C_0603_1608Metric_Pad1.05x0.95mm_HandSolder
 Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
