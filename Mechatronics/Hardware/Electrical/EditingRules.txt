@@ -1,0 +1,15 @@
+Grids
+
+100 thou basic placing
+50 thou placing and basic routing
+25 thou	finer routing 
+5 thou finer routing
+
+Tracks
+
+50 thou power and ground tracks
+25 thou signal tracks
+10-15 thou between IC
+
+do not go below 4 thou!
+max temperature rise 10degC
