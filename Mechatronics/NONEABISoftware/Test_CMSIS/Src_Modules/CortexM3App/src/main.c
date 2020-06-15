@@ -5,8 +5,16 @@ void SystemClock_Config(void);
 
 int main(void)
 {
+  RCC->CR |= RCC_CR_HSION;
+  
+  //Wait till HSE ready
+  while( !(RCC->CR & (RCC_CR_HSIRDY)) );
+  
+  //Select HSE as system clock 01
+  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSI);
+  
+  
 
- 
   //Turn on HSE
   RCC->CR |= RCC_CR_HSEON;
   
@@ -14,8 +22,8 @@ int main(void)
   while( !(RCC->CR & (RCC_CR_HSERDY)) );
   
   //Select HSE as system clock 01
-  RCC->CFGR &= ~(RCC_CFGR_SW);
-  RCC->CFGR |= RCC_CFGR_SW_HSE;
+  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSE);
+
 
 
   //Set HPRE DIV1
@@ -46,8 +54,7 @@ int main(void)
   while(!(RCC->CR & RCC_CR_PLLRDY));
 
   //Select PLL as system clock source
-  RCC->CFGR &= ~(RCC_CFGR_SW);
-  RCC->CFGR |= RCC_CFGR_SW_PLL;
+  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_PLL);
 
 
   
