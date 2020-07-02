@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:EncoderBoard-cache
 EELAYER 30 0
 EELAYER END
 $Descr USLedger 17000 11000
@@ -934,7 +933,7 @@ Wire Wire Line
 	6500 6500 6500 5750
 Connection ~ 6500 5750
 $Comp
-L Encoder:DW01+G IC3
+L EncoderBoard-rescue:DW01+G-Encoder IC3
 U 1 1 5D56FBF8
 P 5700 7600
 F 0 "IC3" H 6200 7865 50  0000 C CNN
@@ -987,7 +986,7 @@ U 1 1 5D5B91B7
 P 7850 7900
 F 0 "J7" H 7823 7830 50  0000 R CNN
 F 1 "Batt-" H 7823 7921 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 7850 7900 50  0001 C CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical_NO3D" H 7850 7900 50  0001 C CNN
 F 3 "~" H 7850 7900 50  0001 C CNN
 	1    7850 7900
 	0    1    1    0   
@@ -1029,7 +1028,7 @@ U 1 1 5D54ED19
 P 7350 6600
 F 0 "J5" H 7323 6530 50  0000 R CNN
 F 1 "Batt+" H 7323 6621 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 7350 6600 50  0001 C CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical_NO3D" H 7350 6600 50  0001 C CNN
 F 3 "~" H 7350 6600 50  0001 C CNN
 	1    7350 6600
 	0    1    1    0   
@@ -1037,7 +1036,7 @@ $EndComp
 Wire Wire Line
 	4400 6800 5100 6800
 $Comp
-L Encoder:TP4056 IC2
+L EncoderBoard-rescue:TP4056-Encoder IC2
 U 1 1 5D4C3075
 P 5100 6500
 F 0 "IC2" H 5800 6765 50  0000 C CNN
@@ -1181,7 +1180,7 @@ U 1 1 5D5490F4
 P 9600 1350
 F 0 "J1" H 9573 1280 50  0000 R CNN
 F 1 "Conn_01x07_Male" H 9573 1371 50  0000 R CNN
-F 2 "Encoder:PinSocket_1x07_P2.54mm_Vertical" H 9600 1350 50  0001 C CNN
+F 2 "Encoder:PinHeader_1x07_P2.54mm_Vertical" H 9600 1350 50  0001 C CNN
 F 3 "~" H 9600 1350 50  0001 C CNN
 	1    9600 1350
 	-1   0    0    1   
@@ -1552,7 +1551,7 @@ U 1 1 5D8EC53B
 P 3450 3050
 F 0 "U1" H 3450 4817 50  0000 C CNN
 F 1 "STM32F103C8T6" H 3450 4726 50  0000 C CNN
-F 2 "Encoder:QFP50P900X900X160-48N" H 3450 3050 50  0001 L BNN
+F 2 "Encoder:LQFP-48_7x7mm_P0.5mm" H 3450 3050 50  0001 L BNN
 F 3 "STM32F103C8T6" H 3450 3050 50  0001 L BNN
 F 4 "Unavailable" H 3450 3050 50  0001 L BNN "Field4"
 F 5 "None" H 3450 3050 50  0001 L BNN "Field5"
@@ -1563,7 +1562,7 @@ F 8 "LQFP-48 STMicroelectronics" H 3450 3050 50  0001 L BNN "Field8"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Encoder:82402305 U4
+L EncoderBoard-rescue:82402305-Encoder U4
 U 1 1 5D8F0F67
 P 2800 6800
 F 0 "U4" H 3150 6850 50  0000 L CNN

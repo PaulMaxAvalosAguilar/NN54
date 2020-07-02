@@ -1,4 +1,4 @@
-16367407243124886
+16372320885142309
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -44583,12 +44583,12 @@ SOD-323
 2
 2
 Encoder
-No3dmodelPinHeader_1x01_P2.54mm_Vertical
-Through hole straight pin header, 1x01, 2.54mm pitch, single row
-Through hole pin header THT 1x01 2.54mm single row
+LQFP-48_7x7mm_P0.5mm
+
+
 0
-1
-1
+48
+48
 Encoder
 OptointerrupterConnector
 
@@ -44604,26 +44604,47 @@ Through hole pin header THT 1x01 2.54mm single row
 1
 1
 Encoder
-PinSocket_1x04_P2.54mm_Vertical
+PinHeader_1x01_P2.54mm_Vertical_NO3D
+Through hole straight pin header, 1x01, 2.54mm pitch, single row
+Through hole pin header THT 1x01 2.54mm single row
+0
+1
+1
+Encoder
+PinHeader_1x02_P2.54mm_Vertical
+Through hole straight pin header, 1x02, 2.54mm pitch, single row
+Through hole pin header THT 1x02 2.54mm single row
+0
+2
+2
+Encoder
+PinHeader_1x04_P2.54mm_Vertical
 Through hole straight socket strip, 1x04, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
 Through hole socket strip THT 1x04 2.54mm single row
 0
 4
 4
 Encoder
-PinSocket_1x07_P2.54mm_Vertical
+PinHeader_1x06_P2.54mm_Vertical
+Through hole straight pin header, 1x06, 2.54mm pitch, single row
+Through hole pin header THT 1x06 2.54mm single row
+0
+6
+6
+Encoder
+PinHeader_1x07_P2.54mm_Vertical
 Through hole straight socket strip, 1x07, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
 Through hole socket strip THT 1x07 2.54mm single row
 0
 7
 7
 Encoder
-QFP50P900X900X160-48N
-
-
+PinHeader_1x08_P2.54mm_Vertical
+Through hole straight pin header, 1x08, 2.54mm pitch, single row
+Through hole pin header THT 1x08 2.54mm single row
 0
-48
-48
+8
+8
 Encoder
 R_0603_1608Metric_Pad1.05x0.95mm_HandSolder
 Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator

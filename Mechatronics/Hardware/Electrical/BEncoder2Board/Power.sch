@@ -315,8 +315,6 @@ Wire Wire Line
 	4550 3700 4600 3700
 NoConn ~ 5300 4300
 Wire Wire Line
-	4050 2750 4600 2750
-Wire Wire Line
 	6000 3500 6000 2750
 Connection ~ 6000 2750
 $Comp
@@ -356,19 +354,6 @@ Wire Wire Line
 	6300 4300 6600 4300
 Wire Wire Line
 	6300 4600 6200 4600
-$Comp
-L Connector:Conn_01x01_Male J?
-U 1 1 5F1370B2
-P 7350 4900
-AR Path="/5F1370B2" Ref="J?"  Part="1" 
-AR Path="/5F11DB77/5F1370B2" Ref="J6"  Part="1" 
-F 0 "J6" H 7323 4830 50  0000 R CNN
-F 1 "Batt-" H 7323 4921 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 7350 4900 50  0001 C CNN
-F 3 "~" H 7350 4900 50  0001 C CNN
-	1    7350 4900
-	0    1    1    0   
-$EndComp
 NoConn ~ 6200 4800
 Wire Wire Line
 	5200 4600 4700 4600
@@ -404,19 +389,6 @@ F 3 "" H 4850 5000 50  0001 C CNN
 	1    4850 5000
 	-1   0    0    -1  
 $EndComp
-$Comp
-L Connector:Conn_01x01_Male J?
-U 1 1 5F1370C9
-P 6750 3600
-AR Path="/5F1370C9" Ref="J?"  Part="1" 
-AR Path="/5F11DB77/5F1370C9" Ref="J5"  Part="1" 
-F 0 "J5" H 6723 3530 50  0000 R CNN
-F 1 "Batt+" H 6723 3621 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 6750 3600 50  0001 C CNN
-F 3 "~" H 6750 3600 50  0001 C CNN
-	1    6750 3600
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	4050 3800 4600 3800
 Wire Wire Line
@@ -427,9 +399,6 @@ Wire Wire Line
 Wire Wire Line
 	2150 2850 1600 2850
 Connection ~ 2150 2950
-Wire Wire Line
-	6750 3800 6900 3800
-Connection ~ 6750 3800
 Connection ~ 2150 2750
 $Comp
 L power:GND #PWR?
@@ -494,10 +463,6 @@ F 3 "~" H 7400 3000 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	7400 3150 7400 3800
-Text Label 6450 3800 0    50   ~ 0
-Batt+
-Text Label 7000 5100 0    50   ~ 0
-Batt-
 Wire Wire Line
 	2150 2750 2450 2750
 $Comp
@@ -597,27 +562,27 @@ Connection ~ 6750 5100
 $Comp
 L Connector:Conn_01x01_Male J?
 U 1 1 5F13713F
-P 1150 4150
+P 1700 3900
 AR Path="/5F13713F" Ref="J?"  Part="1" 
 AR Path="/5F11DB77/5F13713F" Ref="J4"  Part="1" 
-F 0 "J4" H 1123 4080 50  0000 R CNN
-F 1 "GNDPWR" H 1123 4171 50  0000 R CNN
-F 2 "Encoder:No3dmodelPinHeader_1x01_P2.54mm_Vertical" H 1150 4150 50  0001 C CNN
-F 3 "~" H 1150 4150 50  0001 C CNN
-	1    1150 4150
+F 0 "J4" H 1673 3830 50  0000 R CNN
+F 1 "GNDPWR" H 1673 3921 50  0000 R CNN
+F 2 "Encoder:PinHeader_1x01_P2.54mm_Vertical" H 1700 3900 50  0001 C CNN
+F 3 "~" H 1700 3900 50  0001 C CNN
+	1    1700 3900
 	0    1    1    0   
 $EndComp
 $Comp
 L power:GNDPWR #PWR?
 U 1 1 5F137145
-P 1150 4450
+P 1700 4200
 AR Path="/5F137145" Ref="#PWR?"  Part="1" 
 AR Path="/5F11DB77/5F137145" Ref="#PWR0145"  Part="1" 
-F 0 "#PWR0145" H 1150 4250 50  0001 C CNN
-F 1 "GNDPWR" H 1154 4296 50  0000 C CNN
-F 2 "" H 1150 4400 50  0001 C CNN
-F 3 "" H 1150 4400 50  0001 C CNN
-	1    1150 4450
+F 0 "#PWR0145" H 1700 4000 50  0001 C CNN
+F 1 "GNDPWR" H 1704 4046 50  0000 C CNN
+F 2 "" H 1700 4150 50  0001 C CNN
+F 3 "" H 1700 4150 50  0001 C CNN
+	1    1700 4200
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -642,13 +607,6 @@ Wire Wire Line
 	2450 2750 2900 2750
 NoConn ~ 6000 3600
 NoConn ~ 6000 3700
-Wire Wire Line
-	4600 2750 4600 2450
-Connection ~ 4600 2750
-Wire Wire Line
-	4600 2750 6000 2750
-Text Label 4600 2700 1    50   ~ 0
-CHG
 Wire Wire Line
 	5200 4800 5150 4800
 Wire Wire Line
@@ -713,7 +671,7 @@ U 1 1 5F2B218E
 P 2450 3800
 F 0 "U5" H 2778 3746 50  0000 L CNN
 F 1 "82402305" H 2778 3655 50  0000 L CNN
-F 2 "" H 2450 3300 50  0001 C CNN
+F 2 "Encoder:Sot-23(6)" H 2450 3300 50  0001 C CNN
 F 3 "" H 2450 3300 50  0001 C CNN
 	1    2450 3800
 	1    0    0    -1  
@@ -740,7 +698,7 @@ U 1 1 5F2D92FF
 P 4600 3500
 F 0 "IC1" H 5300 3765 50  0000 C CNN
 F 1 "TP4056" H 5300 3674 50  0000 C CNN
-F 2 "SOIC127P600X175-9N" H 5850 3600 50  0001 L CNN
+F 2 "Encoder:Sop(8)" H 5850 3600 50  0001 L CNN
 F 3 "https://dlnmh9ip6v2uc.cloudfront.net/datasheets/Prototyping/TP4056.pdf" H 5850 3500 50  0001 L CNN
 F 4 "1A Standalone Linear Li-lon Battery Charger, SOP-8" H 5850 3400 50  0001 L CNN "Description"
 F 5 "1.75" H 5850 3300 50  0001 L CNN "Height"
@@ -757,8 +715,6 @@ Wire Wire Line
 Wire Wire Line
 	8250 3700 8450 3700
 Connection ~ 8250 3700
-Wire Wire Line
-	6300 3800 6750 3800
 $Comp
 L power:PWR_FLAG #FLG0104
 U 1 1 5F29970B
@@ -771,9 +727,9 @@ F 3 "~" H 8250 3700 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	6750 5100 7350 5100
+	6750 5100 7000 5100
 Wire Wire Line
-	1150 4350 1150 4450
+	1700 4100 1700 4200
 Wire Wire Line
 	1600 2950 1800 2950
 $Comp
@@ -782,7 +738,7 @@ U 1 1 5F2E97F9
 P 5450 5600
 F 0 "Q1" H 5600 5400 50  0000 L CNN
 F 1 "DMosfet" H 5550 5300 50  0000 L CNN
-F 2 "" V 5350 5500 50  0001 C CNN
+F 2 "Encoder:Sot-23(6)" V 5350 5500 50  0001 C CNN
 F 3 "~" V 5250 5700 50  0001 C CNN
 	1    5450 5600
 	1    0    0    -1  
@@ -793,7 +749,7 @@ U 1 1 5F2EE54D
 P 5200 4600
 F 0 "IC2" H 5700 4865 50  0000 C CNN
 F 1 "DW01+G" H 5700 4774 50  0000 C CNN
-F 2 "SOT95P280X145-6N" H 6050 4700 50  0001 L CNN
+F 2 "Encoder:Sot-23(6)" H 6050 4700 50  0001 L CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/Fortune-Semicon-DW01-G_C14213.pdf" H 6050 4600 50  0001 L CNN
 F 4 "One Cell Lithium-ion/Polymer Battery Protection IC" H 6050 4500 50  0001 L CNN "Description"
 F 5 "1.45" H 6050 4400 50  0001 L CNN "Height"
@@ -830,4 +786,29 @@ $EndComp
 Connection ~ 1800 2950
 Wire Wire Line
 	1800 2950 2150 2950
+Text GLabel 6500 3800 1    50   Input ~ 0
+Batt+
+Wire Wire Line
+	4050 2750 6000 2750
+Text GLabel 4600 2750 1    50   Input ~ 0
+CHG
+$Comp
+L Connector:Conn_01x02_Male J5
+U 1 1 5F03A757
+P 8250 5050
+F 0 "J5" H 8222 4932 50  0000 R CNN
+F 1 "Conn_01x02_Male" H 8222 5023 50  0000 R CNN
+F 2 "Encoder:PinHeader_1x02_P2.54mm_Vertical" H 8250 5050 50  0001 C CNN
+F 3 "~" H 8250 5050 50  0001 C CNN
+	1    8250 5050
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6300 3800 6900 3800
+Text GLabel 7000 5100 2    50   Input ~ 0
+Batt-
+Text GLabel 8050 5050 0    50   Input ~ 0
+Batt-
+Text GLabel 8050 4950 0    50   Input ~ 0
+Batt+
 $EndSCHEMATC
