@@ -13,3 +13,10 @@ Tracks
 
 do not go below 4 thou!
 max temperature rise 10degC
+
+4  thou  - .450 A
+10 thou  - .874 A
+15 thou  - 1.17 A
+20 thou  - 1.44 A
+25 thou  - 1.69 A
+50 thou  - 2.80 A

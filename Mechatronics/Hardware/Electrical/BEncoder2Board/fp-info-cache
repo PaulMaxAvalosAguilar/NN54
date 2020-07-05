@@ -1,4 +1,4 @@
-16372320885142309
+16372321135664798
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -44597,6 +44597,13 @@ OptointerrupterConnector
 4
 4
 Encoder
+OptointerrupterSmall
+Through hole straight pin header, 1x02, 2.54mm pitch, single row
+Through hole pin header THT 1x02 2.54mm single row
+0
+4
+4
+Encoder
 PinHeader_1x01_P2.54mm_Vertical
 Through hole straight pin header, 1x01, 2.54mm pitch, single row
 Through hole pin header THT 1x01 2.54mm single row
@@ -44610,13 +44617,6 @@ Through hole pin header THT 1x01 2.54mm single row
 0
 1
 1
-Encoder
-PinHeader_1x02_P2.54mm_Vertical
-Through hole straight pin header, 1x02, 2.54mm pitch, single row
-Through hole pin header THT 1x02 2.54mm single row
-0
-2
-2
 Encoder
 PinHeader_1x04_P2.54mm_Vertical
 Through hole straight socket strip, 1x04, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
