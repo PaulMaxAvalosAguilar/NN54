@@ -496,27 +496,27 @@ TIM2_CH2
 $Comp
 L power:GND #PWR0120
 U 1 1 5F070E6F
-P 3650 3550
-F 0 "#PWR0120" H 3650 3300 50  0001 C CNN
-F 1 "GND" H 3655 3377 50  0000 C CNN
-F 2 "" H 3650 3550 50  0001 C CNN
-F 3 "" H 3650 3550 50  0001 C CNN
-	1    3650 3550
+P 3800 3350
+F 0 "#PWR0120" H 3800 3100 50  0001 C CNN
+F 1 "GND" H 3805 3177 50  0000 C CNN
+F 2 "" H 3800 3350 50  0001 C CNN
+F 3 "" H 3800 3350 50  0001 C CNN
+	1    3800 3350
 	-1   0    0    1   
 $EndComp
 $Comp
 L Device:R R5
 U 1 1 5F070E68
-P 3650 3700
-F 0 "R5" H 3720 3746 50  0000 L CNN
-F 1 "10K" H 3720 3655 50  0000 L CNN
-F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 3580 3700 50  0001 C CNN
-F 3 "~" H 3650 3700 50  0001 C CNN
-	1    3650 3700
+P 3800 3500
+F 0 "R5" V 3800 3450 50  0000 L CNN
+F 1 "10K" V 3870 3455 50  0000 L CNN
+F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 3730 3500 50  0001 C CNN
+F 3 "~" H 3800 3500 50  0001 C CNN
+	1    3800 3500
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	3800 4100 3800 3850
+	3800 4100 3800 3650
 Text Label 3500 6950 1    50   ~ 0
 2SIN+
 Text Label 3650 6950 1    50   ~ 0
@@ -680,22 +680,20 @@ F 3 "" H 8650 5500 50  0001 C CNN
 	1    8650 5500
 	1    0    0    -1  
 $EndComp
-Text Label 5500 6250 0    50   ~ 0
-USART3RX
-Text Label 6200 6250 2    50   ~ 0
+Text Label 5500 5200 0    50   ~ 0
+USART1RX
+Text Label 6200 5200 2    50   ~ 0
 BLETX
 Wire Wire Line
-	5450 6250 6250 6250
-Text Label 4700 7050 1    50   ~ 0
-USART3TX
-Text Label 4700 7350 1    50   ~ 0
+	5450 5200 6250 5200
+Text Label 4100 3700 3    50   ~ 0
+USART1TX
+Text Label 4100 3400 3    50   ~ 0
 BLERX
 Wire Wire Line
 	4250 3300 4250 3900
 Wire Wire Line
 	3950 3300 3950 4000
-Wire Wire Line
-	3800 3850 3650 3850
 Text Label 3950 3500 1    50   ~ 0
 SIGB
 Text Label 2400 6100 0    50   ~ 0
@@ -850,7 +848,6 @@ Text Label 6200 5350 2    50   ~ 0
 OLEDSCL
 Text Label 6200 5500 2    50   ~ 0
 OLEDSDA
-NoConn ~ 3650 4100
 NoConn ~ 4400 4100
 NoConn ~ 2850 4750
 NoConn ~ 2850 4900
@@ -860,7 +857,6 @@ NoConn ~ 5450 6100
 NoConn ~ 5450 5950
 NoConn ~ 5450 5800
 NoConn ~ 5450 5650
-NoConn ~ 5450 5200
 NoConn ~ 5450 5050
 NoConn ~ 5450 4900
 NoConn ~ 7800 5900
@@ -878,8 +874,8 @@ F 3 "~" H 7050 3650 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	4100 4100 4100 3300
-Text Label 4100 3650 3    50   ~ 0
+	3650 4100 3650 3300
+Text Label 3650 3650 3    50   ~ 0
 EncEnable
 $Comp
 L power:PWR_FLAG #FLG0102
@@ -923,7 +919,7 @@ Wire Wire Line
 Wire Wire Line
 	4550 6650 4550 7250
 Wire Wire Line
-	4700 6650 4700 7600
+	4100 4100 4100 3300
 $Comp
 L Encoder:STM32G431CBT6 U1
 U 1 1 5EF8C6BF
@@ -936,4 +932,6 @@ F 3 "" H 3850 5600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 NoConn ~ 2850 5050
+NoConn ~ 4700 6650
+NoConn ~ 5450 6250
 $EndSCHEMATC

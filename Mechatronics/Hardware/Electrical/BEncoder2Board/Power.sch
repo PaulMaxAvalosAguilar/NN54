@@ -556,7 +556,7 @@ $EndComp
 Wire Wire Line
 	6300 4600 6300 5100
 Wire Wire Line
-	6300 5100 6750 5100
+	6300 5100 6500 5100
 Connection ~ 6300 4600
 Connection ~ 6750 5100
 $Comp
@@ -651,8 +651,6 @@ Wire Wire Line
 	6750 5100 6750 5950
 Wire Wire Line
 	5650 5150 5650 5250
-Text Label 2450 4350 3    50   ~ 0
-Batt-
 Wire Wire Line
 	2450 4350 2450 4550
 Connection ~ 8450 3700
@@ -733,17 +731,6 @@ Wire Wire Line
 Wire Wire Line
 	1600 2950 1800 2950
 $Comp
-L Encoder:DMosfet Q1
-U 1 1 5F2E97F9
-P 5450 5600
-F 0 "Q1" H 5600 5400 50  0000 L CNN
-F 1 "DMosfet" H 5550 5300 50  0000 L CNN
-F 2 "Encoder:Sot-23(6)" V 5350 5500 50  0001 C CNN
-F 3 "~" V 5250 5700 50  0001 C CNN
-	1    5450 5600
-	1    0    0    -1  
-$EndComp
-$Comp
 L Encoder:DW01+G IC2
 U 1 1 5F2EE54D
 P 5200 4600
@@ -811,4 +798,29 @@ Text GLabel 8050 5050 0    50   Input ~ 0
 Batt-
 Text GLabel 8050 4950 0    50   Input ~ 0
 Batt+
+$Comp
+L Encoder:DMosfet Q1
+U 1 1 5F0365A7
+P 5450 5600
+F 0 "Q1" H 5944 5696 50  0000 L CNN
+F 1 "DMosfet" H 5944 5605 50  0000 L CNN
+F 2 "Encoder:Sot-23(6)" V 5350 5500 50  0001 C CNN
+F 3 "~" V 5250 5700 50  0001 C CNN
+	1    5450 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG?
+U 1 1 5F08AA9A
+P 6500 5100
+F 0 "#FLG?" H 6500 5175 50  0001 C CNN
+F 1 "PWR_FLAG" H 6500 5273 50  0000 C CNN
+F 2 "" H 6500 5100 50  0001 C CNN
+F 3 "~" H 6500 5100 50  0001 C CNN
+	1    6500 5100
+	-1   0    0    -1  
+$EndComp
+Connection ~ 6500 5100
+Wire Wire Line
+	6500 5100 6750 5100
 $EndSCHEMATC

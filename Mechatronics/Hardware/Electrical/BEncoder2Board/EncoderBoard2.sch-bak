@@ -19,7 +19,7 @@ U 1 1 5C28311C
 P 3250 1800
 F 0 "U2" H 3250 2125 50  0000 C CNN
 F 1 "ITR1802" H 3250 2034 50  0000 C CNN
-F 2 "Encoder:OptointerrupterConnector" H 3250 1800 50  0001 C CNN
+F 2 "Encoder:OptointerrupterSmall" H 3250 1800 50  0001 C CNN
 F 3 "" H 3250 1800 50  0001 C CNN
 	1    3250 1800
 	1    0    0    -1  
@@ -30,7 +30,7 @@ U 1 1 5C28324D
 P 3250 2700
 F 0 "U3" H 3250 3025 50  0000 C CNN
 F 1 "ITR1802" H 3250 2934 50  0000 C CNN
-F 2 "Encoder:OptointerrupterConnector" H 3250 2700 50  0001 C CNN
+F 2 "Encoder:OptointerrupterSmall" H 3250 2700 50  0001 C CNN
 F 3 "" H 3250 2700 50  0001 C CNN
 	1    3250 2700
 	1    0    0    -1  
