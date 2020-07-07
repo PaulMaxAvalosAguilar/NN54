@@ -556,7 +556,7 @@ $EndComp
 Wire Wire Line
 	6300 4600 6300 5100
 Wire Wire Line
-	6300 5100 6750 5100
+	6300 5100 6500 5100
 Connection ~ 6300 4600
 Connection ~ 6750 5100
 $Comp
@@ -809,4 +809,18 @@ F 3 "~" V 5250 5700 50  0001 C CNN
 	1    5450 5600
 	1    0    0    -1  
 $EndComp
+$Comp
+L power:PWR_FLAG #FLG0106
+U 1 1 5F08AA9A
+P 6500 5100
+F 0 "#FLG0106" H 6500 5175 50  0001 C CNN
+F 1 "PWR_FLAG" H 6500 5273 50  0000 C CNN
+F 2 "" H 6500 5100 50  0001 C CNN
+F 3 "~" H 6500 5100 50  0001 C CNN
+	1    6500 5100
+	-1   0    0    -1  
+$EndComp
+Connection ~ 6500 5100
+Wire Wire Line
+	6500 5100 6750 5100
 $EndSCHEMATC
