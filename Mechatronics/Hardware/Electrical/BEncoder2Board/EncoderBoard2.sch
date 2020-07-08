@@ -403,8 +403,8 @@ $Comp
 L Device:C C4
 U 1 1 5EFA1FD1
 P 3400 5500
-F 0 "C4" V 3200 5450 50  0000 C CNN
-F 1 "100nF" V 3350 5300 50  0000 C CNN
+F 0 "C4" V 3350 5350 50  0000 C CNN
+F 1 "100nF" V 3350 5150 50  0000 C CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 3438 5350 50  0001 C CNN
 F 3 "~" H 3400 5500 50  0001 C CNN
 	1    3400 5500
@@ -853,7 +853,6 @@ NoConn ~ 3550 4750
 NoConn ~ 3550 4900
 NoConn ~ 3550 6250
 NoConn ~ 5100 6650
-NoConn ~ 6150 6100
 NoConn ~ 6150 5050
 NoConn ~ 6150 4900
 NoConn ~ 9150 5750
@@ -1188,6 +1187,11 @@ F 3 "" H 3950 7500 50  0001 C CNN
 	1    3950 7500
 	-1   0    0    1   
 $EndComp
+NoConn ~ 4500 6650
+NoConn ~ 4650 6650
+Text GLabel 6150 6100 2    50   Input ~ 0
+CHG
+NoConn ~ 6150 5650
 Wire Wire Line
 	4050 6650 4050 7050
 Wire Wire Line
@@ -1209,9 +1213,5 @@ F 3 "" H 4550 5600 50  0001 C CNN
 	1    4850 5450
 	1    0    0    -1  
 $EndComp
-NoConn ~ 4500 6650
-NoConn ~ 4650 6650
-Text GLabel 6150 5950 2    50   Input ~ 0
-CHG
-NoConn ~ 6150 5650
+NoConn ~ 6150 5950
 $EndSCHEMATC
