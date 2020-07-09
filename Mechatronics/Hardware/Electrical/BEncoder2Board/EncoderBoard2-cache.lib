@@ -333,11 +333,11 @@ X GND 6 1000 0 200 L 50 50 0 0 W
 ENDDRAW
 ENDDEF
 #
-# Encoder_EG1218
+# Encoder_EG1218(+3.3v)
 #
-DEF Encoder_EG1218 S 0 0 Y Y 1 F N
+DEF Encoder_EG1218(+3.3v) S 0 0 Y Y 1 F N
 F0 "S" -150 90 50 H V C CNN
-F1 "Encoder_EG1218" 0 -210 50 H V C CNN
+F1 "Encoder_EG1218(+3.3v)" 0 -210 50 H V C CNN
 F2 "digikey-footprints:Switch_Slide_11.6x4mm_EG1218" 200 200 50 H I L CNN
 F3 "http://spec_sheets.e-switch.com/specs/P040040.pdf" 200 300 60 H I L CNN
 F4 "EG1903-ND" 200 400 60 H I L CNN "Digi-Key_PN"
@@ -357,6 +357,7 @@ P 2 0 1 0 -80 0 120 90 N
 X ~ 1 200 100 100 L 50 50 1 1 P
 X ~ 2 -200 0 100 R 50 50 1 1 P
 X ~ 3 200 -100 100 L 50 50 1 1 P
+X ~ 4 200 200 100 L 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #

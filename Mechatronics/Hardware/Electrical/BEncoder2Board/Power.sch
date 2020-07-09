@@ -73,28 +73,6 @@ $EndComp
 Wire Wire Line
 	2150 2950 2150 3050
 $Comp
-L Encoder:EG1218 S?
-U 1 1 5F137023
-P 7900 3700
-AR Path="/5F137023" Ref="S?"  Part="1" 
-AR Path="/5F11DB77/5F137023" Ref="S1"  Part="1" 
-F 0 "S1" H 7900 3375 50  0000 C CNN
-F 1 "EG1218" H 7900 3466 50  0000 C CNN
-F 2 "Encoder:Switch_Slide_11.6x4mm_EG1218" H 8100 3900 50  0001 L CNN
-F 3 "http://spec_sheets.e-switch.com/specs/P040040.pdf" H 8100 4000 60  0001 L CNN
-F 4 "EG1903-ND" H 8100 4100 60  0001 L CNN "Digi-Key_PN"
-F 5 "EG1218" H 8100 4200 60  0001 L CNN "MPN"
-F 6 "Switches" H 8100 4300 60  0001 L CNN "Category"
-F 7 "Slide Switches" H 8100 4400 60  0001 L CNN "Family"
-F 8 "http://spec_sheets.e-switch.com/specs/P040040.pdf" H 8100 4500 60  0001 L CNN "DK_Datasheet_Link"
-F 9 "/product-detail/en/e-switch/EG1218/EG1903-ND/101726" H 8100 4600 60  0001 L CNN "DK_Detail_Page"
-F 10 "SWITCH SLIDE SPDT 200MA 30V" H 8100 4700 60  0001 L CNN "Description"
-F 11 "E-Switch" H 8100 4800 60  0001 L CNN "Manufacturer"
-F 12 "Active" H 8100 4900 60  0001 L CNN "Status"
-	1    7900 3700
-	-1   0    0    1   
-$EndComp
-$Comp
 L Device:R R?
 U 1 1 5F137029
 P 7950 2900
@@ -778,7 +756,7 @@ Batt+
 Wire Wire Line
 	4050 2750 6000 2750
 Text GLabel 4600 2750 1    50   Input ~ 0
-CHG
+VCC
 $Comp
 L Connector:Conn_01x02_Male J5
 U 1 1 5F03A757
@@ -823,4 +801,37 @@ $EndComp
 Connection ~ 6500 5100
 Wire Wire Line
 	6500 5100 6750 5100
+$Comp
+L Encoder:EG1218(+3.3v) S1
+U 1 1 5F088668
+P 7900 3700
+F 0 "S1" H 7900 3375 50  0000 C CNN
+F 1 "EG1218(+3.3v)" H 8000 4000 50  0000 C CNN
+F 2 "Encoder:PinHeader_1x04_P2.54mm_Vertical" H 8100 3900 50  0001 L CNN
+F 3 "http://spec_sheets.e-switch.com/specs/P040040.pdf" H 8100 4000 60  0001 L CNN
+F 4 "EG1903-ND" H 8100 4100 60  0001 L CNN "Digi-Key_PN"
+F 5 "EG1218" H 8100 4200 60  0001 L CNN "MPN"
+F 6 "Switches" H 8100 4300 60  0001 L CNN "Category"
+F 7 "Slide Switches" H 8100 4400 60  0001 L CNN "Family"
+F 8 "http://spec_sheets.e-switch.com/specs/P040040.pdf" H 8100 4500 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/e-switch/EG1218/EG1903-ND/101726" H 8100 4600 60  0001 L CNN "DK_Detail_Page"
+F 10 "SWITCH SLIDE SPDT 200MA 30V" H 8100 4700 60  0001 L CNN "Description"
+F 11 "E-Switch" H 8100 4800 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 8100 4900 60  0001 L CNN "Status"
+	1    7900 3700
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5F08D5F0
+P 7700 3900
+AR Path="/5F08D5F0" Ref="#PWR?"  Part="1" 
+AR Path="/5F11DB77/5F08D5F0" Ref="#PWR0101"  Part="1" 
+F 0 "#PWR0101" H 7700 3750 50  0001 C CNN
+F 1 "+3.3V" V 7715 4028 50  0000 L CNN
+F 2 "" H 7700 3900 50  0001 C CNN
+F 3 "" H 7700 3900 50  0001 C CNN
+	1    7700 3900
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC
