@@ -1,4 +1,4 @@
-16372375533101334
+16373969874596187
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -44645,6 +44645,13 @@ Through hole pin header THT 1x08 2.54mm single row
 0
 8
 8
+Encoder
+PinHeader_2x02_P2.54mm_Vertical
+Through hole straight pin header, 1x02, 2.54mm pitch, single row
+Through hole pin header THT 1x02 2.54mm single row
+0
+4
+4
 Encoder
 R_0603_1608Metric_Pad1.05x0.95mm_HandSolder
 Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
