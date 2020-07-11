@@ -256,18 +256,14 @@ $EndComp
 $Comp
 L power:+3.3V #PWR0104
 U 1 1 5EFE29C0
-P 3150 3850
-F 0 "#PWR0104" H 3150 3700 50  0001 C CNN
-F 1 "+3.3V" H 3165 4023 50  0000 C CNN
-F 2 "" H 3150 3850 50  0001 C CNN
-F 3 "" H 3150 3850 50  0001 C CNN
-	1    3150 3850
+P 3150 3450
+F 0 "#PWR0104" H 3150 3300 50  0001 C CNN
+F 1 "+3.3V" H 3165 3623 50  0000 C CNN
+F 2 "" H 3150 3450 50  0001 C CNN
+F 3 "" H 3150 3450 50  0001 C CNN
+	1    3150 3450
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3150 4150 3150 4500
-Text Label 3150 4150 3    50   ~ 0
-Supply
 Wire Wire Line
 	6300 4600 6300 4100
 Connection ~ 6300 4600
@@ -278,7 +274,7 @@ Wire Wire Line
 	5700 6750 5700 6650
 Text Label 6300 4250 3    50   ~ 0
 Supply
-Text Label 4050 3700 3    50   ~ 0
+Text Label 3150 3550 3    50   ~ 0
 Supply
 $Comp
 L power:GND #PWR0107
@@ -873,20 +869,6 @@ Wire Wire Line
 	4350 4100 4350 3300
 Text Label 4350 3650 3    50   ~ 0
 EncEnable
-$Comp
-L power:PWR_FLAG #FLG0102
-U 1 1 5EFDA81C
-P 3150 4500
-F 0 "#FLG0102" H 3150 4575 50  0001 C CNN
-F 1 "PWR_FLAG" V 3150 4627 50  0000 L CNN
-F 2 "" H 3150 4500 50  0001 C CNN
-F 3 "~" H 3150 4500 50  0001 C CNN
-	1    3150 4500
-	0    -1   -1   0   
-$EndComp
-Connection ~ 3150 4500
-Wire Wire Line
-	3150 4500 3150 4550
 Text GLabel 7650 5500 1    50   Input ~ 0
 Batt+
 Connection ~ 4950 7250
@@ -1303,4 +1285,21 @@ Wire Wire Line
 Wire Wire Line
 	6450 3300 6450 3150
 Connection ~ 6400 3300
+Wire Wire Line
+	3150 4150 3150 4200
+$Comp
+L power:GND #PWR0106
+U 1 1 5F0AE8F0
+P 3150 4200
+F 0 "#PWR0106" H 3150 3950 50  0001 C CNN
+F 1 "GND" H 3155 4027 50  0000 C CNN
+F 2 "" H 3150 4200 50  0001 C CNN
+F 3 "" H 3150 4200 50  0001 C CNN
+	1    3150 4200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3150 3450 3150 3850
+Text Label 4050 3600 3    50   ~ 0
+Supply
 $EndSCHEMATC
