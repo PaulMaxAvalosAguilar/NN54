@@ -1,1 +1,0 @@
-../ZBOMTool/KiBoM/KiBOM_CLI.py --cfg ../ZBOMTool/bom.ini *.xml .csv
