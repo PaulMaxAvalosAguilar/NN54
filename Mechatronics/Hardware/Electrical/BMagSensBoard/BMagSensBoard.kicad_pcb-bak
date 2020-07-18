@@ -2,7 +2,7 @@
 
   (general
     (thickness 1.6)
-    (drawings 10)
+    (drawings 11)
     (tracks 28)
     (zones 0)
     (modules 2)
@@ -208,6 +208,7 @@
     )
   )
 
+  (gr_line (start 136.466 96.064) (end 157.162639 96.064) (layer Dwgs.User) (width 0.15) (tstamp 5F0E086B))
   (gr_line (start 157.162639 92) (end 157.162639 96.0628) (layer Dwgs.User) (width 0.15) (tstamp 5F0E0817))
   (gr_line (start 155.162639 92) (end 155.162639 96.0628) (layer Dwgs.User) (width 0.15) (tstamp 5F0E0786))
   (gr_line (start 136.466 92) (end 136.466 96.0628) (layer Dwgs.User) (width 0.15) (tstamp 5F0E0636))
