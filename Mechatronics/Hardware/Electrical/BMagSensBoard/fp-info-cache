@@ -1,4 +1,4 @@
-16377160021194917
+16375565292556324
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -44673,13 +44673,6 @@ SOT-23
 0
 3
 3
-Encoder
-SolderWirePad_1x01_SMD_5x10mm
-Wire Pad, Square, SMD Pad,  5mm x 10mm,
-MesurementPoint Square SMDPad 5mmx10mm 
-0
-6
-6
 Encoder
 Sop(8)
 8ESOP
