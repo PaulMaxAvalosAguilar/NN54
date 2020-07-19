@@ -14,10 +14,10 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Encoder:TLE5009 U1
+L Encoder:TLE5009 U7
 U 1 1 5F0B6CA7
 P 5400 3900
-F 0 "U1" H 5375 4365 50  0000 C CNN
+F 0 "U7" H 5375 4365 50  0000 C CNN
 F 1 "TLE5009" H 5375 4274 50  0000 C CNN
 F 2 "Encoder:SO-8_3.9x4.9mm_P1.27mm" H 5350 3800 50  0001 C CNN
 F 3 "" H 5350 3800 50  0001 C CNN
@@ -25,28 +25,28 @@ F 3 "" H 5350 3800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:Conn_01x06_Male J1
+L Connector:Conn_01x06_Male J7
 U 1 1 5F0B758B
-P 5300 4950
-F 0 "J1" V 5454 4562 50  0000 R CNN
-F 1 "Conn_01x06_Male" V 5363 4562 50  0000 R CNN
-F 2 "Encoder:SolderWirePad_1x01_SMD_5x10mm" H 5300 4950 50  0001 C CNN
-F 3 "~" H 5300 4950 50  0001 C CNN
-	1    5300 4950
+P 5300 5200
+F 0 "J7" V 5454 4812 50  0000 R CNN
+F 1 "Conn_01x06_Male" V 5363 4812 50  0000 R CNN
+F 2 "Encoder:SolderWirePad_1x01_SMD_5x10mm" H 5300 5200 50  0001 C CNN
+F 3 "~" H 5300 5200 50  0001 C CNN
+	1    5300 5200
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	5100 4750 5100 4400
+	5100 5000 5100 4650
 Wire Wire Line
-	5200 4750 5200 4400
+	5200 5000 5200 4650
 Wire Wire Line
-	5300 4750 5300 4400
+	5300 5000 5300 4650
 Wire Wire Line
-	5400 4750 5400 4400
+	5400 5000 5400 4650
 Wire Wire Line
-	5500 4750 5500 4400
+	5500 5000 5500 4650
 Wire Wire Line
-	5600 4750 5600 4400
+	5600 5000 5600 4650
 Wire Wire Line
 	4950 4150 4850 4150
 Wire Wire Line
@@ -67,8 +67,6 @@ Text Label 5900 4000 0    50   ~ 0
 SIN_N
 Text Label 5900 4150 0    50   ~ 0
 SIN_P
-Text Label 4600 4150 0    50   ~ 0
-GND
 Text Label 4600 3850 0    50   ~ 0
 COS_N
 Text Label 4600 3700 0    50   ~ 0
@@ -77,18 +75,60 @@ Wire Wire Line
 	5800 4150 6200 4150
 Wire Wire Line
 	5800 4000 6200 4000
-Wire Wire Line
-	5800 3850 6200 3850
-Text Label 5100 4700 1    50   ~ 0
+Text Label 5100 4950 1    50   ~ 0
 COS_P
-Text Label 5200 4700 1    50   ~ 0
+Text Label 5200 4950 1    50   ~ 0
 COS_N
-Text Label 5300 4650 1    50   ~ 0
-GND
-Text Label 5500 4650 1    50   ~ 0
+Text Label 5500 4900 1    50   ~ 0
 SIN_N
-Text Label 5400 4650 1    50   ~ 0
+Text Label 5400 4900 1    50   ~ 0
 SIN_P
-Text Label 5600 4650 1    50   ~ 0
+Text Label 5600 4900 1    50   ~ 0
 VDD
+$Comp
+L Device:C C27
+U 1 1 5F13AC11
+P 6500 4000
+F 0 "C27" H 6615 4046 50  0000 L CNN
+F 1 "100nF" H 6615 3955 50  0000 L CNN
+F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 6538 3850 50  0001 C CNN
+F 3 "~" H 6500 4000 50  0001 C CNN
+	1    6500 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0101
+U 1 1 5F13B1C6
+P 4550 4150
+F 0 "#PWR0101" H 4550 3900 50  0001 C CNN
+F 1 "GND" H 4555 3977 50  0000 C CNN
+F 2 "" H 4550 4150 50  0001 C CNN
+F 3 "" H 4550 4150 50  0001 C CNN
+	1    4550 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5800 3850 6500 3850
+$Comp
+L power:GND #PWR0102
+U 1 1 5F13B564
+P 6500 4150
+F 0 "#PWR0102" H 6500 3900 50  0001 C CNN
+F 1 "GND" H 6505 3977 50  0000 C CNN
+F 2 "" H 6500 4150 50  0001 C CNN
+F 3 "" H 6500 4150 50  0001 C CNN
+	1    6500 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5F13CDDA
+P 5300 4650
+F 0 "#PWR?" H 5300 4400 50  0001 C CNN
+F 1 "GND" H 5305 4477 50  0000 C CNN
+F 2 "" H 5300 4650 50  0001 C CNN
+F 3 "" H 5300 4650 50  0001 C CNN
+	1    5300 4650
+	-1   0    0    1   
+$EndComp
 $EndSCHEMATC
