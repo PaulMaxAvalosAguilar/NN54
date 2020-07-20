@@ -1,3 +1,4 @@
 (sym_lib_table
   (lib (name Encoder)(type Legacy)(uri ${KIPRJMOD}/../Library/Encoder.lib)(options "")(descr ""))
+  (lib (name SensorsBoard-rescue)(type Legacy)(uri ${KIPRJMOD}/SensorsBoard-rescue.lib)(options "")(descr ""))
 )
