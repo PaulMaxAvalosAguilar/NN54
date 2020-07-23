@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/paul/NN54/Mechatronics/Hardware/Electrical/BSensorsBoard/SensorsBoard.sch)
-    (date "dom 19 jul 2020 22:58:29 CDT")
+    (date "jue 23 jul 2020 12:38:51 CDT")
     (tool "Eeschema 5.1.6+dfsg1-1~bpo10+1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -15,8 +15,8 @@
         (comment (number 3) (value ""))
         (comment (number 4) (value "")))))
   (components
-    (comp (ref U1)
-      (value ITR1802)
+    (comp (ref U8)
+      (value ITR8102)
       (footprint Encoder:itr8102)
       (libsource (lib SensorsBoard-rescue) (part ITR1802-Encoder) (description ""))
       (sheetpath (names /) (tstamps /))
@@ -76,14 +76,14 @@
       (uri /home/paul/NN54/Mechatronics/Hardware/Electrical/BSensorsBoard/SensorsBoard-rescue.lib)))
   (nets
     (net (code 1) (name "Net-(J1-Pad1)")
-      (node (ref U1) (pin 1))
+      (node (ref U8) (pin 1))
       (node (ref J1) (pin 1)))
     (net (code 2) (name "Net-(J2-Pad1)")
-      (node (ref U1) (pin 2))
+      (node (ref U8) (pin 2))
       (node (ref J2) (pin 1)))
     (net (code 3) (name "Net-(J4-Pad1)")
-      (node (ref U1) (pin 3))
+      (node (ref U8) (pin 3))
       (node (ref J4) (pin 1)))
     (net (code 4) (name "Net-(J3-Pad1)")
-      (node (ref U1) (pin 4))
+      (node (ref U8) (pin 4))
       (node (ref J3) (pin 1)))))

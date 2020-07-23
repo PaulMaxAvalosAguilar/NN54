@@ -120,7 +120,7 @@
   (module Encoder:itr8102 (layer F.Cu) (tedit 5D60A6D4) (tstamp 5F161ADC)
     (at 177.815399 95.760199 180)
     (path /5C59CA18)
-    (fp_text reference U1 (at 0.116999 -0.027001) (layer F.SilkS) hide
+    (fp_text reference U8 (at 0.116999 -0.027001 180 unlocked) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value ITR1802 (at 0.0508 -5.8166) (layer F.Fab)
@@ -387,7 +387,7 @@
   (module Encoder:itr8102 (layer F.Cu) (tedit 5D60A6D4) (tstamp 5D60B41E)
     (at 177.835401 115.139801)
     (path /5C59CA18)
-    (fp_text reference U1 (at 0.116999 -0.027001) (layer F.SilkS) hide
+    (fp_text reference U8 (at 0.116999 -0.027001) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value ITR1802 (at 0.0508 -5.8166) (layer F.Fab)
@@ -415,8 +415,8 @@
     (arrow2a (pts (xy 185.928 112.1156) (xy 186.514421 110.989096)))
     (arrow2b (pts (xy 185.928 112.1156) (xy 185.341579 110.989096)))
   )
-  (gr_line (start 182.5244 112.1156) (end 173.1264 112.1156) (layer Edge.Cuts) (width 0.15) (tstamp 5E1925BF))
-  (gr_line (start 173.1264 98.7844) (end 182.5244 98.7844) (layer Edge.Cuts) (width 0.15) (tstamp 5F161AE7))
+  (gr_line (start 182.5244 112.1156) (end 173.1264 112.1156) (layer F.SilkS) (width 0.15) (tstamp 5E1925BF))
+  (gr_line (start 173.1264 98.7844) (end 182.5244 98.7844) (layer F.SilkS) (width 0.15) (tstamp 5F161AE7))
   (gr_line (start 182.5244 85.1192) (end 173.1264 85.1192) (layer Edge.Cuts) (width 0.15) (tstamp 5F161AE5))
   (gr_text E+ (at 178.9684 90.7072 180) (layer F.SilkS) (tstamp 5F161AAF)
     (effects (font (size 0.889 0.762) (thickness 0.1778)))
