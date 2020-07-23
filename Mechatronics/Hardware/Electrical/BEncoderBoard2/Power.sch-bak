@@ -807,7 +807,7 @@ U 1 1 5F1D7B37
 P 7900 3700
 F 0 "S1" H 7950 3500 50  0000 C CNN
 F 1 "EG1218_Conn" H 8000 4000 50  0000 C CNN
-F 2 "digikey-footprints:Switch_Slide_11.6x4mm_EG1218" H 8100 3900 50  0001 L CNN
+F 2 "Encoder:PinHeader_1x03_P2.54mm_Vertical" H 8100 3900 50  0001 L CNN
 F 3 "http://spec_sheets.e-switch.com/specs/P040040.pdf" H 8100 4000 60  0001 L CNN
 F 4 "EG1903-ND" H 8100 4100 60  0001 L CNN "Digi-Key_PN"
 F 5 "EG1218" H 8100 4200 60  0001 L CNN "MPN"

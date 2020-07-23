@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/paul/NN54/Mechatronics/Hardware/Electrical/BEncoderBoard2/EncoderBoard2.sch)
-    (date "mar 21 jul 2020 20:30:38 CDT")
+    (date "jue 23 jul 2020 12:05:58 CDT")
     (tool "Eeschema 5.1.6+dfsg1-1~bpo10+1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -359,7 +359,7 @@
       (sheetpath (names /Power/) (tstamps /5F11DB77/))
       (tstamp 5F137066))
     (comp (ref R6)
-      (value 1.2K)
+      (value 1.5K)
       (footprint Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder)
       (datasheet ~)
       (libsource (lib Device) (part R) (description Resistor))
