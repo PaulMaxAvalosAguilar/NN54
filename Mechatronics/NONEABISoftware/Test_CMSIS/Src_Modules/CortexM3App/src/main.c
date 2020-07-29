@@ -12,7 +12,7 @@ int main(void)
   
   //Select HSI as system clock 01
   //  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSI);
-  n200797009
+  //  n200797009
   
 
   //Turn on HSE
