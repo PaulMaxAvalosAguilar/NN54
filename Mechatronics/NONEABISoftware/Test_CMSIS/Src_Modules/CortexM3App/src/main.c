@@ -5,14 +5,14 @@ void SystemClock_Config(void);
 
 int main(void)
 {
-  RCC->CR |= RCC_CR_HSION;
+  //  RCC->CR |= RCC_CR_HSION;
   
-  //Wait till HSE ready
-  while( !(RCC->CR & (RCC_CR_HSIRDY)) );
+  //Wait till HSI ready
+  //  while( !(RCC->CR & (RCC_CR_HSIRDY)) );
   
-  //Select HSE as system clock 01
-  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSI);
-  
+  //Select HSI as system clock 01
+  //  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSI);
+  n200797009
   
 
   //Turn on HSE
@@ -75,9 +75,9 @@ int main(void)
   {
 
     if((RCC->CFGR & RCC_CFGR_SWS_PLL)){
-      for(int i = 0;i < 100000; i++);
+      for(int i = 0;i < 1000000; i++);
       GPIOC->BSRR = 1<<13;
-      for(int i = 0;i < 100000; i++);
+      for(int i = 0;i < 1000000; i++);
       GPIOC->BSRR = 1<<(13+16);
     }
   }
