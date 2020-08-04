@@ -13,7 +13,9 @@ int main(void)
   //Select HSI as system clock 01
   //  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSI);
   //  n200797009
-  
+
+
+
 
   //Turn on HSE
   RCC->CR |= RCC_CR_HSEON;
@@ -22,7 +24,7 @@ int main(void)
   while( !(RCC->CR & (RCC_CR_HSERDY)) );
   
   //Select HSE as system clock 01
-  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSE);
+  //  RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (RCC_CFGR_SW_HSE);
 
 
 
@@ -49,7 +51,7 @@ int main(void)
 
   //Turn on PLL
   RCC->CR |= RCC_CR_PLLON;
-  
+
   //Wait till PLL ready
   while(!(RCC->CR & RCC_CR_PLLRDY));
 
@@ -69,10 +71,18 @@ int main(void)
   GPIOC->CRH |= GPIO_CRH_CNF13_0;
   GPIOC->CRH &= ~GPIO_CRH_CNF13_1;
 
-  GPIOC->BSRR = 1<<(13);
+  GPIOC->BSRR = 1<<13;
+
   
   while (1)
   {
+
+    /*
+    if(RCC->CR |= RCC_CR_HSION){
+            GPIOC->BSRR = 1<<(13+16);
+    }
+    */
+
 
     if((RCC->CFGR & RCC_CFGR_SWS_PLL)){
       for(int i = 0;i < 1000000; i++);
@@ -80,6 +90,8 @@ int main(void)
       for(int i = 0;i < 1000000; i++);
       GPIOC->BSRR = 1<<(13+16);
     }
+
+
   }
 }
 
