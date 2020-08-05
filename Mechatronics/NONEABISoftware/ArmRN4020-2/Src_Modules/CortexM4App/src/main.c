@@ -4,6 +4,20 @@ void SystemClock_Config(void);
 
 int main(void)
 {
+
+  //OPTION BYTES
+  //PG10 reset Input/Output
+  //nBOOT0 = 1
+  //nSWBOOT0  = 1 (BOOT0 taken from PB8/BOOT0 pin)
+  //SRAM1 and CCM SRAM parity check disable
+  //nBOOT1 = 1
+  //Software window watchdog
+  //Independent watchdog counter is running in stop mode
+  //Software independent watchdog
+  //No reset generated when entering the Stop mode
+  //BOR_LEV threshold 1.7
+  //Read protection not active
+  
   
   while (1)
   {
@@ -12,7 +26,7 @@ int main(void)
     //The HSI16 is used as system clock source after startup from Reset
     //Flash erase and programming is only possible in voltage scale range 1
 
-    //PWR_CR1 Voltage scaling range 1
+    //PWR_CR1 Low power run not set, Voltage scaling range 1, low power mode= Stop 0 mode
     //PWR_CR5 Main regulator in range 1 normal mode
     //FLASH_ACR Instruction cache and data cache enabled, zero wait state*
     //RCC_CR All clocks off and not ready(hsi*), HSE not bypassed
