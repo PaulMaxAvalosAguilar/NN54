@@ -56,6 +56,19 @@ int main(void)
     //Select PLL as system clocksource
     RCC->CFGR |= RCC_CFGR_SW_PLL;
 
+
+    //---------------------CONFIGURE I2C-------------------------
+
+    //RCC_CCIPR I2C2 PCLK selected as clock
+
+    //Analog nois filet ON
+    //Digital filter diabled
+    //Clock stretching enabled
+    
+    RCC->APB1ENR1 |= RCC_APB1ENR1_I2C2EN; //Enable I2C clock
+    I2C2->TIMINGR = 0x00702991 & 0xF0FFFFFFU; //Set timings
+    I2C2->CR1 |= I2C_CR1_PE; //Enable periphereal
+    
     
   }
 }
