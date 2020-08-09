@@ -1,0 +1,30 @@
+Si empieza con porcentaje
+	ignorar (excepto %sTREAM_OPEN% %DISCONNECT%)
+
+
+Si es AOK
+Si es CMD> se espera un comando (si es el primero, ha iniciado el modo comando)
+Si es END"0x0D0A" entonces  ha terminado el modo comando
+
+Si no empieza con % pero acaba con \n entonces es la respuesta a un comando
+
+Meter $$$ (para inciar modo comando)
+Meter ---\n
+Meter --Comando--\n
+
+Si ha empezado la pipa de datos de la uart
+
+
+status{
+uart pipe initiated
+command mode initiated = 0;
+}
+
+
+
+SR,000C
+
+CMD mode hard to enter when not connected, try $$$$$$
+CMD mode still while connected and disconnecting (if stream not opened)
+Stream opens when suscribed, CMD  (command mode) out when stream opened
+There is no advise of unsuscription
