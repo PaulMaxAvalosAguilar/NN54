@@ -36,16 +36,15 @@ int main(void)
     
     //Wait states for less than 90 MHz at VCore Range 1 normal mode
     FLASH->ACR |= FLASH_ACR_PRFTEN;
-    FLASH->ACR &= ~FLASH_ACR_LATENCY_Msk;
-    FLASH->ACR |= FLASH_ACR_LATENCY_2WS;
-
+    FLASH->ACR = (FLASH->ACR & (~FLASH_ACR_LATENCY)) | FLASH_ACR_LATENCY_2WS; //2 wait states
     
     //Turn HSE and wait till is ready
     RCC->CR |= RCC_CR_HSEON;
     while(!(RCC->CR & (RCC_CR_HSERDY)));
 
     //Turn PLL on, configure it and wait till ready
-    RCC->PLLCFGR = (RCC_PLLCFGR_PLLM_0 | (20 << RCC_PLLCFGR_PLLN_Pos)); //M = 2 , N = 20
+    RCC->PLLCFGR = (RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN))
+		    | (0b10 << RCC_PLLCFGR_PLLM_Pos) | (24 << RCC_PLLCFGR_PLLN_Pos); //M = 3, N = 24
     RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;    
     
     RCC->CR |= RCC_CR_PLLON;
@@ -56,15 +55,33 @@ int main(void)
     //Select PLL as system clocksource
     RCC->CFGR |= RCC_CFGR_SW_PLL;
 
+    //---------------------ENABLE GPIO CLOCK---------------------
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
+
 
     //---------------------CONFIGURE I2C-------------------------
 
-    //RCC_CCIPR I2C2 PCLK selected as clock
+    //I2C2 GPIO CONFIGUREATION
+    //PA8 I2C2_SDA
+    GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE8)) | (0b10 << GPIO_MODER_MODE8_Pos); //Alternate function mode
+    GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED8)) | (0b00 << GPIO_OSPEEDR_OSPEED8_Pos); //Low speed
+    GPIOA->OTYPER |= GPIO_OTYPER_OT8; //Open drain
+    GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD8)) | (0b01 << GPIO_PUPDR_PUPD8_Pos); //Pull up
+    GPIOA->AFR[0] = (GPIOA->AFR[0] & (~GPIO_AFRH_AFSEL8)) | (4 << GPIO_AFRH_AFSEL8_Pos); //Alternate function 4
 
-    //Analog nois filet ON
-    //Digital filter diabled
-    //Clock stretching enabled
+    //PA9 I2C2_SCL
+    GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE9)) | (0b10 << GPIO_MODER_MODE9_Pos); //Alternate function mode
+    GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED9)) | (0b00 << GPIO_OSPEEDR_OSPEED9_Pos); //Low speed
+    GPIOA->OTYPER |= GPIO_OTYPER_OT9; //Open drain
+    GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD9)) | (0b01 << GPIO_PUPDR_PUPD9_Pos); //Pull up
+    GPIOA->AFR[0] = (GPIOA->AFR[0] & (~GPIO_AFRH_AFSEL9)) | (4 << GPIO_AFRH_AFSEL9_Pos); //Alternate function 4
+
+    //I2C2 CONFIGURATION
     
+    //RCC_CCIPR I2C2 PCLK selected as clock
+    //Analog noise filter ON
+    //Digital filter diSabled
+    //Clock stretching enabled    
     RCC->APB1ENR1 |= RCC_APB1ENR1_I2C2EN; //Enable I2C clock
     I2C2->TIMINGR = 0x00702991 & 0xF0FFFFFFU; //Set timings
     I2C2->CR1 |= I2C_CR1_PE; //Enable periphereal
