@@ -28,3 +28,19 @@ CMD mode hard to enter when not connected, try $$$$$$
 CMD mode still while connected and disconnecting (if stream not opened)
 Stream opens when suscribed, CMD  (command mode) out when stream opened
 There is no advise of unsuscription
+
+
+$$$
+WC
+WW
+@PW_ON
+&R
+A
+ESC(AOK prints inmediatly after)
+SR,00CC (Non-discoverable/not advertising on power, Non-connectable on power,
+Reboot after disconnection/Running script after power on)
+SS,40
+SGA,0
+SGC,0
+SC,0
+S-,VBT
