@@ -36,18 +36,13 @@ Application:
 
 
 flash: Application
-	$(STFLASH) write $(TARGETDIRECTORY)/$(VERSION)/$(TARGET).bin 0x8000000
+	$(STFLASH) --reset write $(TARGETDIRECTORY)/$(VERSION)/$(TARGET).bin 0x8000000 
 
 FILECOMAND := 'file ./$(TARGETDIRECTORY)/$(VERSION)/$(TARGET).elf'
 
 debug:
-	openocd -f OpenOCD/stlink-v2.cfg -c "transport select hla_swd" -f OpenOCD/stm32f1x.cfg \
-	-c "init" &
-	arm-none-eabi-gdb -ex 'target remote localhost:3333' \
-	-ex $(FILECOMAND) -ex 'monitor arm semihosting enable' -ex 'monitor reset halt' 
-
-
-
+	arm-none-eabi-gdb  -ex 'target extended localhost:4242' \
+	-ex $(FILECOMAND) -ex 'load' -ex 'monitor reset' 
 
 #Clean PART
 clean: 

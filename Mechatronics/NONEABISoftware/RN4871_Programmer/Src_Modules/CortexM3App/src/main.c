@@ -4,11 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-
 extern void initialise_monitor_handles(void);
-
-
-
 
 static void configurePeriphereals(void){
 
@@ -44,9 +40,6 @@ static void configurePeriphereals(void){
     usart_enable(USART1);//Enable USART
 
 }
-
-
-
 
 int main(void)
 {
