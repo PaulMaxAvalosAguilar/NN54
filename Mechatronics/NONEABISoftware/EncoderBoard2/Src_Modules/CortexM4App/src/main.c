@@ -58,6 +58,8 @@ int main(void)
 
   //---------------------ENABLE GPIO CLOCK---------------------
   RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
+  RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
+  
   GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE8)) | (0b01 << GPIO_MODER_MODE8_Pos); //General Purpose Output mode
   GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED8)) | (0b00 << GPIO_OSPEEDR_OSPEED8_Pos); //Low speed
   GPIOA->OTYPER &= ~GPIO_OTYPER_OT8; //Push pull
@@ -71,17 +73,17 @@ int main(void)
   //I2C2 GPIO CONFIGUREATION
   //PA8 I2C2_SDA
   GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE8)) | (0b10 << GPIO_MODER_MODE8_Pos); //Alternate function mode
-  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED8)) | (0b00 << GPIO_OSPEEDR_OSPEED8_Pos); //Low speed
   GPIOA->OTYPER |= GPIO_OTYPER_OT8; //Open drain
+  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED8)) | (0b00 << GPIO_OSPEEDR_OSPEED8_Pos); //Low speed
   GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD8)) | (0b01 << GPIO_PUPDR_PUPD8_Pos); //Pull up
-  GPIOA->AFR[0] = (GPIOA->AFR[0] & (~GPIO_AFRH_AFSEL8)) | (4 << GPIO_AFRH_AFSEL8_Pos); //Alternate function 4
+  GPIOA->AFR[1] = (GPIOA->AFR[1] & (~GPIO_AFRH_AFSEL8)) | (4 << GPIO_AFRH_AFSEL8_Pos); //Alternate function 4
 
   //PA9 I2C2_SCL
   GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE9)) | (0b10 << GPIO_MODER_MODE9_Pos); //Alternate function mode
-  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED9)) | (0b00 << GPIO_OSPEEDR_OSPEED9_Pos); //Low speed
   GPIOA->OTYPER |= GPIO_OTYPER_OT9; //Open drain
+  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED9)) | (0b00 << GPIO_OSPEEDR_OSPEED9_Pos); //Low speed
   GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD9)) | (0b01 << GPIO_PUPDR_PUPD9_Pos); //Pull up
-  GPIOA->AFR[0] = (GPIOA->AFR[0] & (~GPIO_AFRH_AFSEL9)) | (4 << GPIO_AFRH_AFSEL9_Pos); //Alternate function 4
+  GPIOA->AFR[1] = (GPIOA->AFR[1] & (~GPIO_AFRH_AFSEL9)) | (4 << GPIO_AFRH_AFSEL9_Pos); //Alternate function 4
 
   //I2C2 CONFIGURATION
     
@@ -89,10 +91,31 @@ int main(void)
   //Analog noise filter ON
   //Digital filter diSabled
   //Clock stretching enabled    
-  RCC->APB1ENR1 |= RCC_APB1ENR1_I2C2EN; //Enable I2C clock
+  RCC->APB1ENR1 |= RCC_APB1ENR1_I2C2EN; //Enable I2C2 clock
   I2C2->TIMINGR = 0x00702991 & 0xF0FFFFFFU; //Set timings
   I2C2->CR1 |= I2C_CR1_PE; //Enable periphereal
   */
+
+  //---------------------CONFIGURE UART-------------------------
+
+  //UART1 GPIO CONFIGURATION
+  //PA10 UART1_RX
+  GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE10)) | (0b10 << GPIO_MODER_MODE10_Pos) ; //Alternate function mode
+  GPIOA->OTYPER &= (~GPIO_OTYPER_OT10);//Push pull  
+  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED10)) | (0b00 << GPIO_OSPEEDR_OSPEED10_Pos); //Low speed
+  GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD10)) | (0b00 << GPIO_PUPDR_PUPD10_Pos); //No pull up, no pull down
+  GPIOA->AFR[1] = (GPIOA->AFR[1] & (~GPIO_AFRH_AFSEL10)) | (7 << GPIO_AFRH_AFSEL10_Pos); //Alternate function 10
+
+  //PB6 UART1_TX
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE6)) | (0b10 << GPIO_MODER_MODE6_Pos) ; //Alternate function mode
+  GPIOB->OTYPER &= (~GPIO_OTYPER_OT6);//Push pull  
+  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED6)) | (0b00 << GPIO_OSPEEDR_OSPEED6_Pos); //Low speed
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD6)) | (0b00 << GPIO_PUPDR_PUPD6_Pos); //No pull up, no pull down
+  GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (7 << GPIO_AFRL_AFSEL6_Pos); //Alternate function 10
+
+  //UART1 CONFIGURATION
+  RCC->APB2ENR |= RCC_APB2ENR_USART1EN; //Enable UART1 CLOCK
+  
 
   while( ((RCC->PLLCFGR) & RCC_PLLCFGR_PLLN) == (24 << RCC_PLLCFGR_PLLN_Pos)){
         GPIOA->BSRR |= GPIO_BSRR_BS8;
@@ -108,6 +131,10 @@ int main(void)
       for(int i = 1; i < 1000000;i++);
 
   }
+
+
+  //
+  
 }
 
 
