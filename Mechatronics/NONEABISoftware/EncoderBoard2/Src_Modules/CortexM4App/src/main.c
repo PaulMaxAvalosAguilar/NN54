@@ -51,7 +51,7 @@ int main(void)
 
   RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN;
     
-  //Select PLL as system clocksource
+  //Select PLL as system clocksource and wait till selected
   RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_SW_PLL)) | (RCC_CFGR_SW_PLL);
   while( ((RCC->CFGR) & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 
@@ -94,7 +94,7 @@ int main(void)
   I2C2->CR1 |= I2C_CR1_PE; //Enable periphereal
   */
 
-  while( ((RCC->CFGR) & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLL){
+  while( ((RCC->PLLCFGR) & RCC_PLLCFGR_PLLN) == (24 << RCC_PLLCFGR_PLLN_Pos)){
         GPIOA->BSRR |= GPIO_BSRR_BS8;
   }
 

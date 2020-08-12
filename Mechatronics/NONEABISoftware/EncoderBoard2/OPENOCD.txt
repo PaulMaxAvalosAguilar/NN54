@@ -1,2 +1,2 @@
-openocd -f OpenOCD/stlink-v2.cfg -c "transport select hla_swd" -f OpenOCD/stm32f1x.cfg
+openocd -f OpenOCD/stlink-dap.cfg -c "transport select hla_swd" -f OpenOCD/stm32g4x.cfg
 
