@@ -114,8 +114,25 @@ int main(void)
   GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (7 << GPIO_AFRL_AFSEL6_Pos); //Alternate function 10
 
   //UART1 CONFIGURATION
+
+  //Parity control disabled
+  //Little endian transmition
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN; //Enable UART1 CLOCK
-  
+
+  USART1->CR1 &= ~USART_CR1_FIFOEN;//FIFO mode disabled
+  USART1->CR1 &= ~(USART_CR1_M0 | USART_CR1_M1);//1 start bit, 8 data bits
+  USART1->CR1 &= ~USART_CR1_OVER8;//Oversampling by 16
+  USART1->CR1 &= ~USART_CR1_PCE;//No parity
+  USART1->CR1 |= RCC_USART_TE;//Enable transmiter
+  USART1->CR1 |= RCC_USART_RE;//Enable receiver
+  USART1->CR2 = (USART1->CR2 & ~(USART_CR2_STOP)) | (0b00 << USART_CR2_STOP_Pos);//1 Stop bit
+  USART1->CR3 &= ~USART_CR3_ONEBIT;//Three sample bit method
+  USART1->CR3 &= ~USART_CR3_CTSE;//CTS disabled
+  USART1->CR3 &= ~USART_CR3_RTSE;//RTS disabled
+  USART1->PRESC = (USART1->PRESC & (~USART_PRESC_PRESCALER)) | (0b0000 << USART_PRESC_PRESCALER_Pos);//Input clock not divided
+  USART1->BRR = 173;//20,000,000/ 173 = 115,200
+  RCC->USART1 |= RCC_USART_UE;//Enable USART
+
 
   while( ((RCC->PLLCFGR) & RCC_PLLCFGR_PLLN) == (24 << RCC_PLLCFGR_PLLN_Pos)){
         GPIOA->BSRR |= GPIO_BSRR_BS8;
