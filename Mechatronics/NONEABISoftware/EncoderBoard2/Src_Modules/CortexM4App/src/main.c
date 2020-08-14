@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 void SystemClock_Config(void);
+extern void initialise_monitor_handles(void);  
 
 int main(void)
 {
@@ -19,7 +20,7 @@ int main(void)
   //BOR_LEV threshold 1.7
   //Read protection not active
   
-  extern void initialise_monitor_handles();  
+
 
   //---------------------INCREASE CPU SPEED-------------------------
 
@@ -135,7 +136,7 @@ int main(void)
   USART1->BRR = 694;//80,000,000/ 173 = 115,200
   USART1->CR1 |= USART_CR1_UE;//Enable USART
 
-
+  initialise_monitor_handles();
 
   char g = 0;
 
@@ -155,7 +156,7 @@ int main(void)
     */
     if(USART1->ISR & USART_ISR_RXNE){
       g = (USART1->RDR) & 0X00FF;
-      
+      printf("%c\n",g);
     };
 
 
