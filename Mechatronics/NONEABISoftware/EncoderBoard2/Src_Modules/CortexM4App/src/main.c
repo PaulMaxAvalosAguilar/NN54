@@ -1,4 +1,5 @@
 #include "stm32g431xx.h"
+#include <stdio.h>
 
 void SystemClock_Config(void);
 
@@ -18,7 +19,7 @@ int main(void)
   //BOR_LEV threshold 1.7
   //Read protection not active
   
-  
+  extern void initialise_monitor_handles();  
 
   //---------------------INCREASE CPU SPEED-------------------------
 
@@ -43,7 +44,7 @@ int main(void)
 
   //Turn PLL on, configure it and wait till ready
   RCC->PLLCFGR = (RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN))
-    | (0b10 << RCC_PLLCFGR_PLLM_Pos) | (24 << RCC_PLLCFGR_PLLN_Pos); //M = 3, N = 24
+    | (0b00 << RCC_PLLCFGR_PLLM_Pos) | (20 << RCC_PLLCFGR_PLLN_Pos); //M = 3, N = 24
   RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;    
     
   RCC->CR |= RCC_CR_PLLON;
@@ -55,6 +56,8 @@ int main(void)
   RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_SW_PLL)) | (RCC_CFGR_SW_PLL);
   while( ((RCC->CFGR) & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 
+  //-----------------Enable independent clocks-----------------
+  RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_USART1SEL)) | (0b01 << RCC_CCIPR_USART1SEL);
 
   //---------------------ENABLE GPIO CLOCK---------------------
   RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -65,6 +68,22 @@ int main(void)
   GPIOA->OTYPER &= ~GPIO_OTYPER_OT8; //Push pull
   GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD8)) | (0b00 << GPIO_PUPDR_PUPD8_Pos); //No Pull up down
   //  GPIOA->BSRR |= GPIO_BSRR_BS_8;
+
+
+  //UART1 GPIO CONFIGURATION
+  //PA10 UART1_RX
+  GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE10)) | (0b10 << GPIO_MODER_MODE10_Pos) ; //Alternate function mode
+  GPIOA->OTYPER &= (~GPIO_OTYPER_OT10);//Push pull  
+  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED10)) | (0b00 << GPIO_OSPEEDR_OSPEED10_Pos); //Low speed
+  GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD10)) | (0b00 << GPIO_PUPDR_PUPD10_Pos); //No pull up, no pull down
+  GPIOA->AFR[1] = (GPIOA->AFR[1] & (~GPIO_AFRH_AFSEL10)) | (7 << GPIO_AFRH_AFSEL10_Pos); //Alternate function 10
+
+  //PB6 UART1_TX
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE6)) | (0b10 << GPIO_MODER_MODE6_Pos) ; //Alternate function mode
+  GPIOB->OTYPER &= (~GPIO_OTYPER_OT6);//Push pull  
+  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED6)) | (0b00 << GPIO_OSPEEDR_OSPEED6_Pos); //Low speed
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD6)) | (0b00 << GPIO_PUPDR_PUPD6_Pos); //No pull up, no pull down
+  GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (7 << GPIO_AFRL_AFSEL6_Pos); //Alternate function 10
 
 
   //---------------------CONFIGURE I2C-------------------------
@@ -98,54 +117,47 @@ int main(void)
 
   //---------------------CONFIGURE UART-------------------------
 
-  //UART1 GPIO CONFIGURATION
-  //PA10 UART1_RX
-  GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE10)) | (0b10 << GPIO_MODER_MODE10_Pos) ; //Alternate function mode
-  GPIOA->OTYPER &= (~GPIO_OTYPER_OT10);//Push pull  
-  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED10)) | (0b00 << GPIO_OSPEEDR_OSPEED10_Pos); //Low speed
-  GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD10)) | (0b00 << GPIO_PUPDR_PUPD10_Pos); //No pull up, no pull down
-  GPIOA->AFR[1] = (GPIOA->AFR[1] & (~GPIO_AFRH_AFSEL10)) | (7 << GPIO_AFRH_AFSEL10_Pos); //Alternate function 10
-
-  //PB6 UART1_TX
-  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE6)) | (0b10 << GPIO_MODER_MODE6_Pos) ; //Alternate function mode
-  GPIOB->OTYPER &= (~GPIO_OTYPER_OT6);//Push pull  
-  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED6)) | (0b00 << GPIO_OSPEEDR_OSPEED6_Pos); //Low speed
-  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD6)) | (0b00 << GPIO_PUPDR_PUPD6_Pos); //No pull up, no pull down
-  GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (7 << GPIO_AFRL_AFSEL6_Pos); //Alternate function 10
-
   //UART1 CONFIGURATION
-
-  //Parity control disabled
-  //Little endian transmition
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN; //Enable UART1 CLOCK
 
   USART1->CR1 &= ~USART_CR1_FIFOEN;//FIFO mode disabled
   USART1->CR1 &= ~(USART_CR1_M0 | USART_CR1_M1);//1 start bit, 8 data bits
   USART1->CR1 &= ~USART_CR1_OVER8;//Oversampling by 16
   USART1->CR1 &= ~USART_CR1_PCE;//No parity
-  USART1->CR1 |= RCC_USART_TE;//Enable transmiter
-  USART1->CR1 |= RCC_USART_RE;//Enable receiver
+  USART1->CR1 |= USART_CR1_TE;//Enable transmiter
+  USART1->CR1 |= USART_CR1_RE;//Enable receiver
   USART1->CR2 = (USART1->CR2 & ~(USART_CR2_STOP)) | (0b00 << USART_CR2_STOP_Pos);//1 Stop bit
   USART1->CR3 &= ~USART_CR3_ONEBIT;//Three sample bit method
   USART1->CR3 &= ~USART_CR3_CTSE;//CTS disabled
   USART1->CR3 &= ~USART_CR3_RTSE;//RTS disabled
+  USART1->CR3 |= USART_CR3_OVRDIS;//Overrun Disable
   USART1->PRESC = (USART1->PRESC & (~USART_PRESC_PRESCALER)) | (0b0000 << USART_PRESC_PRESCALER_Pos);//Input clock not divided
-  USART1->BRR = 173;//20,000,000/ 173 = 115,200
-  RCC->USART1 |= RCC_USART_UE;//Enable USART
+  USART1->BRR = 694;//80,000,000/ 173 = 115,200
+  USART1->CR1 |= USART_CR1_UE;//Enable USART
 
 
-  while( ((RCC->PLLCFGR) & RCC_PLLCFGR_PLLN) == (24 << RCC_PLLCFGR_PLLN_Pos)){
-        GPIOA->BSRR |= GPIO_BSRR_BS8;
-  }
 
+  char g = 0;
 
   while (1)
   {
 
-      GPIOA->BSRR |= GPIO_BSRR_BS8;
-      for(int i = 1; i < 1000000;i++);
-      GPIOA->BSRR |= GPIO_BSRR_BR8;
-      for(int i = 1; i < 1000000;i++);
+    /*
+    while( !(USART1->ISR & USART_ISR_TXE));
+    USART1->TDR = 66;
+    while( !(USART1->ISR & USART_ISR_TC));
+
+
+    GPIOA->BSRR |= GPIO_BSRR_BS8;
+    for(int i = 1; i < 1000000;i++);
+    GPIOA->BSRR |= GPIO_BSRR_BR8;
+    for(int i = 1; i < 1000000;i++);
+    */
+    if(USART1->ISR & USART_ISR_RXNE){
+      g = (USART1->RDR) & 0X00FF;
+      
+    };
+
 
   }
 

@@ -41,7 +41,7 @@ flash: Application
 FILECOMAND := 'file ./$(TARGETDIRECTORY)/$(VERSION)/$(TARGET).elf'
 
 debug:
-#openocd -f OpenOCD/stlink-dap.cfg -c "transport select hla_swd" -f OpenOCD/stm32g4x.cfg
+#openocd.exe -f stlink.cfg -c "transport select hla_swd" -f stm32g4x.cfg
 	arm-none-eabi-gdb  -ex 'target extended localhost:3333' \
 	-ex $(FILECOMAND) -ex 'monitor reset halt' 
 
