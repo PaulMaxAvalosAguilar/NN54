@@ -1,5 +1,6 @@
 #include "stm32g431xx.h"
 #include <stdio.h>
+#include <string.h>
 
 void SystemClock_Config(void);
 extern void initialise_monitor_handles(void);  
@@ -58,7 +59,7 @@ int main(void)
   while( ((RCC->CFGR) & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 
   //-----------------Enable independent clocks-----------------
-  RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_USART1SEL)) | (0b01 << RCC_CCIPR_USART1SEL);
+  RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_USART1SEL)) | (0b01 << RCC_CCIPR_USART1SEL_Pos);
 
   //---------------------ENABLE GPIO CLOCK---------------------
   RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -138,6 +139,29 @@ int main(void)
 
   initialise_monitor_handles();
 
+  //-------------------CONFIGURE DMA---------------------------
+
+  //DMA CONFIGURATION
+  RCC->AHB1ENR |= RCC_AHB1ENR_DMAMUX1EN;//Enable DMA multiplexer
+  RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;//Enable DMA1
+
+  const char myString[] = "Hola";
+
+  DMA1_Channel2->CPAR |= USART1->TDR;//DMA destination address
+  DMA1_Channel2->CMAR |= USART1->TDR;//Source address
+  DMA1_Channel2->CNDTR |= strlen(myString);
+  
+
+  DMA1_Channel2->CCR = (DMA1_Channel2->CCR & (~DMA_CCR_PL)) | (0b00 << DMA_CCR_PL_Pos);
+  DMA1_Channel2->CCR |= DMA_CCR_DIR; //read from memory
+  DMA1_Channel2->CCR &= ~(DMA_CCR_CIRC);//circular mode not enabled
+  DMA1_Channel2->CCR |= (DMA_CCR_MINC);//Memory increment mode enabled
+  DMA1_Channel2->CCR &= ~(DMA_CCR_PINC);//Periphereal increment mode disabled
+  DMA1_Channel2->CCR = (DMA1_Channel2->CCR &= (~DMA_CCR_MSIZE)) | (0b00 << DMA_CCR_MSIZE_Pos); //Memory size 8 bits
+  DMA1_Channel2->CCR = (DMA1_Channel2->CCR &= (~DMA_CCR_PSIZE)) | (0b00 << DMA_CCR_PSIZE_Pos); //Perihphereal size 8 bits
+
+  DMA1_Channel2->CCR |= DMA_CCR_EN;//Channel enable
+  
   char g = 0;
 
   while (1)
