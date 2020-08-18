@@ -2,8 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#define UART_RX_BUFFER_LEN 256
+char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
+
 void printString(const char myString[]);
-//extern void initialise_monitor_handles(void);  
+extern void initialise_monitor_handles(void);  
 
 int main(void)
 {
@@ -118,9 +121,9 @@ int main(void)
 
   //---------------------CONFIGURE UART-------------------------
 
-  //UART1 CONFIGURATION
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN; //Enable UART1 clock
-
+  
+  //UART1 CONFIGURATION
   USART1->CR1 &= ~USART_CR1_FIFOEN;//FIFO mode disabled
   USART1->CR1 &= ~(USART_CR1_M0 | USART_CR1_M1);//1 start bit, 8 data bits
   USART1->CR1 &= ~USART_CR1_OVER8;//Oversampling by 16
@@ -133,6 +136,7 @@ int main(void)
   USART1->CR3 &= ~USART_CR3_RTSE;//RTS disabled
   USART1->CR3 |= USART_CR3_OVRDIS;//Overrun Disable
   USART1->CR3 |= USART_CR3_DMAT;//Enable DMA transmit
+  USART1->CR3 |= USART_CR3_DMAR;//Enable DMA receive
   USART1->PRESC = (USART1->PRESC & (~USART_PRESC_PRESCALER)) | (0b0000 << USART_PRESC_PRESCALER_Pos);//Input clock not divided
   USART1->BRR = 694;//80,000,000/ 173 = 115,200
   USART1->CR1 |= USART_CR1_UE;//Enable USART
@@ -141,10 +145,10 @@ int main(void)
 
   //-------------------CONFIGURE DMA---------------------------
 
-  //DMA CONFIGURATION
   RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;//Enable DMA1 clock
   RCC->AHB1ENR |= RCC_AHB1ENR_DMAMUX1EN;//Enable DMA multiplexer clock
 
+  //DMA UART TX CONFIGURATION
   DMA1_Channel2->CCR |= DMA_CCR_DIR; //read from memory
   DMA1_Channel2->CCR = (DMA1_Channel2->CCR & (~DMA_CCR_PL)) | (0b00 << DMA_CCR_PL_Pos); //Low Priority level
   DMA1_Channel2->CCR &= ~(DMA_CCR_CIRC);//circular mode disabled
@@ -158,19 +162,31 @@ int main(void)
 
   DMAMUX1_Channel1->CCR = (DMAMUX1_Channel1->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (25 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Request 25
 
-  //  initialise_monitor_handles();
+  //DMA UART RX CONFIGURATION
+  DMA1_Channel1->CCR &= ~DMA_CCR_DIR; //read from periphereal
+  DMA1_Channel1->CCR = (DMA1_Channel1->CCR & (~DMA_CCR_PL)) | (0b01 << DMA_CCR_PL_Pos); //Medium Priority level
+  DMA1_Channel1->CCR |= DMA_CCR_CIRC;//circular mode enabled
+  DMA1_Channel1->CNDTR = UART_RX_BUFFER_LEN;//DMA length
+
+  DMA1_Channel1->CPAR = (uint32_t)&USART1->RDR;//DMA source address
+  DMA1_Channel1->CCR &= ~(DMA_CCR_PINC);//Periphereal increment mode disabled
+  DMA1_Channel1->CCR = (DMA1_Channel1->CCR &= (~DMA_CCR_PSIZE)) | (0b00 << DMA_CCR_PSIZE_Pos); //Perihphereal size 8 bits
+
+  DMA1_Channel1->CMAR = (uint32_t)receiveBuffer;//DMA destination address
+  DMA1_Channel1->CCR |= (DMA_CCR_MINC);//Memory increment mode enabled
+  DMA1_Channel1->CCR = (DMA1_Channel1->CCR &= (~DMA_CCR_MSIZE)) | (0b00 << DMA_CCR_MSIZE_Pos); //Memory size 8 bits
+
+  DMAMUX1_Channel0->CCR = (DMAMUX1_Channel0->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (24 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Request 24
+
+  DMA1_Channel1->CCR |= DMA_CCR_EN;//Channel enable
   
-  char g = 0;
+
+  initialise_monitor_handles();
+  
+  uint32_t g = 0;
 
   while (1)
   {
-
-    /*
-    while( !(USART1->ISR & USART_ISR_TXE));
-    USART1->TDR = 152;
-    g++;
-    while( !(USART1->ISR & USART_ISR_TC));
-    */
 
     printString("Hola\n");
 
@@ -180,6 +196,12 @@ int main(void)
     for(int i = 1; i < 1000000;i++);
 
 
+    while(receiveBuffer[g]){
+      printf("%c",receiveBuffer[g]);
+      g = (g+1) % UART_RX_BUFFER_LEN;
+    }
+
+    
     /*
     if(USART1->ISR & USART_ISR_RXNE){
       g = (USART1->RDR) & 0X00FF;
@@ -197,7 +219,7 @@ int main(void)
 
 void printString(const char myString[]){
   DMA1_Channel2->CCR &= ~DMA_CCR_EN;//Channel disable
-  DMA1_Channel2->CMAR = (uint32_t)myString;//Source address
+  DMA1_Channel2->CMAR = (uint32_t)myString;//DMA source address
   DMA1_Channel2->CNDTR = strlen(myString);//DMA length
   DMA1_Channel2->CCR |= DMA_CCR_EN;//Channel enable
   while(!(DMA1->ISR & DMA_ISR_TCIF2));//Wait till transfere complete
