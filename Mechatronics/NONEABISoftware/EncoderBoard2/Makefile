@@ -42,9 +42,8 @@ FILECOMAND := 'file ./$(TARGETDIRECTORY)/$(VERSION)/$(TARGET).elf'
 
 debug:
 #./openocd.exe -f stlink.cfg -c "transport select hla_swd" -f stm32g4x.cfg
-	arm-none-eabi-gdb  -ex 'target extended localhost:3333' \
-	-ex $(FILECOMAND) -ex 'monitor arm semihosting enable' -ex 'monitor reset halt' 
-#	-ex $(FILECOMAND) -ex 'monitor reset halt' 
+	arm-none-eabi-gdb -ex 'target extended localhost:3333' \
+	-ex $(FILECOMAND) -ex 'monitor reset halt' 
 
 #Clean PART
 clean: 
