@@ -122,7 +122,7 @@ int main(void)
   //I2C2 CONFIGURATION
   I2C2->CR1 &= ~I2C_CR1_ANFOFF; //Aanalog noise filter enabled
   I2C2->CR1 &= ~I2C_CR1_NOSTRETCH; //Clock stretching enabled
-  I2C2->TIMINGR = 0x00702991 & 0xF0FFFFFFU; //Set timings
+  I2C2->TIMINGR = 0x00702991 & 0xF0FFFFFFU; //Set timings 400kz
   I2C2->CR2 &= ~I2C_CR2_ADD10;//The master operatines in 7 bit addressing mode
   I2C2->CR1 |= I2C_CR1_PE; //Enable periphereal
 
@@ -190,14 +190,15 @@ int main(void)
   uint32_t g = 0;
 
   lcd_init();
-  lcd_gotoxy(10,7);
+  lcd_gotoxy(0,0);
 
+  lcd_puts("Encoder Pollito");
+  lcd_gotoxy(10,7);
+  lcd_puts("SDT");
   while (1)
   {
-    
-    lcd_puts("Hola");
 
-    /*
+
     printString("\x31""Hola\n");
 
     GPIOA->BSRR |= GPIO_BSRR_BS8;
@@ -207,12 +208,10 @@ int main(void)
 
 
     while(receiveBuffer[g]){
-      printf("%c",receiveBuffer[g]);
+      //      printf("%c",receiveBuffer[g]);
       receiveBuffer[g] = 0;
       g = (g+1) % UART_RX_BUFFER_LEN;
     }
-
-    */
 
     
     /*
