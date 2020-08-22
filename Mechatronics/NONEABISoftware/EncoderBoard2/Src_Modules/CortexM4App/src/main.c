@@ -192,7 +192,7 @@ int main(void)
   lcd_init();
   lcd_gotoxy(0,0);
 
-  lcd_puts("Encoder Pollito");
+  lcd_puts("Encoder Pollo");
   lcd_gotoxy(10,7);
   lcd_puts("SDT");
   while (1)

@@ -7,6 +7,7 @@ static struct {
   uint8_t y;
 } cursorPosition;
 
+uint8_t lcdSendBuffer[256];
 
 void lcd_command(uint8_t cmd[], uint8_t size) {
   i2c_start(LCD_I2C_ADR,size);
@@ -104,9 +105,11 @@ void lcd_gotoxy(uint8_t x, uint8_t y){
 }
 
 void lcd_puts(const char* s){
+
   uint8_t bufferLen = (strlen(s) * FONT_COLUMNS)+ 1; 
   uint8_t buffer[bufferLen];
-  int count = 1;
+
+  int count = 0;
 
   while(*s){
     char c = *s;
@@ -116,11 +119,11 @@ void lcd_puts(const char* s){
 
     for (uint8_t i = 0; i <  sizeof(FONT[0]); i++)
       {      
-	buffer[count++] = FONT[(uint8_t)c][i];
+	lcdSendBuffer[++count] = FONT[(uint8_t)c][i];
       }
     s++;
   }
 
-  lcd_data(buffer, bufferLen);//print char at display
+  lcd_data(lcdSendBuffer, (count) + 1);//print char at display
 }
 
