@@ -61,27 +61,30 @@ int main(void)
   while( ((RCC->CFGR) & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 
   //-----------------Enable independent clocks-----------------
+  
   RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_USART1SEL)) | (0b01 << RCC_CCIPR_USART1SEL_Pos);//System clock as USART1 clock
   RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_I2C2SEL)) | (0b01 << RCC_CCIPR_I2C2SEL_Pos);//System clock as I2C2 clock
 
-  //---------------------ENABLE GPIO CLOCK---------------------
+  //---------------------CONFIGURE GPIO---------------------
+  
   RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
   RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 
   /*
+  //TEST PINS CONFIGURATION
+  //PA8 
   GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE8)) | (0b01 << GPIO_MODER_MODE8_Pos); //General Purpose Output mode
   GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED8)) | (0b00 << GPIO_OSPEEDR_OSPEED8_Pos); //Low speed
   GPIOA->OTYPER &= ~GPIO_OTYPER_OT8; //Push pull
   GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD8)) | (0b00 << GPIO_PUPDR_PUPD8_Pos); //No Pull up down
-
-  GPIOA->BSRR |= GPIO_BSRR_BS8;
+  GPIOA->BSRR |= GPIO_BSRR_BS8;//Turn on PA8
   
+  //PA9 
   GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE9)) | (0b01 << GPIO_MODER_MODE9_Pos); //General Purpose Output mode
   GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED9)) | (0b00 << GPIO_OSPEEDR_OSPEED9_Pos); //Low speed
   GPIOA->OTYPER &= ~GPIO_OTYPER_OT9; //Push pull
   GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD9)) | (0b00 << GPIO_PUPDR_PUPD9_Pos); //No Pull up down
-
-  GPIOA->BSRR |= GPIO_BSRR_BS9;
+  GPIOA->BSRR |= GPIO_BSRR_BS9;//Turn on PA9
   */
 
   //I2C GPIO CONFIGURATION
@@ -122,6 +125,7 @@ int main(void)
   //I2C2 CONFIGURATION
   I2C2->CR1 &= ~I2C_CR1_ANFOFF; //Aanalog noise filter enabled
   I2C2->CR1 &= ~I2C_CR1_NOSTRETCH; //Clock stretching enabled
+  I2C2->CR1 |= I2C_CR1_TXDMAEN;//Enable DMA transmit
   I2C2->TIMINGR = 0x00702991 & 0xF0FFFFFFU; //Set timings 400kz
   I2C2->CR2 &= ~I2C_CR2_ADD10;//The master operatines in 7 bit addressing mode
   I2C2->CR1 |= I2C_CR1_PE; //Enable periphereal
@@ -147,31 +151,17 @@ int main(void)
   USART1->PRESC = (USART1->PRESC & (~USART_PRESC_PRESCALER)) | (0b0000 << USART_PRESC_PRESCALER_Pos);//Input clock not divided
   USART1->BRR = 694;//80,000,000/ 173 = 115,200
   USART1->CR1 |= USART_CR1_UE;//Enable USART
-
-
+  
 
   //-------------------CONFIGURE DMA---------------------------
 
   RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;//Enable DMA1 clock
   RCC->AHB1ENR |= RCC_AHB1ENR_DMAMUX1EN;//Enable DMA multiplexer clock
 
-  //DMA UART TX CONFIGURATION
-  DMA1_Channel2->CCR |= DMA_CCR_DIR; //read from memory
-  DMA1_Channel2->CCR = (DMA1_Channel2->CCR & (~DMA_CCR_PL)) | (0b00 << DMA_CCR_PL_Pos); //Low Priority level
-  DMA1_Channel2->CCR &= ~(DMA_CCR_CIRC);//circular mode disabled
 
-  DMA1_Channel2->CPAR = (uint32_t)&USART1->TDR;//DMA destination address
-  DMA1_Channel2->CCR &= ~(DMA_CCR_PINC);//Periphereal increment mode disabled
-  DMA1_Channel2->CCR = (DMA1_Channel2->CCR &= (~DMA_CCR_PSIZE)) | (0b00 << DMA_CCR_PSIZE_Pos); //Perihphereal size 8 bits
-
-  DMA1_Channel2->CCR |= (DMA_CCR_MINC);//Memory increment mode enabled
-  DMA1_Channel2->CCR = (DMA1_Channel2->CCR &= (~DMA_CCR_MSIZE)) | (0b00 << DMA_CCR_MSIZE_Pos); //Memory size 8 bits
-
-  DMAMUX1_Channel1->CCR = (DMAMUX1_Channel1->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (25 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Request 25
-
-  //DMA UART RX CONFIGURATION
+  //DMA UART1 RX CONFIGURATION
   DMA1_Channel1->CCR &= ~DMA_CCR_DIR; //read from periphereal
-  DMA1_Channel1->CCR = (DMA1_Channel1->CCR & (~DMA_CCR_PL)) | (0b01 << DMA_CCR_PL_Pos); //Medium Priority level
+  DMA1_Channel1->CCR = (DMA1_Channel1->CCR & (~DMA_CCR_PL)) | (0b10 << DMA_CCR_PL_Pos); //High Priority level
   DMA1_Channel1->CCR |= DMA_CCR_CIRC;//circular mode enabled
   DMA1_Channel1->CNDTR = UART_RX_BUFFER_LEN;//DMA length
 
@@ -186,24 +176,52 @@ int main(void)
   DMAMUX1_Channel0->CCR = (DMAMUX1_Channel0->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (24 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Requppest 24
 
   DMA1_Channel1->CCR |= DMA_CCR_EN;//Channel enable
+
+  //DMA UART1 TX CONFIGURATION
+  DMA1_Channel2->CCR |= DMA_CCR_DIR; //read from memory
+  DMA1_Channel2->CCR = (DMA1_Channel2->CCR & (~DMA_CCR_PL)) | (0b01 << DMA_CCR_PL_Pos); //Medium Priority level
+  DMA1_Channel2->CCR &= ~(DMA_CCR_CIRC);//circular mode disabled
+
+  DMA1_Channel2->CPAR = (uint32_t)&USART1->TDR;//DMA destination address
+  DMA1_Channel2->CCR &= ~(DMA_CCR_PINC);//Periphereal increment mode disabled
+  DMA1_Channel2->CCR = (DMA1_Channel2->CCR &= (~DMA_CCR_PSIZE)) | (0b00 << DMA_CCR_PSIZE_Pos); //Perihphereal size 8 bits
+
+  DMA1_Channel2->CCR |= (DMA_CCR_MINC);//Memory increment mode enabled
+  DMA1_Channel2->CCR = (DMA1_Channel2->CCR &= (~DMA_CCR_MSIZE)) | (0b00 << DMA_CCR_MSIZE_Pos); //Memory size 8 bits
+
+  DMAMUX1_Channel1->CCR = (DMAMUX1_Channel1->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (25 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Request 25
+
+  //DMA I2C2 TRANSMIT CONFIGURATION
+  DMA1_Channel3->CCR |= DMA_CCR_DIR; //read from memory
+  DMA1_Channel3->CCR = (DMA1_Channel3->CCR & (~DMA_CCR_PL)) | (0b00 << DMA_CCR_PL_Pos); //Low Priority level
+  DMA1_Channel3->CCR &= ~(DMA_CCR_CIRC);//circular mode disabled
+
+  DMA1_Channel3->CPAR = (uint32_t)&I2C2->TXDR;//DMA destination address
+  DMA1_Channel3->CCR &= ~(DMA_CCR_PINC);//Periphereal increment mode disabled
+  DMA1_Channel3->CCR = (DMA1_Channel3->CCR &= (~DMA_CCR_PSIZE)) | (0b00 << DMA_CCR_PSIZE_Pos); //Perihphereal size 8 bits
+
+  DMA1_Channel3->CCR |= (DMA_CCR_MINC);//Memory increment mode enabled
+  DMA1_Channel3->CCR = (DMA1_Channel3->CCR &= (~DMA_CCR_MSIZE)) | (0b00 << DMA_CCR_MSIZE_Pos); //Memory size 8 bits
+
+  DMAMUX1_Channel2->CCR = (DMAMUX1_Channel2->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (19 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Request 29
+
+  //DMA
+  for (int i = 0; i < 10000; i++);  
   
   uint32_t g = 0;
 
   lcd_init();
   lcd_gotoxy(0,0);
 
-  lcd_puts("Encoder Pollo");
-  lcd_gotoxy(10,7);
-  lcd_puts("SDT");
+  lcd_puts("Encoder");
+  lcd_gotoxy(1,7);
+  lcd_puts("Saint Germain");
   while (1)
   {
 
-
     printString("\x31""Hola\n");
 
-    GPIOA->BSRR |= GPIO_BSRR_BS8;
     for(int i = 1; i < 1000000;i++);
-    GPIOA->BSRR |= GPIO_BSRR_BR8;
     for(int i = 1; i < 1000000;i++);
 
 
@@ -212,7 +230,6 @@ int main(void)
       receiveBuffer[g] = 0;
       g = (g+1) % UART_RX_BUFFER_LEN;
     }
-
     
     /*
     if(USART1->ISR & USART_ISR_RXNE){
@@ -220,13 +237,7 @@ int main(void)
       printf("%c\n",g);
     };
     */
-
-
   }
-
-
-  //
-  
 }
 
 void printString(const char myString[]){
@@ -235,7 +246,7 @@ void printString(const char myString[]){
   DMA1_Channel2->CNDTR = strlen(myString);//DMA length
   DMA1_Channel2->CCR |= DMA_CCR_EN;//Channel enable
   while(!(DMA1->ISR & DMA_ISR_TCIF2));//Wait till transfere complete
-  DMA1->ISR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
+  DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
 }
 
 
