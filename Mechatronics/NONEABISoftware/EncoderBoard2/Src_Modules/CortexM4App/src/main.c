@@ -1,15 +1,41 @@
 #include "stm32g431xx.h"
 #include "lcd.h"
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 
 #define UART_RX_BUFFER_LEN 256
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
 
-void printString(const char myString[]);
+static volatile uint32_t counter = 0;
 
+void TIM2_IRQHandler(void);
+void lcdPutsBlinkFree(const char *g, int ypos);
 char* reverse(char *buffer, int i, int j);
 char* itoa(int value, char* buffer, int base);
+void printString(const char myString[]);
+
+void lcdPutsBlinkFree(const char *g, int ypos){
+  int i = 0;
+  char text[22];//max used characters used plus null terminator
+  int blankchars;
+
+  while(*(g + i)){
+    if(i >20) break;
+    text[i] = *(g +i);
+    i++;
+  }
+
+  blankchars = 21 -i;
+  while(blankchars){
+    text[i] = ' ';
+    blankchars--;
+    i++;
+  }
+  text[i] = '\0';
+  lcd_gotoxy(0, ypos);
+  lcd_puts(text);
+  
+}
 
 // inline function to swap two numbers
 static inline void myswap(char *x, char *y) {
@@ -24,7 +50,7 @@ char* reverse(char *buffer, int i, int j){
 }
 
 // Iterative function to implement itoa() function in C
-char* itoa(int value, char* buffer, int base){
+char* intoa(int value, char* buffer, int base){
 	// invalid input
 	if (base < 2 || base > 32)
 		return buffer;
@@ -88,7 +114,7 @@ int main(void)
 
   //Wait states for less than 90 MHz at VCore Range 1 normal mode
   FLASH->ACR |= FLASH_ACR_PRFTEN;
-  FLASH->ACR = (FLASH->ACR & (~FLASH_ACR_LATENCY)) | FLASH_ACR_LATENCY_2WS; //2 wait states
+  FLASH->ACR = (FLASH->ACR & (~FLASH_ACR_LATENCY)) | FLASH_ACR_LATENCY_1WS; //1 wait states
     
   //Turn HSE and wait till is ready
   RCC->CR |= RCC_CR_HSEON;
@@ -96,7 +122,7 @@ int main(void)
 
   //Turn PLL on, configure it and wait till ready
   RCC->PLLCFGR = (RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN))
-    | (0b00 << RCC_PLLCFGR_PLLM_Pos) | (20 << RCC_PLLCFGR_PLLN_Pos); //M = 3, N = 24
+    | (0b01 << RCC_PLLCFGR_PLLM_Pos) | (25 << RCC_PLLCFGR_PLLN_Pos); //M = 2, N = 25 50 Mhz SYSCLK
   RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;    
     
   RCC->CR |= RCC_CR_PLLON;
@@ -181,9 +207,38 @@ int main(void)
   GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD7)) | (0b00 << GPIO_PUPDR_PUPD7_Pos); //No pull up, no pull down
   GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL7)) | (11 << GPIO_AFRL_AFSEL7_Pos); //Alternate function 11
 
+
+  //TIM2 GPIO CONFIGURATION
+  //PA15 TIM2_CH1
+  GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE15)) | (0b10 << GPIO_MODER_MODE15_Pos) ; //Alternate function mode
+  GPIOA->OTYPER &= (~GPIO_OTYPER_OT15);//Push pull  
+  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED15)) | (0b00 << GPIO_OSPEEDR_OSPEED15_Pos); //Low speed
+  GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD15)) | (0b00 << GPIO_PUPDR_PUPD15_Pos); //No pull up, no pull down
+  GPIOA->AFR[1] = (GPIOA->AFR[1] & (~GPIO_AFRH_AFSEL15)) | (1 << GPIO_AFRH_AFSEL15_Pos); //Alternate function 1
+
+  //PB3 TIM2_CH2
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE3)) | (0b10 << GPIO_MODER_MODE3_Pos) ; //Alternate function mode
+  GPIOB->OTYPER &= (~GPIO_OTYPER_OT3);//Push pull  
+  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED3)) | (0b00 << GPIO_OSPEEDR_OSPEED3_Pos); //Low speed
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD3)) | (0b00 << GPIO_PUPDR_PUPD3_Pos); //No pull up, no pull dowxn
+  GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL3)) | (1 << GPIO_AFRL_AFSEL3_Pos); //Alternate function 11
+
+  /*
+  GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE15)) | (0b00 << GPIO_MODER_MODE15_Pos) ; //Alternate function mode
+  GPIOA->OTYPER &= (~GPIO_OTYPER_OT15);//Push pull  
+  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED15)) | (0b00 << GPIO_OSPEEDR_OSPEED15_Pos); //Low speed
+  GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD15)) | (0b00 << GPIO_PUPDR_PUPD15_Pos); //No pull up, no pull down
+
+  //PB3 TIM2_CH2
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE3)) | (0b00 << GPIO_MODER_MODE3_Pos) ; //Alternate function mode
+  GPIOB->OTYPER &= (~GPIO_OTYPER_OT3);//Push pull  
+  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED3)) | (0b00 << GPIO_OSPEEDR_OSPEED3_Pos); //Low speed
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD3)) | (0b00 << GPIO_PUPDR_PUPD3_Pos); //No pull up, no pull down
+  */
+
   //ENC ENABLE CONFIGURATION
   //PB9 
-  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE9)) | (0b10 << GPIO_MODER_MODE9_Pos) ; //General purpose outputMode
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE9)) | (0b01 << GPIO_MODER_MODE9_Pos) ; //General purpose outputMode
   GPIOB->OTYPER &= (~GPIO_OTYPER_OT9);//Push pull  
   GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED5)) | (0b00 << GPIO_OSPEEDR_OSPEED7_Pos); //Low speed
   GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD7)) | (0b00 << GPIO_PUPDR_PUPD7_Pos); //No pull up, no pull down
@@ -198,7 +253,7 @@ int main(void)
   I2C2->CR1 &= ~I2C_CR1_ANFOFF; //Aanalog noise filter enabled
   I2C2->CR1 &= ~I2C_CR1_NOSTRETCH; //Clock stretching enabled
   I2C2->CR1 |= I2C_CR1_TXDMAEN;//Enable DMA transmit
-  I2C2->TIMINGR = 0x00702991 & 0xF0FFFFFFU; //Set timings 400kz
+  I2C2->TIMINGR = 0x00401959 & 0xF0FFFFFFU; //Set timings 400kz
   I2C2->CR2 &= ~I2C_CR2_ADD10;//The master operatines in 7 bit addressing mode
   I2C2->CR1 |= I2C_CR1_PE; //Enable periphereal
 
@@ -221,7 +276,7 @@ int main(void)
   USART1->CR3 |= USART_CR3_DMAT;//Enable DMA transmit
   USART1->CR3 |= USART_CR3_DMAR;//Enable DMA receive
   USART1->PRESC = (USART1->PRESC & (~USART_PRESC_PRESCALER)) | (0b0000 << USART_PRESC_PRESCALER_Pos);//Input clock not divided
-  USART1->BRR = 694;//80,000,000/ 173 = 115,200
+  USART1->BRR = 434;//50,000,000/ 434 = 115,200
   USART1->CR1 |= USART_CR1_UE;//Enable USART
   
 
@@ -293,7 +348,34 @@ int main(void)
   while(!(LPTIM1->ISR & LPTIM_ISR_ARROK));
   LPTIM1->CR |= LPTIM_CR_CNTSTRT; //Timer start in Continuous mode
 
+  //---------------------CONFIGURE TIM2-------------------------
 
+  RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
+
+  //TIM2 CONFIGURATION
+  TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI1SEL)) | (0b0000 << TIM_TISEL_TI1SEL_Pos);//tim_ti1_in source
+  TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI2SEL)) | (0b0000 << TIM_TISEL_TI2SEL_Pos);//tim_ti2_in source
+  TIM2->CCER |= (TIM_CCER_CC1NP | TIM_CCER_CC1P);//edge selection both edges for tim_ti1 source
+  //TIM2->CCER |= (TIM_CCER_CC2NP | TIM_CCER_CC2P);//edge selection both edges for tim_ti2 source
+  TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_IC1F)) | (0b0011 << TIM_CCMR1_IC1F_Pos);//Tim_ti1 filtered for 8 clock cycles
+  //TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_IC2F)) | (0b0011 << TIM_CCMR1_IC2F_Pos);//Tim_ti2 filtered for 8 clock cycles
+  TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC1S)) | (0b01 << TIM_CCMR1_CC1S_Pos);//(input mode)Tim_ic1 mapping on tim_ti1 
+  //TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC2S)) | (0b01 << TIM_CCMR1_CC2S_Pos);//(input mode)Tim_ic2 mapping on tim_ti2
+  TIM2->CCER |= (TIM_CCER_CC1E);//Capture enabled for Capture register 1 and 2
+
+  TIM2->CR2 |= TIM_CR2_TI1S;// ti1_in ti2_in source XORed
+  TIM2->ARR = 0xFFFFFFFF;//Autoreload register
+  TIM2->PSC = 5;//Preescaler
+  TIM2->CNT = 0;
+  TIM2->DIER = TIM_DIER_CC1IE;//Enable Interrupts
+  TIM2->CR1 |= TIM_CR1_CEN; //Counter enable
+
+  //---------------------CONFIGURE NVIC-------------------------
+
+  NVIC_SetPriorityGrouping(4); //4 bits for pre-emption 0 bit for subpriority
+  NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  NVIC_EnableIRQ(TIM2_IRQn);
+  
   
   uint32_t g = 0;
 
@@ -307,13 +389,15 @@ int main(void)
   char buffer[21];
   while (1)
   {
+
     /*
     printString("\x31""Hola\n");
 
     for(int i = 1; i < 1000000;i++);
     for(int i = 1; i < 1000000;i++);
+    */
 
-
+    /*
     while(receiveBuffer[g]){
       //      printf("%c",receiveBuffer[g]);
       receiveBuffer[g] = 0;
@@ -322,25 +406,27 @@ int main(void)
     */
 
     uint32_t count=LPTIM1->CNT;
-    count=LPTIM1->CNT;
-    
-    itoa(count,buffer,10);
-    lcd_gotoxy(1,5);
-    lcd_puts(buffer);
 
-    static int i = 0;
-    if(i == 0){
-      RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b10 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
-      i = 1;
-    }else{
-      RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b00 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
-      i = 0;
+    /*
+    if((GPIOA->IDR & GPIO_IDR_ID15)){
+      a = 1;
     }
 
-    itoa(g++,buffer,10);
-    lcd_gotoxy(1,3);
-    lcd_puts(buffer);
+    if((GPIOB->IDR & GPIO_IDR_ID3)){
+      b = 1;
+    }
+    */
 
+    sprintf(buffer, "%lu", counter);
+    lcdPutsBlinkFree(buffer,2);
+
+    /*
+    sprintf(buffer, "%u", TIM2->CCR2);
+    lcdPutsBlinkFree(buffer,3);
+    */
+    
+    intoa(count,buffer,10);
+    lcdPutsBlinkFree(buffer,5);
 
     
     /*
@@ -362,3 +448,7 @@ void printString(const char myString[]){
 }
 
 
+void TIM2_IRQHandler(){
+  TIM2->SR &= ~TIM_SR_CC1IF;
+  counter = TIM2->CCR1;
+}
