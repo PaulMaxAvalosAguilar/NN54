@@ -7,8 +7,10 @@
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
 
 static volatile uint32_t counter = 0;
+static volatile uint32_t charging = 0;
 
 void TIM2_IRQHandler(void);
+void EXTI15_10_IRQHandler(void);
 void lcdPutsBlinkFree(const char *g, int ypos);
 char* reverse(char *buffer, int i, int j);
 char* itoa(int value, char* buffer, int base);
@@ -203,7 +205,7 @@ int main(void)
   //PB7 LPTIM_IN2
   GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE7)) | (0b10 << GPIO_MODER_MODE7_Pos) ; //Alternate function mode
   GPIOB->OTYPER &= (~GPIO_OTYPER_OT7);//Push pull  
-  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED5)) | (0b00 << GPIO_OSPEEDR_OSPEED7_Pos); //Low speed
+  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED7)) | (0b00 << GPIO_OSPEEDR_OSPEED7_Pos); //Low speed
   GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD7)) | (0b00 << GPIO_PUPDR_PUPD7_Pos); //No pull up, no pull down
   GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL7)) | (11 << GPIO_AFRL_AFSEL7_Pos); //Alternate function 11
 
@@ -223,27 +225,19 @@ int main(void)
   GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD3)) | (0b00 << GPIO_PUPDR_PUPD3_Pos); //No pull up, no pull dowxn
   GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL3)) | (1 << GPIO_AFRL_AFSEL3_Pos); //Alternate function 11
 
-  /*
-  GPIOA->MODER = (GPIOA->MODER & (~GPIO_MODER_MODE15)) | (0b00 << GPIO_MODER_MODE15_Pos) ; //Alternate function mode
-  GPIOA->OTYPER &= (~GPIO_OTYPER_OT15);//Push pull  
-  GPIOA->OSPEEDR = (GPIOA->OSPEEDR & (~GPIO_OSPEEDR_OSPEED15)) | (0b00 << GPIO_OSPEEDR_OSPEED15_Pos); //Low speed
-  GPIOA->PUPDR = (GPIOA->PUPDR & (~GPIO_PUPDR_PUPD15)) | (0b00 << GPIO_PUPDR_PUPD15_Pos); //No pull up, no pull down
-
-  //PB3 TIM2_CH2
-  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE3)) | (0b00 << GPIO_MODER_MODE3_Pos) ; //Alternate function mode
-  GPIOB->OTYPER &= (~GPIO_OTYPER_OT3);//Push pull  
-  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED3)) | (0b00 << GPIO_OSPEEDR_OSPEED3_Pos); //Low speed
-  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD3)) | (0b00 << GPIO_PUPDR_PUPD3_Pos); //No pull up, no pull down
-  */
-
   //ENC ENABLE CONFIGURATION
   //PB9 
   GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE9)) | (0b01 << GPIO_MODER_MODE9_Pos) ; //General purpose outputMode
   GPIOB->OTYPER &= (~GPIO_OTYPER_OT9);//Push pull  
-  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED5)) | (0b00 << GPIO_OSPEEDR_OSPEED7_Pos); //Low speed
-  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD7)) | (0b00 << GPIO_PUPDR_PUPD7_Pos); //No pull up, no pull down
-  GPIOB->BSRR |= GPIO_BSRR_BR9;//Turn on encoder  
+  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED9)) | (0b00 << GPIO_OSPEEDR_OSPEED9_Pos); //Low speed
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD9)) | (0b00 << GPIO_PUPDR_PUPD9_Pos); //No pull up, no pull down
+  GPIOB->BSRR |= GPIO_BSRR_BR9;//Turn on encoder
 
+  //ENC CONNECTED CONFIGURATION
+  //PB12
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE12)) | (0b00 << GPIO_MODER_MODE12_Pos) ; //Input mode
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD12)) | (0b10 << GPIO_PUPDR_PUPD12_Pos); //Pull down
+  
 
   //---------------------CONFIGURE I2C-------------------------
 
@@ -370,11 +364,24 @@ int main(void)
   TIM2->DIER = TIM_DIER_CC1IE;//Enable Interrupts
   TIM2->CR1 |= TIM_CR1_CEN; //Counter enable
 
+  //---------------------CONFIGURE EXTI-------------------------
+  RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+  SYSCFG->EXTICR[3] = (SYSCFG->EXTICR[3] & (~SYSCFG_EXTICR4_EXTI12)) | (0b0001 << SYSCFG_EXTICR4_EXTI12_Pos);
+
+  EXTI->IMR1 |= 1 << EXTI_IMR1_IM12_Pos;//Enable Exti 12
+  EXTI->RTSR1 |= 1 << EXTI_RTSR1_RT12_Pos;//Enable Exti 12 rising trigger
+  EXTI->FTSR1 |= 1 << EXTI_FTSR1_FT12_Pos;//Enable Exti 12 falling trigger  
+  
+
   //---------------------CONFIGURE NVIC-------------------------
 
   NVIC_SetPriorityGrouping(4); //4 bits for pre-emption 0 bit for subpriority
   NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   NVIC_EnableIRQ(TIM2_IRQn);
+
+  NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  NVIC_EnableIRQ(EXTI15_10_IRQn);
   
   
   uint32_t g = 0;
@@ -407,27 +414,14 @@ int main(void)
 
     uint32_t count=LPTIM1->CNT;
 
-    /*
-    if((GPIOA->IDR & GPIO_IDR_ID15)){
-      a = 1;
-    }
-
-    if((GPIOB->IDR & GPIO_IDR_ID3)){
-      b = 1;
-    }
-    */
-
     sprintf(buffer, "%lu", counter);
     lcdPutsBlinkFree(buffer,2);
 
-    /*
-    sprintf(buffer, "%u", TIM2->CCR2);
+    sprintf(buffer, "%lu", charging);
     lcdPutsBlinkFree(buffer,3);
-    */
-    
+
     intoa(count,buffer,10);
     lcdPutsBlinkFree(buffer,5);
-
     
     /*
     if(USART1->ISR & USART_ISR_RXNE){
@@ -451,4 +445,16 @@ void printString(const char myString[]){
 void TIM2_IRQHandler(){
   TIM2->SR &= ~TIM_SR_CC1IF;
   counter = TIM2->CCR1;
+}
+
+void EXTI15_10_IRQHandler(){
+
+  EXTI->PR1 |= EXTI_PR1_PIF12;//Clear flag
+  
+  if((GPIOB->IDR & GPIO_IDR_ID12)){
+    charging = 1;
+  }else{
+    charging = 0;
+  }
+  
 }
