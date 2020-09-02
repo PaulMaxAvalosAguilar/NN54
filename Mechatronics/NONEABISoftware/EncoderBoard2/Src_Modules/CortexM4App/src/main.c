@@ -9,6 +9,7 @@ char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
 static volatile uint32_t counter = 0;
 static volatile uint32_t charging = 0;
 
+void USART1_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 void lcdPutsBlinkFree(const char *g, int ypos);
@@ -260,6 +261,7 @@ int main(void)
   USART1->CR1 &= ~(USART_CR1_M0 | USART_CR1_M1);//1 start bit, 8 data bits
   USART1->CR1 &= ~USART_CR1_OVER8;//Oversampling by 16
   USART1->CR1 &= ~USART_CR1_PCE;//No parity
+  USART1->CR1 |= USART_CR1_IDLEIE;//IDLE interrupt enable
   USART1->CR1 |= USART_CR1_TE;//Enable transmiter
   USART1->CR1 |= USART_CR1_RE;//Enable receiver
   USART1->CR2 = (USART1->CR2 & ~(USART_CR2_STOP)) | (0b00 << USART_CR2_STOP_Pos);//1 Stop bit
@@ -365,23 +367,33 @@ int main(void)
   TIM2->CR1 |= TIM_CR1_CEN; //Counter enable
 
   //---------------------CONFIGURE EXTI-------------------------
-  RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+  RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;//Enable SYSCFG clock
 
   SYSCFG->EXTICR[3] = (SYSCFG->EXTICR[3] & (~SYSCFG_EXTICR4_EXTI12)) | (0b0001 << SYSCFG_EXTICR4_EXTI12_Pos);
 
   EXTI->IMR1 |= 1 << EXTI_IMR1_IM12_Pos;//Enable Exti 12
   EXTI->RTSR1 |= 1 << EXTI_RTSR1_RT12_Pos;//Enable Exti 12 rising trigger
   EXTI->FTSR1 |= 1 << EXTI_FTSR1_FT12_Pos;//Enable Exti 12 falling trigger  
+
+  //---------------------CONFIGURE PWR---------------------------
+
+  RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;//Enable PWR clock
   
 
   //---------------------CONFIGURE NVIC-------------------------
 
   NVIC_SetPriorityGrouping(4); //4 bits for pre-emption 0 bit for subpriority
   NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-  NVIC_EnableIRQ(TIM2_IRQn);
+  //  NVIC_EnableIRQ(TIM2_IRQn);
 
   NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   NVIC_EnableIRQ(EXTI15_10_IRQn);
+
+  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  NVIC_EnableIRQ(USART1_IRQn);
+
+
+
   
   
   uint32_t g = 0;
@@ -412,6 +424,7 @@ int main(void)
     }
     */
 
+    /*
     uint32_t count=LPTIM1->CNT;
 
     sprintf(buffer, "%lu", counter);
@@ -422,6 +435,53 @@ int main(void)
 
     intoa(count,buffer,10);
     lcdPutsBlinkFree(buffer,5);
+    */
+
+    for(int i = 1; i < 3000000;i++);
+    sprintf(buffer, "1");
+    lcdPutsBlinkFree(buffer,3);
+
+    for(int i = 1; i < 3000000;i++);
+    sprintf(buffer, "2");
+    lcdPutsBlinkFree(buffer,3);
+
+    for(int i = 1; i < 3000000;i++);
+    sprintf(buffer, "3");
+    lcdPutsBlinkFree(buffer,3);
+
+    for(int i = 1; i < 3000000;i++);
+    sprintf(buffer, "4");
+    lcdPutsBlinkFree(buffer,3);
+
+    for(int i = 1; i < 3000000;i++);
+    sprintf(buffer, "5");
+    lcdPutsBlinkFree(buffer,3);
+
+    __asm volatile( "cpsid i" ::: "memory" );
+    __asm volatile( "dsb" );
+    __asm volatile( "isb" );
+    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);
+    PWR->CR1 |= PWR_CR1_LPR;
+    while(!(PWR->SR2 & PWR_SR2_REGLPS));//Wait till low power regulator started
+    while(!(PWR->SR2 & PWR_SR2_REGLPF));//Wait till regulator is in low power mode
+    printString("\x31""Hola\n");
+    lcdPutsBlinkFree("9",3);
+    __WFI();
+    PWR->CR1 &= ~PWR_CR1_LPR;
+    while((PWR->SR2 & PWR_SR2_REGLPF));
+    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1000 << RCC_CFGR_HPRE_Pos);
+    printString("\x31""Adios\n");
+    lcdPutsBlinkFree("10",3);
+    __asm volatile( "cpsie i" ::: "memory" );
+    __asm volatile( "dsb" );
+    __asm volatile( "isb" );
+
+    lcdPutsBlinkFree(receiveBuffer+g,4);    
+    while(receiveBuffer[g]){
+      receiveBuffer[g] = 0;
+      g = (g+1) % UART_RX_BUFFER_LEN;
+
+    }
     
     /*
     if(USART1->ISR & USART_ISR_RXNE){
@@ -441,6 +501,9 @@ void printString(const char myString[]){
   DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
 }
 
+void USART1_IRQHandler(){
+  USART1->ICR |= USART_ICR_IDLECF;
+}
 
 void TIM2_IRQHandler(){
   TIM2->SR &= ~TIM_SR_CC1IF;
