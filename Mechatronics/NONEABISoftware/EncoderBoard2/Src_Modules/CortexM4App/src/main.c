@@ -436,6 +436,8 @@ int main(void)
     lcdPutsBlinkFree(buffer,5);
     */
 
+
+
     for(int i = 1; i < 3000000;i++);
     sprintf(buffer, "1");
     lcdPutsBlinkFree(buffer,3);
@@ -459,6 +461,7 @@ int main(void)
     __asm volatile( "cpsid i" ::: "memory" );
     __asm volatile( "dsb" );
     __asm volatile( "isb" );
+    RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b00 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
     RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);//CPU freq 195.312 Khz
     PWR->CR1 |= PWR_CR1_LPR;
     while(!(PWR->SR2 & PWR_SR2_REGLPS));//Wait till low power regulator started
@@ -469,6 +472,7 @@ int main(void)
     PWR->CR1 &= ~PWR_CR1_LPR;
     while((PWR->SR2 & PWR_SR2_REGLPF));
     RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b0000 << RCC_CFGR_HPRE_Pos);//CPU freq 50 mhz
+    RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b10 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
     printString("\x31""Adios\n");
     lcdPutsBlinkFree("10",3);
     __asm volatile( "cpsie i" ::: "memory" );
@@ -476,10 +480,13 @@ int main(void)
     __asm volatile( "isb" );
 
 
+    uint32_t count=LPTIM1->CNT;
 
-    if(receiveBuffer+g,4){
+    sprintf(buffer, "%lu", count);
+    lcdPutsBlinkFree(buffer,2);
+
+    if(receiveBuffer[g]){
       printString(receiveBuffer+g);
-      //      lcdPutsBlinkFree(receiveBuffer+g,4);
     
       while(receiveBuffer[g]){
 	receiveBuffer[g] = 0;
@@ -487,7 +494,6 @@ int main(void)
 
       }
     }
-
 
     
     
