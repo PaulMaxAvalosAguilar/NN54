@@ -111,6 +111,7 @@ void lcd_puts(const char* s){
     char c = *s;
     if( (cursorPosition.x >= DISPLAY_WIDTH-sizeof(FONT[0])) || (c < ' ') ) continue;
     // mapping char
+
     c -= ' ';
 
     for (uint8_t i = 0; i <  sizeof(FONT[0]); i++)

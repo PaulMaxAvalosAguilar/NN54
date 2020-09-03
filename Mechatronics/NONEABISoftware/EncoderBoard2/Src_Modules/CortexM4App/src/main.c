@@ -378,7 +378,6 @@ int main(void)
   //---------------------CONFIGURE PWR---------------------------
 
   RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;//Enable PWR clock
-  
 
   //---------------------CONFIGURE NVIC-------------------------
 
@@ -460,7 +459,7 @@ int main(void)
     __asm volatile( "cpsid i" ::: "memory" );
     __asm volatile( "dsb" );
     __asm volatile( "isb" );
-    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);
+    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);//CPU freq 195.312 Khz
     PWR->CR1 |= PWR_CR1_LPR;
     while(!(PWR->SR2 & PWR_SR2_REGLPS));//Wait till low power regulator started
     while(!(PWR->SR2 & PWR_SR2_REGLPF));//Wait till regulator is in low power mode
@@ -469,19 +468,28 @@ int main(void)
     __WFI();
     PWR->CR1 &= ~PWR_CR1_LPR;
     while((PWR->SR2 & PWR_SR2_REGLPF));
-    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1000 << RCC_CFGR_HPRE_Pos);
+    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b0000 << RCC_CFGR_HPRE_Pos);//CPU freq 50 mhz
     printString("\x31""Adios\n");
     lcdPutsBlinkFree("10",3);
     __asm volatile( "cpsie i" ::: "memory" );
     __asm volatile( "dsb" );
     __asm volatile( "isb" );
 
-    lcdPutsBlinkFree(receiveBuffer+g,4);    
-    while(receiveBuffer[g]){
-      receiveBuffer[g] = 0;
-      g = (g+1) % UART_RX_BUFFER_LEN;
 
+
+    if(receiveBuffer+g,4){
+      printString(receiveBuffer+g);
+      //      lcdPutsBlinkFree(receiveBuffer+g,4);
+    
+      while(receiveBuffer[g]){
+	receiveBuffer[g] = 0;
+	g = (g+1) % UART_RX_BUFFER_LEN;
+
+      }
     }
+
+
+    
     
     /*
     if(USART1->ISR & USART_ISR_RXNE){
