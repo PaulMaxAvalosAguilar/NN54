@@ -238,7 +238,14 @@ int main(void)
   //PB12
   GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE12)) | (0b00 << GPIO_MODER_MODE12_Pos) ; //Input mode
   GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD12)) | (0b10 << GPIO_PUPDR_PUPD12_Pos); //Pull down
-  
+
+  //ANALOG CONFIGURATION
+  //PB14
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE14)) | (0b00 << GPIO_MODER_MODE14_Pos) ; //General purpose inputMode
+  GPIOB->OTYPER &= (~GPIO_OTYPER_OT14);//Push pull  
+  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED14)) | (0b00 << GPIO_OSPEEDR_OSPEED14_Pos); //Low speed
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD14)) | (0b10 << GPIO_PUPDR_PUPD14_Pos); //Pull down
+
 
   //---------------------CONFIGURE I2C-------------------------
 
@@ -423,6 +430,15 @@ int main(void)
     }
     */
 
+    int var = 0;
+    
+    if(GPIOB->IDR & GPIO_IDR_ID14){
+      var = 1;
+    }
+
+    sprintf(buffer, "%d", var);
+    lcdPutsBlinkFree(buffer,2);
+
     /*
     uint32_t count=LPTIM1->CNT;
 
@@ -437,7 +453,7 @@ int main(void)
     */
 
 
-
+    /*
     for(int i = 1; i < 3000000;i++);
     sprintf(buffer, "1");
     lcdPutsBlinkFree(buffer,3);
@@ -495,7 +511,7 @@ int main(void)
       }
     }
 
-    
+    */
     
     /*
     if(USART1->ISR & USART_ISR_RXNE){
@@ -535,3 +551,42 @@ void EXTI15_10_IRQHandler(){
   }
   
 }
+
+/*
+DEEPPWD =1//Exist Deep power down mode
+  ADVREGEN =1 //Enable ADC internal voltage regulator
+  //Wait delay TADCVREG_STUP
+
+  // Writing DEEPPWD=1 automatically disables the ADC voltage regulator and bit ADVREGEN
+  //is automatically cleared.
+
+  ADCCALDIF = 0//Calibration for single ended conversion
+  ADCAL =1 //Initiate calibration
+  //Wait till ADCAL = 0
+  ADCALDIF = 1//Calibration for differential conversions
+  ADCAL =1 //Initiate calibration
+  //Wait till ADCAL = 0
+
+  //read  CALFACT_S and CALFACT_D in ADC_CALFACT
+
+  
+  DIFSEL[I] ADC_DIFSEL  //Channel single endded or differential input selection
+  ADC_SQR1 |= L
+  ADC_SQR1 |= SQ1 //Channel 0?
+  //Read ADC_DR
+
+  //Set injected channel sequence legth
+  
+  //Enable VREFEN  in ADCx_CCR
+  
+
+  ADEN = 1//Enable adc
+  //Wait till ADRDY
+  //Write 1 to ADRDY
+  ADSTART
+  JADSTART
+
+  ADDIS = 1 //Disable ADC
+  //Wait till ADDIS = 0
+  
+  */
