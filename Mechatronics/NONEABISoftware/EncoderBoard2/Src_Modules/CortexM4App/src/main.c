@@ -1,3 +1,5 @@
+#include "FreeRTOS.h"
+#include "task.h"
 #include "stm32g431xx.h"
 #include "lcd.h"
 #include <string.h>
@@ -83,6 +85,27 @@ char* intoa(int value, char* buffer, int base){
 	buffer[i] = '\0'; // null terminate string
 	// reverse the string and return it
 	return reverse(buffer, 0, i - 1);
+}
+
+static void mainTask(void *args __attribute__((unused))){
+  
+  
+  
+  int g = 0;
+
+  lcd_init();
+  lcd_gotoxy(0,0);
+
+  lcd_puts("Encoder");
+  lcd_gotoxy(1,7);
+  lcd_puts("Saint Germain");
+
+  char buffer[30];
+  
+  for(;;){
+    sprintf(buffer, "%d", g++);
+    lcdPutsBlinkFree(buffer,3);
+  }
 }
 
 int main(void)
@@ -400,18 +423,12 @@ int main(void)
 
 
 
-  
-  
-  uint32_t g = 0;
-
-  lcd_init();
-  lcd_gotoxy(0,0);
-
-  lcd_puts("Encoder");
-  lcd_gotoxy(1,7);
-  lcd_puts("Saint Germain");
-
   char buffer[21];
+
+
+  xTaskCreate(mainTask,"mainTask",800,NULL,1,NULL);
+  vTaskStartScheduler();
+  
   while (1)
   {
 
@@ -429,15 +446,6 @@ int main(void)
       g = (g+1) % UART_RX_BUFFER_LEN;
     }
     */
-
-    int var = 0;
-    
-    if(GPIOB->IDR & GPIO_IDR_ID14){
-      var = 1;
-    }
-
-    sprintf(buffer, "%d", var);
-    lcdPutsBlinkFree(buffer,2);
 
     /*
     uint32_t count=LPTIM1->CNT;
