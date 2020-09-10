@@ -105,6 +105,9 @@ static void mainTask(void *args __attribute__((unused))){
   for(;;){
     sprintf(buffer, "%d", g++);
     lcdPutsBlinkFree(buffer,3);
+
+
+    
   }
 }
 
@@ -165,6 +168,7 @@ int main(void)
   RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_USART1SEL)) | (0b01 << RCC_CCIPR_USART1SEL_Pos);//System clock as USART1 clock
   RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_I2C2SEL)) | (0b01 << RCC_CCIPR_I2C2SEL_Pos);//System clock as I2C2 clock
   RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b00 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
+  RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_ADC12SEL)) | (0b10 <<RCC_CCIPR_ADC12SEL_Pos);//Sysclock selected as ADC 1 & 2 clock
 
   //---------------------CONFIGURE GPIO---------------------
   
@@ -409,7 +413,56 @@ int main(void)
 
   RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;//Enable PWR clock
 
-  //---------------------CONFIGURE NVIC-------------------------
+  //---------------------CONFIGURE ADC---------------------------
+
+  
+  RCC->AHB2ENR |= RCC_AHB2ENR_ADC12EN;//Enable ADC12 clock
+
+
+  //ADC1 CONFIGURATION
+  uint16_t adcCalFactD = 0;
+  uint16_t adcCalFactS = 0;
+
+  ADC1->CR &= ~ADC_CR_DEEPPWD;//Exit deep power down mode
+  ADC1->CR |= ADC_CR_ADVREGEN;//Enable ADC internal voltage regulator
+  for(int i = 0; i<500; i++);//TADCVREG_STUP 20us wait
+
+  //  ADC1->CR |= ADC_CR_DEEPPWD;//Writing DEEPPWD=1 automatically disables the ADC voltage regulator and bit ADVREGEN
+  ADC1->CR &= ~ADC_CR_ADCALDIF;//Calibration in single ended mode
+  ADC1->CR |= ADC_CR_ADCAL;//Initiate calibration
+  while(ADC1->CR & ADC_CR_ADCAL);//Wait while calibratoin is in progress
+
+  ADC1->CR |= ADC_CR_ADCALDIF;//Calibration in differential mode
+  ADC1->CR |= ADC_CR_ADCAL;//Initiate calibration
+  while(ADC1->CR & ADC_CR_ADCAL);//Wait while calibratoin is in progress
+
+  ADC1->DIFSEL |= ADC_DIFSEL_DIFSEL_1;//IN1 Differential
+  ADC1->DIFSEL |= ADC_DIFSEL_DIFSEL_3;//IN3 Differential
+  ADC1->DIFSEL &= ~ADC_DIFSEL_DIFSEL_5;//IN5 Single ended
+  ADC1->DIFSEL &= ~ADC_DIFSEL_DIFSEL_18;//IN18 Single ended
+
+  ADC1->CR |= ADC_CR_ADEN;//Enable ADC1;
+
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0001 << ADC_SQR1_L_Pos);//2 conversions
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (18 << ADC_SQR1_SQ2_Pos);//1st conversion on IN18
+  
+  //ADC2 CONFIGURATION
+  ADC2->CR &= ~ADC_CR_DEEPPWD;//Exit deep power down mode
+  ADC2->CR |= ADC_CR_ADVREGEN;//Enable ADC internal voltage regulator
+  for(int i = 0; i<500; i++);//TADCVREG_STUP 20us wait
+
+  ADC2->CR |= ADC_CR_ADCALDIF;//Calibration in differential mode
+  ADC2->CR |= ADC_CR_ADCAL;//Initiate calibration
+  while(ADC2->CR & ADC_CR_ADCAL);//Wait while calibration is in progress
+
+  ADC2->DIFSEL |= ADC_DIFSEL_DIFSEL_3;//IN3 Differential
+  ADC2->DIFSEL |= ADC_DIFSEL_DIFSEL_12;//IN12 Differential
+
+  ADC1->CR |= ADC_CR_ADEN;//Enable ADC2;
+
+
+  //---------------------CONFIGURE NVIC--------------------------
 
   NVIC_SetPriorityGrouping(4); //4 bits for pre-emption 0 bit for subpriority
   NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
@@ -560,22 +613,9 @@ void EXTI15_10_IRQHandler(){
   
 }
 
+
+
 /*
-DEEPPWD =1//Exist Deep power down mode
-  ADVREGEN =1 //Enable ADC internal voltage regulator
-  //Wait delay TADCVREG_STUP
-
-  // Writing DEEPPWD=1 automatically disables the ADC voltage regulator and bit ADVREGEN
-  //is automatically cleared.
-
-  ADCCALDIF = 0//Calibration for single ended conversion
-  ADCAL =1 //Initiate calibration
-  //Wait till ADCAL = 0
-  ADCALDIF = 1//Calibration for differential conversions
-  ADCAL =1 //Initiate calibration
-  //Wait till ADCAL = 0
-
-  //read  CALFACT_S and CALFACT_D in ADC_CALFACT
 
   
   DIFSEL[I] ADC_DIFSEL  //Channel single endded or differential input selection
