@@ -429,6 +429,9 @@ int main(void)
   RCC->AHB2ENR |= RCC_AHB2ENR_ADC12EN;//Enable ADC12 clock
   ADC12_COMMON->CCR = (ADC12_COMMON->CCR & (~ADC_CCR_CKMODE)) | (0b00 << ADC_CCR_CKMODE_Pos);//Adc generated at product level
   ADC12_COMMON->CCR = (ADC12_COMMON->CCR & (~ADC_CCR_PRESC)) | (0b0000 << ADC_CCR_PRESC_Pos);//Input ADC clock not divided
+  VREFBUF->CSR &= ~VREFBUF_CSR_HIZ;
+  VREFBUF->CSR |= VREFBUF_CSR_ENVR;
+  VREFBUF->CSR = (VREFBUF->CSR & (~VREFBUF_CSR_VRS)) | (0b01 << VREFBUF_CSR_VRS_Pos);//Voltage reference set to 2.5V
 
   //ADC1 CONFIGURATION
   uint16_t adcCalFactD = 0;
