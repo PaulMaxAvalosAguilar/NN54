@@ -101,13 +101,25 @@ static void mainTask(void *args __attribute__((unused))){
   lcd_puts("Saint Germain");
 
   char buffer[30];
+
+  uint32_t firstData = 0;
+  uint32_t secondData = 0;
   
   for(;;){
     sprintf(buffer, "%d", g++);
     lcdPutsBlinkFree(buffer,3);
 
+    ADC1->CR |= ADC_CR_ADSTART;
+    while(!(ADC1->ISR & ADC_ISR_EOC));
+    firstData = ADC1->DR;//Read data register and clear EOC flag
 
-    
+    while(!(ADC1->ISR & ADC_ISR_EOC));
+    secondData = ADC1->DR;//Read data register and clear EOC flag
+
+    while(ADC1->CR & ADC_CR_ADSTART);
+
+    sprintf(buffer, "%d", firstData);
+    lcdPutsBlinkFree(buffer,6);
   }
 }
 
@@ -268,10 +280,8 @@ int main(void)
 
   //ANALOG CONFIGURATION
   //PB14
-  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE14)) | (0b00 << GPIO_MODER_MODE14_Pos) ; //General purpose inputMode
-  GPIOB->OTYPER &= (~GPIO_OTYPER_OT14);//Push pull  
-  GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED14)) | (0b00 << GPIO_OSPEEDR_OSPEED14_Pos); //Low speed
-  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD14)) | (0b10 << GPIO_PUPDR_PUPD14_Pos); //Pull down
+  GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE14)) | (0b11 << GPIO_MODER_MODE14_Pos) ; //Analog mode
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD14)) | (0b00 << GPIO_PUPDR_PUPD14_Pos); //Pull down
 
 
   //---------------------CONFIGURE I2C-------------------------
@@ -417,7 +427,8 @@ int main(void)
 
   
   RCC->AHB2ENR |= RCC_AHB2ENR_ADC12EN;//Enable ADC12 clock
-
+  ADC12_COMMON->CCR = (ADC12_COMMON->CCR & (~ADC_CCR_CKMODE)) | (0b00 << ADC_CCR_CKMODE_Pos);//Adc generated at product level
+  ADC12_COMMON->CCR = (ADC12_COMMON->CCR & (~ADC_CCR_PRESC)) | (0b0000 << ADC_CCR_PRESC_Pos);//Input ADC clock not divided
 
   //ADC1 CONFIGURATION
   uint16_t adcCalFactD = 0;
@@ -445,7 +456,11 @@ int main(void)
 
   ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0001 << ADC_SQR1_L_Pos);//2 conversions
   ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
-  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (18 << ADC_SQR1_SQ2_Pos);//1st conversion on IN18
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (5 << ADC_SQR1_SQ2_Pos);//2nd conversion on IN5
+  //  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (18 << ADC_SQR1_SQ2_Pos);//2nd conversion on IN18
+
+  ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b101 << ADC_SMPR1_SMP5_Pos);//Sample time 92.5 clock cycles
+  
   
   //ADC2 CONFIGURATION
   ADC2->CR &= ~ADC_CR_DEEPPWD;//Exit deep power down mode
