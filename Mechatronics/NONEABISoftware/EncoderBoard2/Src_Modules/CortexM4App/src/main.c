@@ -4,6 +4,7 @@
 #include "lcd.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define UART_RX_BUFFER_LEN 256
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
@@ -87,39 +88,65 @@ char* intoa(int value, char* buffer, int base){
 	return reverse(buffer, 0, i - 1);
 }
 
+
 static void mainTask(void *args __attribute__((unused))){
   
-  
+  char buffer[30];  
   
   int g = 0;
 
   lcd_init();
   lcd_gotoxy(0,0);
-
   lcd_puts("Encoder");
   lcd_gotoxy(1,7);
   lcd_puts("Saint Germain");
 
-  char buffer[30];
+  uint32_t adcData = 0;
+  uint32_t secData = 0;
 
-  uint32_t firstData = 0;
-  uint32_t secondData = 0;
+  ADC1->CFGR2 |= ADC_CFGR2_BULB;//Bulb sampling
+  ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 4 bits
+  ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSR)) | (0b111 << ADC_CFGR2_OVSR_Pos);//Oversampling ratio 256x
   
   for(;;){
-    sprintf(buffer, "%d", g++);
-    lcdPutsBlinkFree(buffer,3);
 
-    ADC1->CR |= ADC_CR_ADSTART;
-    while(!(ADC1->ISR & ADC_ISR_EOC));
-    firstData = ADC1->DR;//Read data register and clear EOC flag
-
-    while(!(ADC1->ISR & ADC_ISR_EOC));
-    secondData = ADC1->DR;//Read data register and clear EOC flag
-
+    taskENTER_CRITICAL();
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
+    ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b000 << ADC_SMPR1_SMP5_Pos);//Sample time 2.5 clock cycles
+    
+    ADC1->CR |= ADC_CR_ADSTART;//Start conversion
+    while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
+    adcData = ADC1->DR;//Read data register and clear EOC flag
     while(ADC1->CR & ADC_CR_ADSTART);
 
-    sprintf(buffer, "%d", firstData);
-    lcdPutsBlinkFree(buffer,6);
+
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//2nd conversion on IN18
+    //    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (18 << ADC_SQR1_SQ2_Pos);//2nd conversion on IN18
+    ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b111 << ADC_SMPR1_SMP5_Pos);//Sample time 640.5 clock cycles    
+    ADC1->CFGR2 |= ADC_CFGR2_ROVSE;//Regular oversampling enabled
+
+    ADC1->CR |= ADC_CR_ADSTART;//Start conversion
+    taskEXIT_CRITICAL();
+    
+    while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
+    secData = ADC1->DR;//Read data register and clear EOC flag
+    while(ADC1->CR & ADC_CR_ADSTART);
+    ADC1->CFGR2 &= ~ADC_CFGR2_ROVSE;//Regular oversampling disabled
+
+
+    //    sprintf(buffer, "%lu", adcData);
+    intoa(adcData,buffer,10);
+    lcdPutsBlinkFree(buffer,3);
+
+    //    sprintf(buffer, "%lu", (secData*6104/10000)*2);
+    intoa((secData*6104/10000)*2,buffer,10);
+    lcdPutsBlinkFree(buffer,5);
+
+    
+
+    for(int i = 0; i < 2000000;i++);
   }
 }
 
@@ -281,7 +308,7 @@ int main(void)
   //ANALOG CONFIGURATION
   //PB14
   GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE14)) | (0b11 << GPIO_MODER_MODE14_Pos) ; //Analog mode
-  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD14)) | (0b00 << GPIO_PUPDR_PUPD14_Pos); //Pull down
+  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD14)) | (0b00 << GPIO_PUPDR_PUPD14_Pos); //No pull up, no pull down
 
 
   //---------------------CONFIGURE I2C-------------------------
@@ -370,7 +397,7 @@ int main(void)
   DMA1_Channel3->CCR |= (DMA_CCR_MINC);//Memory increment mode enabled
   DMA1_Channel3->CCR = (DMA1_Channel3->CCR &= (~DMA_CCR_MSIZE)) | (0b00 << DMA_CCR_MSIZE_Pos); //Memory size 8 bits
 
-  DMAMUX1_Channel2->CCR = (DMAMUX1_Channel2->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (19 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Request 29
+  DMAMUX1_Channel2->CCR = (DMAMUX1_Channel2->CCR & (~DMAMUX_CxCR_DMAREQ_ID)) | (19 << DMAMUX_CxCR_DMAREQ_ID_Pos);//Request 19
 
   //---------------------CONFIGURE LPTIM-------------------------
 
@@ -429,9 +456,15 @@ int main(void)
   RCC->AHB2ENR |= RCC_AHB2ENR_ADC12EN;//Enable ADC12 clock
   ADC12_COMMON->CCR = (ADC12_COMMON->CCR & (~ADC_CCR_CKMODE)) | (0b00 << ADC_CCR_CKMODE_Pos);//Adc generated at product level
   ADC12_COMMON->CCR = (ADC12_COMMON->CCR & (~ADC_CCR_PRESC)) | (0b0000 << ADC_CCR_PRESC_Pos);//Input ADC clock not divided
-  VREFBUF->CSR &= ~VREFBUF_CSR_HIZ;
-  VREFBUF->CSR |= VREFBUF_CSR_ENVR;
+  ADC12_COMMON->CCR |= ADC_CCR_VREFEN;//Vrefint enable
+
+  
   VREFBUF->CSR = (VREFBUF->CSR & (~VREFBUF_CSR_VRS)) | (0b01 << VREFBUF_CSR_VRS_Pos);//Voltage reference set to 2.5V
+  VREFBUF->CSR &= ~VREFBUF_CSR_HIZ;//Disable High Impedance
+  VREFBUF->CSR |= VREFBUF_CSR_ENVR;//Enable VREFBUF
+  while(!(VREFBUF->CSR & VREFBUF_CSR_VRR));//Wait till VREFBUF ready
+
+
 
   //ADC1 CONFIGURATION
   uint16_t adcCalFactD = 0;
@@ -455,15 +488,12 @@ int main(void)
   ADC1->DIFSEL &= ~ADC_DIFSEL_DIFSEL_5;//IN5 Single ended
   ADC1->DIFSEL &= ~ADC_DIFSEL_DIFSEL_18;//IN18 Single ended
 
+
+  ADC1->ISR |= ADC_ISR_ADRDY;//Clear ADRDY bit
   ADC1->CR |= ADC_CR_ADEN;//Enable ADC1;
+  while(!(ADC1->ISR & ADC_ISR_ADRDY));//Wait till ADC is ready
 
-  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0001 << ADC_SQR1_L_Pos);//2 conversions
-  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
-  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (5 << ADC_SQR1_SQ2_Pos);//2nd conversion on IN5
-  //  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (18 << ADC_SQR1_SQ2_Pos);//2nd conversion on IN18
 
-  ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b101 << ADC_SMPR1_SMP5_Pos);//Sample time 92.5 clock cycles
-  
   
   //ADC2 CONFIGURATION
   ADC2->CR &= ~ADC_CR_DEEPPWD;//Exit deep power down mode
