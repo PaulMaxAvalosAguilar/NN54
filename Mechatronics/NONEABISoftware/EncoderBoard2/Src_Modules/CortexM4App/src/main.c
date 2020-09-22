@@ -56,7 +56,7 @@ char* reverse(char *buffer, int i, int j){
 }
 
 // Iterative function to implement itoa() function in C
-char* intoa(int value, char* buffer, int base){
+char* itoa(int value, char* buffer, int base){
 	// invalid input
 	if (base < 2 || base > 32)
 		return buffer;
@@ -104,13 +104,42 @@ static void mainTask(void *args __attribute__((unused))){
   uint32_t adcData = 0;
   uint32_t secData = 0;
 
-  ADC1->CFGR2 |= ADC_CFGR2_BULB;//Bulb sampling
-  ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 4 bits
-  ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSR)) | (0b111 << ADC_CFGR2_OVSR_Pos);//Oversampling ratio 256x
   
+  float angle = 75.1;
+  float angleRad = (angle * 3.14159265f)/180.0;
+  float angleDiv = (angleRad/3.14159265) * 2147483648;
+
+
+  float cosine;
+  float sine;
+
+  int intCosine;
+  int intSine;
+
   for(;;){
 
+    CORDIC->WDATA = (int32_t)angleDiv;
+    cosine = (CORDIC->RDATA)/2147483648.0f;//Read first result
+    sine = (CORDIC->RDATA)/2147483648.0f;//Read second result
+
+    //    intCosine = cosine * 1000;
+    //    intSine = sine * 1000;
+
+    itoa((int32_t)(cosine*1000000), buffer, 10);
+    lcdPutsBlinkFree(buffer,3);
+    
+    itoa((int32_t)(sine*1000000), buffer, 10);
+    lcdPutsBlinkFree(buffer, 5);
+
+    itoa(g++, buffer, 10);
+    lcdPutsBlinkFree(buffer, 7);
+
+    /*
     taskENTER_CRITICAL();
+    ADC1->CFGR2 |= ADC_CFGR2_BULB;//Bulb sampling
+    ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 4 bits
+    ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSR)) | (0b111 << ADC_CFGR2_OVSR_Pos);//Oversampling ratio 256x
+
     ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
     ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
     ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b000 << ADC_SMPR1_SMP5_Pos);//Sample time 2.5 clock cycles
@@ -143,7 +172,7 @@ static void mainTask(void *args __attribute__((unused))){
     //    sprintf(buffer, "%lu", (secData*6104/10000)*2);
     intoa((secData*6104/10000)*2,buffer,10);
     lcdPutsBlinkFree(buffer,5);
-
+    */
     
 
     for(int i = 0; i < 2000000;i++);
@@ -465,7 +494,6 @@ int main(void)
   while(!(VREFBUF->CSR & VREFBUF_CSR_VRR));//Wait till VREFBUF ready
 
 
-
   //ADC1 CONFIGURATION
   uint16_t adcCalFactD = 0;
   uint16_t adcCalFactS = 0;
@@ -509,6 +537,17 @@ int main(void)
 
   ADC1->CR |= ADC_CR_ADEN;//Enable ADC2;
 
+  //---------------------CONFIGURE CORDIC------------------------
+
+  RCC->AHB1ENR |= RCC_AHB1ENR_CORDICEN;
+
+  //CORDIC CONFIGURATION
+  CORDIC->CSR = (CORDIC->CSR & (~CORDIC_CSR_FUNC)) | (0 << CORDIC_CSR_FUNC_Pos);//Cosine function selected
+  CORDIC->CSR &= ~CORDIC_CSR_ARGSIZE;//Arg width 32 bit
+  CORDIC->CSR &= ~CORDIC_CSR_RESSIZE;//Arg width 32 bit
+  CORDIC->CSR &= ~CORDIC_CSR_NARGS;//Only one 32 bit write
+  CORDIC->CSR |= CORDIC_CSR_NRES;//Two results, two reads necessary
+  
 
   //---------------------CONFIGURE NVIC--------------------------
 
