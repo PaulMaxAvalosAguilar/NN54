@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BITS31 2147483648.0f
+#define PI 3.14159265f
+#define degToRads(x) ((x) * PI)/180.0
+
 #define UART_RX_BUFFER_LEN 256
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
 
@@ -18,6 +22,7 @@ void EXTI15_10_IRQHandler(void);
 void lcdPutsBlinkFree(const char *g, int ypos);
 char* reverse(char *buffer, int i, int j);
 char* itoa(int value, char* buffer, int base);
+char* uitoa(unsigned int value, char* buffer, int base);
 void printString(const char myString[]);
 
 void lcdPutsBlinkFree(const char *g, int ypos){
@@ -88,10 +93,43 @@ char* itoa(int value, char* buffer, int base){
 	return reverse(buffer, 0, i - 1);
 }
 
+char* uitoa(unsigned int value, char* buffer, int base){
+	// invalid input
+	if (base < 2 || base > 32)
+		return buffer;
+
+	// consider absolute value of number
+	unsigned int n = value;
+
+	int i = 0;
+	while (n)
+	{
+		unsigned int r = n % base;
+		if (r >= 10) 
+			buffer[i++] = 65 + (r - 10);
+		else
+			buffer[i++] = 48 + r;
+		n = n / base;
+	}
+
+	// if number is 0
+	if (i == 0)
+		buffer[i++] = '0';
+	// If base is 10 and value is negative, the resulting string 
+	// is preceded with a minus sign (-)
+	// With any other base, value is always considered unsigned
+	if (value < 0 && base == 10)
+		buffer[i++] = '-';
+	buffer[i] = '\0'; // null terminate string
+	// reverse the string and return it
+	return reverse(buffer, 0, i - 1);
+}
+
 
 static void mainTask(void *args __attribute__((unused))){
   
-  char buffer[30];  
+  char buffer[30];
+  char buffer2[30];
   
   int g = 0;
 
@@ -106,8 +144,8 @@ static void mainTask(void *args __attribute__((unused))){
 
   
   float angle = 75.1;
-  float angleRad = (angle * 3.14159265f)/180.0;
-  float angleDiv = (angleRad/3.14159265) * 2147483648;
+  float angleRad = degToRads(angle);
+  float angleDiv = (angleRad/PI) * BITS31;
 
 
   float cosine;
@@ -118,9 +156,10 @@ static void mainTask(void *args __attribute__((unused))){
 
   for(;;){
 
+    /*
     CORDIC->WDATA = (int32_t)angleDiv;
-    cosine = (CORDIC->RDATA)/2147483648.0f;//Read first result
-    sine = (CORDIC->RDATA)/2147483648.0f;//Read second result
+    cosine = (CORDIC->RDATA)/BITS31;//Read first result
+    sine = (CORDIC->RDATA)/BITS31;//Read second result
 
     //    intCosine = cosine * 1000;
     //    intSine = sine * 1000;
@@ -129,9 +168,17 @@ static void mainTask(void *args __attribute__((unused))){
     lcdPutsBlinkFree(buffer,3);
     
     itoa((int32_t)(sine*1000000), buffer, 10);
-    lcdPutsBlinkFree(buffer, 5);
+    lcdPutsBlinkFree(buffer, 5);*/
 
-    itoa(g++, buffer, 10);
+    //    vTaskDelay(pdMS_TO_TICKS(1000));
+
+    unsigned int timer = TIM2->CNT;
+    double uS = timer * 1E-7;
+
+    uitoa(1234567890, buffer, 10);
+    lcdPutsBlinkFree(buffer, 6);
+
+    uitoa(TIM2->CNT, buffer, 10);
     lcdPutsBlinkFree(buffer, 7);
 
     /*
@@ -173,9 +220,6 @@ static void mainTask(void *args __attribute__((unused))){
     intoa((secData*6104/10000)*2,buffer,10);
     lcdPutsBlinkFree(buffer,5);
     */
-    
-
-    for(int i = 0; i < 2000000;i++);
   }
 }
 
@@ -449,6 +493,7 @@ int main(void)
   RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
 
   //TIM2 CONFIGURATION
+  /*
   TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI1SEL)) | (0b0000 << TIM_TISEL_TI1SEL_Pos);//tim_ti1_in source
   TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI2SEL)) | (0b0000 << TIM_TISEL_TI2SEL_Pos);//tim_ti2_in source
   TIM2->CCER |= (TIM_CCER_CC1NP | TIM_CCER_CC1P);//edge selection both edges for tim_ti1 source
@@ -458,11 +503,12 @@ int main(void)
   TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC1S)) | (0b01 << TIM_CCMR1_CC1S_Pos);//(input mode)Tim_ic1 mapping on tim_ti1 
   //TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC2S)) | (0b01 << TIM_CCMR1_CC2S_Pos);//(input mode)Tim_ic2 mapping on tim_ti2
   TIM2->CCER |= (TIM_CCER_CC1E);//Capture enabled for Capture register 1 and 2
+  */
 
-  TIM2->CR2 |= TIM_CR2_TI1S;// ti1_in ti2_in source XORed
-  TIM2->ARR = 0xFFFFFFFF;//Autoreload register
-  TIM2->PSC = 5;//Preescaler
-  TIM2->CNT = 0;
+  //  TIM2->CR2 |= TIM_CR2_TI1S;// ti1_in ti2_in source XORed
+  TIM2->ARR = 0XFFFFFFFF;//Preescaler
+  TIM2->PSC = 4;//Preescaler
+  TIM2->CNT = 0XFFFFFFFF;
   TIM2->DIER = TIM_DIER_CC1IE;//Enable Interrupts
   TIM2->CR1 |= TIM_CR1_CEN; //Counter enable
 
@@ -555,6 +601,7 @@ int main(void)
   NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   //  NVIC_EnableIRQ(TIM2_IRQn);
 
+  
   NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   NVIC_EnableIRQ(EXTI15_10_IRQn);
 
