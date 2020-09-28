@@ -129,9 +129,10 @@ char* uitoa(unsigned int value, char* buffer, int base){
 static void mainTask(void *args __attribute__((unused))){
   
   char buffer[30];
-  char buffer2[30];
+
+
   
-  int g = 0;
+  uint32_t receiveBufferPos = 0;
 
   lcd_init();
   lcd_gotoxy(0,0);
@@ -154,6 +155,12 @@ static void mainTask(void *args __attribute__((unused))){
   int intCosine;
   int intSine;
 
+  //state variables
+  int symbolParsingStarted = 0;
+  int parserBufferCopyPosition = 0;
+
+  int g = 0;
+
   for(;;){
 
     /*
@@ -172,14 +179,54 @@ static void mainTask(void *args __attribute__((unused))){
 
     //    vTaskDelay(pdMS_TO_TICKS(1000));
 
-    unsigned int timer = TIM2->CNT;
-    double uS = timer * 1E-7;
+    itoa(g++, buffer, 10);
+    lcdPutsBlinkFree(buffer, 2);
 
-    uitoa(1234567890, buffer, 10);
-    lcdPutsBlinkFree(buffer, 6);
 
-    uitoa(TIM2->CNT, buffer, 10);
-    lcdPutsBlinkFree(buffer, 7);
+    while(receiveBuffer[receiveBufferPos]){
+      if(receiveBuffer[receiveBufferPos] == '%'){
+	char secondToken = receiveBuffer[receiveBufferPos];
+	char parseBuffer[100] = {0};
+	int parseBufferPos = 0;
+	receiveBuffer[receiveBufferPos] = 0;
+	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+
+
+      ENTER:
+
+	while(!receiveBuffer[receiveBufferPos]);
+	if(receiveBuffer[receiveBufferPos] != secondToken){
+	  parseBuffer[parseBufferPos++] = receiveBuffer[receiveBufferPos];
+	  receiveBuffer[receiveBufferPos] = 0;
+	  receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+	}else{
+	  goto EXIT;
+	}
+
+	goto ENTER;
+
+      EXIT:
+
+	parseBuffer[parseBufferPos++]= 0;
+
+	if(strncmp(parseBuffer, "CONNECT",7) == 0){
+	  lcdPutsBlinkFree("Connected", 5);
+	}else if(strstr(parseBuffer,"STREAM_OPEN")){
+	  lcdPutsBlinkFree("Transmiting", 5);
+	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
+	  lcdPutsBlinkFree("Disconnected", 5);
+	}
+
+	//interpret();
+	receiveBuffer[receiveBufferPos] = 0;
+	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+      }else{
+	
+	receiveBuffer[receiveBufferPos] = 0;
+	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+      }
+    }
+
 
     /*
     taskENTER_CRITICAL();
@@ -609,10 +656,6 @@ int main(void)
   NVIC_EnableIRQ(USART1_IRQn);
 
 
-
-  char buffer[21];
-
-
   xTaskCreate(mainTask,"mainTask",800,NULL,1,NULL);
   vTaskStartScheduler();
   
@@ -747,28 +790,3 @@ void EXTI15_10_IRQHandler(){
   
 }
 
-
-
-/*
-
-  
-  DIFSEL[I] ADC_DIFSEL  //Channel single endded or differential input selection
-  ADC_SQR1 |= L
-  ADC_SQR1 |= SQ1 //Channel 0?
-  //Read ADC_DR
-
-  //Set injected channel sequence legth
-  
-  //Enable VREFEN  in ADCx_CCR
-  
-
-  ADEN = 1//Enable adc
-  //Wait till ADRDY
-  //Write 1 to ADRDY
-  ADSTART
-  JADSTART
-
-  ADDIS = 1 //Disable ADC
-  //Wait till ADDIS = 0
-  
-  */

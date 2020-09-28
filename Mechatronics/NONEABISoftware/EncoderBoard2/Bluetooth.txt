@@ -1,5 +1,5 @@
 Si empieza con porcentaje
-	ignorar (excepto %sTREAM_OPEN% %DISCONNECT%)
+	ignorar (excepto %STREAM_OPEN% %DISCONNECT%)
 
 
 Si es AOK
@@ -18,14 +18,14 @@ Si ha empezado la pipa de datos de la uart
 status{
 uart pipe initiated
 command mode initiated = 0;
-}
+}%
 
 
 
 SR,000C
 
-CMD mode hard to enter when not connected, try $$$$$$
-CMD mode still while connected and disconnecting (if stream not opened)
+CMD mode is hard to enter when not connected, try $$$$$$
+CMD mode remains still while connected and disconnecting (if stream not opened)
 Stream opens when suscribed, CMD  (command mode) out when stream opened
 There is no advise of unsuscription
 
