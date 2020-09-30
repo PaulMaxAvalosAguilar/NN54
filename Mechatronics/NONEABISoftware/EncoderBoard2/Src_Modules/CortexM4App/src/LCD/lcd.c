@@ -124,3 +124,26 @@ void lcd_puts(const char* s){
   lcd_data(lcdSendBuffer, (count) + 1);//print char at display
 }
 
+void lcdPutsBlinkFree(const char *g, int ypos){
+  int i = 0;
+  char text[22];//max used characters used plus null terminator
+  int blankchars;
+
+  while(*(g + i)){
+    if(i >20) break;
+    text[i] = *(g +i);
+    i++;
+  }
+
+  blankchars = 21 -i;
+  while(blankchars){
+    text[i] = ' ';
+    blankchars--;
+    i++;
+  }
+  text[i] = '\0';
+  lcd_gotoxy(0, ypos);
+  lcd_puts(text);
+  
+}
+

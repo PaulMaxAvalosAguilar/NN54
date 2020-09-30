@@ -48,6 +48,7 @@ extern "C" {
   void lcd_gotoxy(uint8_t x, uint8_t y);		// set curser at pos x, y. x means character,
   // y means line (page, refer lcd manual)
   void lcd_puts(const char* s);			// print string, \n-terminated, from ram on screen (TEXTMODE)
+  void lcdPutsBlinkFree(const char *g, int ypos);//print without flicker
 
 #ifdef __cplusplus
 }

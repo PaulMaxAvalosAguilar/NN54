@@ -1,51 +1,45 @@
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
+#include "semphr.h"
 #include "stm32g431xx.h"
 #include "lcd.h"
+#include "main.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BITS31 2147483648.0f
-#define PI 3.14159265f
-#define degToRads(x) ((x) * PI)/180.0
 
-#define UART_RX_BUFFER_LEN 256
+
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
+
+SemaphoreHandle_t adcSemaphore;
+SemaphoreHandle_t encoderSemaphore;
+QueueHandle_t communicationQueue;
+QueueHandle_t lcdQueue;
+QueueSetHandle_t communicationQueueSet;
+
 
 static volatile uint32_t counter = 0;
 static volatile uint32_t charging = 0;
 
+
 void USART1_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
-void lcdPutsBlinkFree(const char *g, int ypos);
 char* reverse(char *buffer, int i, int j);
 char* itoa(int value, char* buffer, int base);
 char* uitoa(unsigned int value, char* buffer, int base);
 void printString(const char myString[]);
 
-void lcdPutsBlinkFree(const char *g, int ypos){
-  int i = 0;
-  char text[22];//max used characters used plus null terminator
-  int blankchars;
 
-  while(*(g + i)){
-    if(i >20) break;
-    text[i] = *(g +i);
-    i++;
-  }
+void sendToLCDQueue(LCDMessage_t messageType,
+		      uint32_t displayValue){
+  lcdData_t dataToSend;
+  dataToSend.messageType = messageType;
+  dataToSend.displayValue = displayValue;
 
-  blankchars = 21 -i;
-  while(blankchars){
-    text[i] = ' ';
-    blankchars--;
-    i++;
-  }
-  text[i] = '\0';
-  lcd_gotoxy(0, ypos);
-  lcd_puts(text);
-  
+  xQueueSendToBack(lcdQueue,&dataToSend,0);
 }
 
 // inline function to swap two numbers
@@ -125,20 +119,62 @@ char* uitoa(unsigned int value, char* buffer, int base){
 	return reverse(buffer, 0, i - 1);
 }
 
+static void lcdTask(void *args __attribute__((unused))){
 
-static void mainTask(void *args __attribute__((unused))){
+  lcdData_t receivedData;
+  char buffer[22];
+
+  uint16_t lineState = 0;
+  uint32_t lastVoltage = 0;
+
+  lcd_init();
+  lcdPutsBlinkFree(" SDT ENCODER     BLE",0);
+
+
+  
+  for(;;){
+
+    xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
+    
+    if(receivedData.messageType == connectedStatus){
+      lcdPutsBlinkFree(receivedData.displayValue?
+		       "Connected":"         ",
+		       2);
+      
+    }else if(receivedData.messageType == batteryLevel){
+      //      lineState = GPIOB_IDR;
+      if( (lineState & (1 <<12)) !=0){
+	//	sprintf(buffer,"    ** Batt: %lu", receivedData.displayValue);
+	lcdPutsBlinkFree(buffer,7);
+      }else{
+	//	sprintf(buffer,"       Batt: %lu", receivedData.displayValue);
+	lcdPutsBlinkFree(buffer,7);
+      }
+      lastVoltage = receivedData.displayValue;
+      
+    }else if(receivedData.messageType == chargingStatus){
+      /*      sprintf(buffer, receivedData.displayValue?
+	      "    ** Batt: %lu":
+	      "       Batt: %lu", lastVoltage);*/
+      lcdPutsBlinkFree(buffer, 7);
+      
+    }else if(receivedData.messageType == encoder){
+      //      sprintf(buffer, "%lu", receivedData.displayValue);
+      lcdPutsBlinkFree(buffer,5);
+    }
+
+  }
+    
+}
+
+
+static void adcTask(void *args __attribute__((unused))){
   
   char buffer[30];
 
 
   
   uint32_t receiveBufferPos = 0;
-
-  lcd_init();
-  lcd_gotoxy(0,0);
-  lcd_puts("Encoder");
-  lcd_gotoxy(1,7);
-  lcd_puts("Saint Germain");
 
   uint32_t adcData = 0;
   uint32_t secData = 0;
@@ -161,6 +197,8 @@ static void mainTask(void *args __attribute__((unused))){
 
   int g = 0;
 
+  sendToLCDQueue(connectedStatus,1);
+
   for(;;){
 
     /*
@@ -180,7 +218,7 @@ static void mainTask(void *args __attribute__((unused))){
     //    vTaskDelay(pdMS_TO_TICKS(1000));
 
     itoa(g++, buffer, 10);
-    lcdPutsBlinkFree(buffer, 2);
+    //    lcdPutsBlinkFree(buffer, 2);
 
 
     while(receiveBuffer[receiveBufferPos]){
@@ -210,11 +248,11 @@ static void mainTask(void *args __attribute__((unused))){
 	parseBuffer[parseBufferPos++]= 0;
 
 	if(strncmp(parseBuffer, "CONNECT",7) == 0){
-	  lcdPutsBlinkFree("Connected", 5);
+	  //	  lcdPutsBlinkFree("Connected", 5);
 	}else if(strstr(parseBuffer,"STREAM_OPEN")){
-	  lcdPutsBlinkFree("Transmiting", 5);
+	  //	  lcdPutsBlinkFree("Transmiting", 5);
 	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
-	  lcdPutsBlinkFree("Disconnected", 5);
+	  //	  lcdPutsBlinkFree("Disconnected", 5);
 	}
 
 	//interpret();
@@ -629,7 +667,6 @@ int main(void)
   ADC2->DIFSEL |= ADC_DIFSEL_DIFSEL_12;//IN12 Differential
 
   ADC1->CR |= ADC_CR_ADEN;//Enable ADC2;
-
   //---------------------CONFIGURE CORDIC------------------------
 
   RCC->AHB1ENR |= RCC_AHB1ENR_CORDICEN;
@@ -656,7 +693,14 @@ int main(void)
   NVIC_EnableIRQ(USART1_IRQn);
 
 
-  xTaskCreate(mainTask,"mainTask",800,NULL,1,NULL);
+  //---------------------CONFIGURE RTOS-------------------------
+
+
+  lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
+  
+  xTaskCreate(adcTask,"adcTask",200,NULL,1,NULL);
+  xTaskCreate(lcdTask,"lcdTask",200, NULL, 2, NULL);
+  
   vTaskStartScheduler();
   
   while (1)
