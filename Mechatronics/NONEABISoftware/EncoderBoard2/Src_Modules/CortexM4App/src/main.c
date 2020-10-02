@@ -123,48 +123,50 @@ static void lcdTask(void *args __attribute__((unused))){
 
   lcdData_t receivedData;
   char buffer[22];
+  char numBuffer[5];
 
   uint16_t lineState = 0;
   uint32_t lastVoltage = 0;
 
   lcd_init();
   lcdPutsBlinkFree(" SDT ENCODER     BLE",0);
-
-
   
   for(;;){
 
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
-    
-    if(receivedData.messageType == connectedStatus){
+
+    if(receivedData.messageType == connectedStatus){//Connected status message
       lcdPutsBlinkFree(receivedData.displayValue?
 		       "Connected":"         ",
 		       2);
-      
-    }else if(receivedData.messageType == batteryLevel){
-      //      lineState = GPIOB_IDR;
-      if( (lineState & (1 <<12)) !=0){
-	//	sprintf(buffer,"    ** Batt: %lu", receivedData.displayValue);
-	lcdPutsBlinkFree(buffer,7);
+
+    }else if(receivedData.messageType == batteryLevel){//Battery level message
+      lineState = GPIOB->IDR;
+      if(lineState & GPIO_IDR_ID12){
+	strcpy(buffer, "    ** Batt: ");
       }else{
-	//	sprintf(buffer,"       Batt: %lu", receivedData.displayValue);
-	lcdPutsBlinkFree(buffer,7);
+	strcpy(buffer, "       Batt: ");
       }
-      lastVoltage = receivedData.displayValue;
-      
-    }else if(receivedData.messageType == chargingStatus){
-      /*      sprintf(buffer, receivedData.displayValue?
-	      "    ** Batt: %lu":
-	      "       Batt: %lu", lastVoltage);*/
+
+      itoa(receivedData.displayValue,numBuffer,10);
+      strcat(buffer, numBuffer);
       lcdPutsBlinkFree(buffer, 7);
       
-    }else if(receivedData.messageType == encoder){
-      //      sprintf(buffer, "%lu", receivedData.displayValue);
-      lcdPutsBlinkFree(buffer,5);
-    }
+      lastVoltage = receivedData.displayValue;//save value
 
-  }
-    
+    }else if(receivedData.messageType == chargingStatus){//Charging status message
+      if(receivedData.displayValue){
+	strcpy(buffer, "    ** Batt: ");
+      }else{
+	strcpy(buffer, "       Batt: ");
+      }
+
+      itoa(lastVoltage,numBuffer,10);
+      strcat(buffer, numBuffer);
+      lcdPutsBlinkFree(buffer, 7);
+      
+    }
+  }    
 }
 
 
@@ -198,6 +200,7 @@ static void adcTask(void *args __attribute__((unused))){
   int g = 0;
 
   sendToLCDQueue(connectedStatus,1);
+  sendToLCDQueue(batteryLevel,4500);
 
   for(;;){
 
@@ -217,10 +220,7 @@ static void adcTask(void *args __attribute__((unused))){
 
     //    vTaskDelay(pdMS_TO_TICKS(1000));
 
-    itoa(g++, buffer, 10);
-    //    lcdPutsBlinkFree(buffer, 2);
-
-
+    /*
     while(receiveBuffer[receiveBufferPos]){
       if(receiveBuffer[receiveBufferPos] == '%'){
 	char secondToken = receiveBuffer[receiveBufferPos];
@@ -264,7 +264,7 @@ static void adcTask(void *args __attribute__((unused))){
 	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
       }
     }
-
+    */
 
     /*
     taskENTER_CRITICAL();
@@ -681,18 +681,16 @@ int main(void)
 
   //---------------------CONFIGURE NVIC--------------------------
 
-  NVIC_SetPriorityGrouping(4); //4 bits for pre-emption 0 bit for subpriority
-  NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-  //  NVIC_EnableIRQ(TIM2_IRQn);
-
+  NVIC_SetPriorityGrouping(0); //4 bits for pre-emption 0 bit for subpriority
   
-  NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  //  NVIC_EnableIRQ(TIM2_IRQn);
   NVIC_EnableIRQ(EXTI15_10_IRQn);
-
-  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   NVIC_EnableIRQ(USART1_IRQn);
 
-
+  NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 1, 0));
+  NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),2, 0));
+  
   //---------------------CONFIGURE RTOS-------------------------
 
 
@@ -825,12 +823,22 @@ void TIM2_IRQHandler(){
 void EXTI15_10_IRQHandler(){
 
   EXTI->PR1 |= EXTI_PR1_PIF12;//Clear flag
+
+  uint16_t lineState = GPIOB->IDR;
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  lcdData_t dataToSend;
+
+  dataToSend.messageType = chargingStatus;
   
-  if((GPIOB->IDR & GPIO_IDR_ID12)){
-    charging = 1;
+  if(lineState & GPIO_IDR_ID12){
+    dataToSend.displayValue = 1;
+    xQueueSendToBackFromISR(lcdQueue, &dataToSend,&xHigherPriorityTaskWoken);
   }else{
-    charging = 0;
+    dataToSend.displayValue = 0;
+    xQueueSendToBackFromISR(lcdQueue, &dataToSend,&xHigherPriorityTaskWoken);
   }
+
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   
 }
 

@@ -69,7 +69,7 @@
 #define configIDLE_SHOULD_YIELD		1
 #define configUSE_MUTEXES		0
 #define configCHECK_FOR_STACK_OVERFLOW	0
-#define configUSE_QUEUE_SETS            1
+#define configUSE_QUEUE_SETS            0
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP  (1000 * configTICK_RATE_HZ)/1000
 
 /* Set the following definitions to 1 to include the API function, or zero
@@ -99,7 +99,7 @@ function. */
 routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
 INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER
 PRIORITY THAN THIS! (higher priorities are lower numeric values. */
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	5
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	1
 
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */

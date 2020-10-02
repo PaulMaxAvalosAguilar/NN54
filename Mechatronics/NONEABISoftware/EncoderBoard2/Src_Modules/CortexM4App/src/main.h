@@ -27,8 +27,7 @@ extern QueueSetHandle_t communicationQueueSet;
 typedef enum LCDMessage_t{
 			  connectedStatus,
 			  batteryLevel,
-			  chargingStatus,
-			  encoder
+			  chargingStatus
 }LCDMessage_t;
 
 typedef struct lcdData_t{
