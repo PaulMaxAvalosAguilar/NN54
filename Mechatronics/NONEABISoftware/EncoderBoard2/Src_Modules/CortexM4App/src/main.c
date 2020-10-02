@@ -9,20 +9,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
 
 SemaphoreHandle_t adcSemaphore;
 SemaphoreHandle_t encoderSemaphore;
-QueueHandle_t communicationQueue;
+SemaphoreHandle_t uartRXSemaphore;
+QueueHandle_t uartTXQueue;
 QueueHandle_t lcdQueue;
-QueueSetHandle_t communicationQueueSet;
-
 
 static volatile uint32_t counter = 0;
-static volatile uint32_t charging = 0;
-
 
 void USART1_IRQHandler(void);
 void TIM2_IRQHandler(void);
@@ -119,6 +114,66 @@ char* uitoa(unsigned int value, char* buffer, int base){
 	return reverse(buffer, 0, i - 1);
 }
 
+static void uartTXTask(void *args __attribute__((unused))){
+  
+  for(;;){
+
+
+  }
+}
+
+static void uartRXTask(void *args __attribute__((unused))){
+
+  uint32_t receiveBufferPos = 0;
+
+  for(;;){
+    
+    xSemaphoreTake(uartRXSemaphore,portMAX_DELAY); //Should go first
+    
+    while(receiveBuffer[receiveBufferPos]){
+      if(receiveBuffer[receiveBufferPos] == '%'){
+	char secondToken = receiveBuffer[receiveBufferPos];
+	char parseBuffer[100] = {0};
+	int parseBufferPos = 0;
+	receiveBuffer[receiveBufferPos] = 0;
+	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+
+
+      ENTER:
+
+	while(!receiveBuffer[receiveBufferPos]);
+	if(receiveBuffer[receiveBufferPos] != secondToken){
+	  parseBuffer[parseBufferPos++] = receiveBuffer[receiveBufferPos];
+	  receiveBuffer[receiveBufferPos] = 0;
+	  receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+	}else{
+	  goto EXIT;
+	}
+
+	goto ENTER;
+
+      EXIT:
+
+	parseBuffer[parseBufferPos++]= 0;
+
+	if(strncmp(parseBuffer, "CONNECT",7) == 0){
+	  sendToLCDQueue(connectedStatus, 1);	  
+	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
+	  sendToLCDQueue(connectedStatus, 0);
+	}
+
+	//interpret();
+	receiveBuffer[receiveBufferPos] = 0;
+	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+      }else{
+	
+	receiveBuffer[receiveBufferPos] = 0;
+	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
+      }
+    }
+  }
+}
+
 static void lcdTask(void *args __attribute__((unused))){
 
   lcdData_t receivedData;
@@ -172,12 +227,6 @@ static void lcdTask(void *args __attribute__((unused))){
 
 static void adcTask(void *args __attribute__((unused))){
   
-  char buffer[30];
-
-
-  
-  uint32_t receiveBufferPos = 0;
-
   uint32_t adcData = 0;
   uint32_t secData = 0;
 
@@ -193,17 +242,10 @@ static void adcTask(void *args __attribute__((unused))){
   int intCosine;
   int intSine;
 
-  //state variables
-  int symbolParsingStarted = 0;
-  int parserBufferCopyPosition = 0;
-
-  int g = 0;
-
-  sendToLCDQueue(connectedStatus,1);
   sendToLCDQueue(batteryLevel,4500);
 
   for(;;){
-
+    
     /*
     CORDIC->WDATA = (int32_t)angleDiv;
     cosine = (CORDIC->RDATA)/BITS31;//Read first result
@@ -219,52 +261,6 @@ static void adcTask(void *args __attribute__((unused))){
     lcdPutsBlinkFree(buffer, 5);*/
 
     //    vTaskDelay(pdMS_TO_TICKS(1000));
-
-    /*
-    while(receiveBuffer[receiveBufferPos]){
-      if(receiveBuffer[receiveBufferPos] == '%'){
-	char secondToken = receiveBuffer[receiveBufferPos];
-	char parseBuffer[100] = {0};
-	int parseBufferPos = 0;
-	receiveBuffer[receiveBufferPos] = 0;
-	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
-
-
-      ENTER:
-
-	while(!receiveBuffer[receiveBufferPos]);
-	if(receiveBuffer[receiveBufferPos] != secondToken){
-	  parseBuffer[parseBufferPos++] = receiveBuffer[receiveBufferPos];
-	  receiveBuffer[receiveBufferPos] = 0;
-	  receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
-	}else{
-	  goto EXIT;
-	}
-
-	goto ENTER;
-
-      EXIT:
-
-	parseBuffer[parseBufferPos++]= 0;
-
-	if(strncmp(parseBuffer, "CONNECT",7) == 0){
-	  //	  lcdPutsBlinkFree("Connected", 5);
-	}else if(strstr(parseBuffer,"STREAM_OPEN")){
-	  //	  lcdPutsBlinkFree("Transmiting", 5);
-	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
-	  //	  lcdPutsBlinkFree("Disconnected", 5);
-	}
-
-	//interpret();
-	receiveBuffer[receiveBufferPos] = 0;
-	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
-      }else{
-	
-	receiveBuffer[receiveBufferPos] = 0;
-	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
-      }
-    }
-    */
 
     /*
     taskENTER_CRITICAL();
@@ -307,6 +303,10 @@ static void adcTask(void *args __attribute__((unused))){
     */
   }
 }
+
+
+
+
 
 int main(void)
 {
@@ -680,12 +680,8 @@ int main(void)
   
 
   //---------------------CONFIGURE NVIC--------------------------
-
-  NVIC_SetPriorityGrouping(0); //4 bits for pre-emption 0 bit for subpriority
   
-  //  NVIC_EnableIRQ(TIM2_IRQn);
-  NVIC_EnableIRQ(EXTI15_10_IRQn);
-  NVIC_EnableIRQ(USART1_IRQn);
+  NVIC_SetPriorityGrouping(0); //4 bits for pre-emption 0 bit for subpriority
 
   NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 1, 0));
@@ -693,12 +689,20 @@ int main(void)
   
   //---------------------CONFIGURE RTOS-------------------------
 
-
+  uartRXSemaphore = xSemaphoreCreateBinary();
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
-  
-  xTaskCreate(adcTask,"adcTask",200,NULL,1,NULL);
-  xTaskCreate(lcdTask,"lcdTask",200, NULL, 2, NULL);
-  
+
+  //  xTaskCreate(uartTXTask, "uartTXTask",200, NULL, 3, NULL);
+  xTaskCreate(uartRXTask, "uartRXTask",100, NULL, 2, NULL);
+  xTaskCreate(lcdTask,"lcdTask",100, NULL, 2, NULL);
+  xTaskCreate(adcTask,"adcTask",100,NULL,1,NULL);
+
+  //---------------------ENABLE INTERRUPTS---------------------------
+
+  //  NVIC_EnableIRQ(TIM2_IRQn);
+  NVIC_EnableIRQ(EXTI15_10_IRQn);
+  NVIC_EnableIRQ(USART1_IRQn);
+
   vTaskStartScheduler();
   
   while (1)
@@ -811,13 +815,19 @@ void printString(const char myString[]){
   DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
 }
 
-void USART1_IRQHandler(){
-  USART1->ICR |= USART_ICR_IDLECF;
-}
-
 void TIM2_IRQHandler(){
   TIM2->SR &= ~TIM_SR_CC1IF;
   counter = TIM2->CCR1;
+}
+
+void USART1_IRQHandler(){
+  USART1->ICR |= USART_ICR_IDLECF;
+
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  configASSERT(uartRXSemaphore );
+  xSemaphoreGiveFromISR(uartRXSemaphore,&xHigherPriorityTaskWoken);
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
 }
 
 void EXTI15_10_IRQHandler(){

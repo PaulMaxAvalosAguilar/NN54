@@ -14,14 +14,29 @@ extern char receiveBuffer[UART_RX_BUFFER_LEN];
 //Queue and Semaphore handles----------------
 extern SemaphoreHandle_t adcSemaphore;
 extern SemaphoreHandle_t encoderSemaphore;
+extern SemaphoreHandle_t uartRXSemaphore;
 
-extern QueueHandle_t communicationQueue;
+extern QueueHandle_t TXQueue;
 extern QueueHandle_t lcdQueue;
-extern QueueSetHandle_t communicationQueueSet;
-
 
 //Queue and Semaphore sizes------------------
 #define LCD_QUEUE_SIZE                20
+#define TX_QUEUE_SIZE                 20
+
+//uartRXTask -------------------------
+typedef enum DataSource_t{
+			  adcSender,
+			  encoderSender
+}DataSource_t;
+
+typedef struct commData_t{
+  DataSource_t eDataSource;
+  uint16_t traveledDistanceOrADC;
+  uint16_t meanPropulsiveVelocity;
+  uint16_t peakVelocity;
+} commData_t;
+
+//uartRXTask --------------------------
 
 //lcdTask -----------------------------------
 typedef enum LCDMessage_t{

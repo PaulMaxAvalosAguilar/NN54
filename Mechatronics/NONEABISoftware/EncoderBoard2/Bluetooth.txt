@@ -1,5 +1,5 @@
 Si empieza con porcentaje
-	ignorar (excepto %STREAM_OPEN% %DISCONNECT%)
+	ignorar (excepto %CONNECT% %STREAM_OPEN% %DISCONNECT%)
 
 
 Si es AOK
