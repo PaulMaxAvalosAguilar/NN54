@@ -9,8 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//UART RX------------------------------------
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
 
+//Queue and Semaphore handles----------------
 SemaphoreHandle_t adcSemaphore;
 SemaphoreHandle_t encoderSemaphore;
 SemaphoreHandle_t uartRXSemaphore;
@@ -18,6 +20,7 @@ QueueHandle_t uartTXQueue;
 QueueHandle_t lcdQueue;
 
 static volatile uint32_t counter = 0;
+uint32_t bluetoothConnected = 0;
 
 void USART1_IRQHandler(void);
 void TIM2_IRQHandler(void);
@@ -25,11 +28,9 @@ void EXTI15_10_IRQHandler(void);
 char* reverse(char *buffer, int i, int j);
 char* itoa(int value, char* buffer, int base);
 char* uitoa(unsigned int value, char* buffer, int base);
-void printString(const char myString[]);
-
 
 void sendToLCDQueue(LCDMessage_t messageType,
-		      uint32_t displayValue){
+		    uint32_t displayValue){
   lcdData_t dataToSend;
   dataToSend.messageType = messageType;
   dataToSend.displayValue = displayValue;
@@ -41,6 +42,33 @@ void sendToLCDQueue(LCDMessage_t messageType,
 static inline void myswap(char *x, char *y) {
 	char t = *x; *x = *y; *y = t;
 }
+
+void printString(const char myString[]){
+  DMA1_Channel2->CCR &= ~DMA_CCR_EN;//Channel disable
+  DMA1_Channel2->CMAR = (uint32_t)myString;//DMA source address
+  DMA1_Channel2->CNDTR = strlen(myString);//DMA length
+  DMA1_Channel2->CCR |= DMA_CCR_EN;//Channel enable
+  while(!(DMA1->ISR & DMA_ISR_TCIF2));//Wait till transfere complete
+  DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
+}
+
+void setBLEConnected(uint8_t boolean){
+  taskENTER_CRITICAL();
+  bluetoothConnected = boolean;
+  taskEXIT_CRITICAL();
+}
+
+uint8_t getBLEConnected(){
+  uint8_t bleConnectionStatus;
+  
+  taskENTER_CRITICAL();
+  bleConnectionStatus = bluetoothConnected;
+  taskEXIT_CRITICAL();
+
+  return bleConnectionStatus;
+}
+
+
 
 // function to reverse buffer[i..j]
 char* reverse(char *buffer, int i, int j){
@@ -107,20 +135,14 @@ char* uitoa(unsigned int value, char* buffer, int base){
 	// If base is 10 and value is negative, the resulting string 
 	// is preceded with a minus sign (-)
 	// With any other base, value is always considered unsigned
-	if (value < 0 && base == 10)
+	if (base == 10)
 		buffer[i++] = '-';
 	buffer[i] = '\0'; // null terminate string
 	// reverse the string and return it
 	return reverse(buffer, 0, i - 1);
 }
 
-static void uartTXTask(void *args __attribute__((unused))){
-  
-  for(;;){
 
-
-  }
-}
 
 static void uartRXTask(void *args __attribute__((unused))){
 
@@ -171,6 +193,15 @@ static void uartRXTask(void *args __attribute__((unused))){
 	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
       }
     }
+  }
+}
+
+static void uartTXTask(void *args __attribute__((unused))){
+  
+  for(;;){
+    printString("HOLO");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
   }
 }
 
@@ -228,45 +259,14 @@ static void lcdTask(void *args __attribute__((unused))){
 static void adcTask(void *args __attribute__((unused))){
   
   uint32_t adcData = 0;
-  uint32_t secData = 0;
-
-  
-  float angle = 75.1;
-  float angleRad = degToRads(angle);
-  float angleDiv = (angleRad/PI) * BITS31;
-
-
-  float cosine;
-  float sine;
-
-  int intCosine;
-  int intSine;
-
-  sendToLCDQueue(batteryLevel,4500);
 
   for(;;){
     
-    /*
-    CORDIC->WDATA = (int32_t)angleDiv;
-    cosine = (CORDIC->RDATA)/BITS31;//Read first result
-    sine = (CORDIC->RDATA)/BITS31;//Read second result
-
-    //    intCosine = cosine * 1000;
-    //    intSine = sine * 1000;
-
-    itoa((int32_t)(cosine*1000000), buffer, 10);
-    lcdPutsBlinkFree(buffer,3);
-    
-    itoa((int32_t)(sine*1000000), buffer, 10);
-    lcdPutsBlinkFree(buffer, 5);*/
-
-    //    vTaskDelay(pdMS_TO_TICKS(1000));
-
-    /*
     taskENTER_CRITICAL();
     ADC1->CFGR2 |= ADC_CFGR2_BULB;//Bulb sampling
     ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 4 bits
     ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSR)) | (0b111 << ADC_CFGR2_OVSR_Pos);//Oversampling ratio 256x
+    ADC1->CFGR2 &= ~ADC_CFGR2_ROVSE;//Regular oversampling disabled
 
     ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
     ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
@@ -277,36 +277,50 @@ static void adcTask(void *args __attribute__((unused))){
     adcData = ADC1->DR;//Read data register and clear EOC flag
     while(ADC1->CR & ADC_CR_ADSTART);
 
-
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//2nd conversion on IN18
-    //    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ2)) | (18 << ADC_SQR1_SQ2_Pos);//2nd conversion on IN18
-    ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b111 << ADC_SMPR1_SMP5_Pos);//Sample time 640.5 clock cycles    
     ADC1->CFGR2 |= ADC_CFGR2_ROVSE;//Regular oversampling enabled
-
+    
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//2nd conversion on IN5
+    ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b111 << ADC_SMPR1_SMP5_Pos);//Sample time 640.5 clock cycles
+    
     ADC1->CR |= ADC_CR_ADSTART;//Start conversion
     taskEXIT_CRITICAL();
     
     while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
-    secData = ADC1->DR;//Read data register and clear EOC flag
+    adcData = ADC1->DR;//Read data register and clear EOC flag
     while(ADC1->CR & ADC_CR_ADSTART);
-    ADC1->CFGR2 &= ~ADC_CFGR2_ROVSE;//Regular oversampling disabled
 
+    sendToLCDQueue(batteryLevel,(adcData * 6104/10000)*2);
+    //    sendTOuartTXQueue();
 
-    //    sprintf(buffer, "%lu", adcData);
-    intoa(adcData,buffer,10);
-    lcdPutsBlinkFree(buffer,3);
-
-    //    sprintf(buffer, "%lu", (secData*6104/10000)*2);
-    intoa((secData*6104/10000)*2,buffer,10);
-    lcdPutsBlinkFree(buffer,5);
-    */
+    if(getBLEConnected()){
+      xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
+    }else{
+      vTaskDelay(pdMS_TO_TICKS(500));
+    }
   }
 }
 
+/*
+
+  float angle = 75.1;
+  float angleRad = degToRads(angle);
+  float angleDiv = (angleRad/PI) * BITS31;
+
+  float cosine;
+  float sine;
 
 
+  CORDIC->WDATA = (int32_t)angleDiv;
+  cosine = (CORDIC->RDATA)/BITS31;//Read first result
+  sine = (CORDIC->RDATA)/BITS31;//Read second result
 
+  itoa((int32_t)(cosine*1000000), buffer, 10);
+  lcdPutsBlinkFree(buffer,3);
+    
+  itoa((int32_t)(sine*1000000), buffer, 10);
+  lcdPutsBlinkFree(buffer, 5);
+*/
 
 int main(void)
 {
@@ -626,9 +640,6 @@ int main(void)
 
 
   //ADC1 CONFIGURATION
-  uint16_t adcCalFactD = 0;
-  uint16_t adcCalFactS = 0;
-
   ADC1->CR &= ~ADC_CR_DEEPPWD;//Exit deep power down mode
   ADC1->CR |= ADC_CR_ADVREGEN;//Enable ADC internal voltage regulator
   for(int i = 0; i<500; i++);//TADCVREG_STUP 20us wait
@@ -647,11 +658,9 @@ int main(void)
   ADC1->DIFSEL &= ~ADC_DIFSEL_DIFSEL_5;//IN5 Single ended
   ADC1->DIFSEL &= ~ADC_DIFSEL_DIFSEL_18;//IN18 Single ended
 
-
   ADC1->ISR |= ADC_ISR_ADRDY;//Clear ADRDY bit
   ADC1->CR |= ADC_CR_ADEN;//Enable ADC1;
   while(!(ADC1->ISR & ADC_ISR_ADRDY));//Wait till ADC is ready
-
 
   
   //ADC2 CONFIGURATION
@@ -689,11 +698,12 @@ int main(void)
   
   //---------------------CONFIGURE RTOS-------------------------
 
+  adcSemaphore = xSemaphoreCreateBinary();
   uartRXSemaphore = xSemaphoreCreateBinary();
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
 
-  //  xTaskCreate(uartTXTask, "uartTXTask",200, NULL, 3, NULL);
-  xTaskCreate(uartRXTask, "uartRXTask",100, NULL, 2, NULL);
+  xTaskCreate(uartRXTask, "uartRXTask",100, NULL, 3, NULL);
+  xTaskCreate(uartTXTask, "uartTXTask",100, NULL, 2, NULL);
   xTaskCreate(lcdTask,"lcdTask",100, NULL, 2, NULL);
   xTaskCreate(adcTask,"adcTask",100,NULL,1,NULL);
 
@@ -804,15 +814,6 @@ int main(void)
     };
     */
   }
-}
-
-void printString(const char myString[]){
-  DMA1_Channel2->CCR &= ~DMA_CCR_EN;//Channel disable
-  DMA1_Channel2->CMAR = (uint32_t)myString;//DMA source address
-  DMA1_Channel2->CNDTR = strlen(myString);//DMA length
-  DMA1_Channel2->CCR |= DMA_CCR_EN;//Channel enable
-  while(!(DMA1->ISR & DMA_ISR_TCIF2));//Wait till transfere complete
-  DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
 }
 
 void TIM2_IRQHandler(){

@@ -10,12 +10,10 @@
 #define UART_RX_BUFFER_LEN 256
 extern char receiveBuffer[UART_RX_BUFFER_LEN];
 
-
 //Queue and Semaphore handles----------------
 extern SemaphoreHandle_t adcSemaphore;
 extern SemaphoreHandle_t encoderSemaphore;
 extern SemaphoreHandle_t uartRXSemaphore;
-
 extern QueueHandle_t TXQueue;
 extern QueueHandle_t lcdQueue;
 
@@ -23,7 +21,7 @@ extern QueueHandle_t lcdQueue;
 #define LCD_QUEUE_SIZE                20
 #define TX_QUEUE_SIZE                 20
 
-//uartRXTask -------------------------
+//uartTXTask -------------------------
 typedef enum DataSource_t{
 			  adcSender,
 			  encoderSender
@@ -51,8 +49,13 @@ typedef struct lcdData_t{
 }lcdData_t;
 //lcdTask -----------------------------------
 
+//connection State machine
+extern uint32_t bluetoothConnected;
+
 void sendToLCDQueue(LCDMessage_t messageType,
 		    uint32_t displayValue);
-
+void printString(const char myString[]);
+void setBLEConnected(uint8_t boolean);
+uint8_t getBLEConnected(void);
 
 #endif
