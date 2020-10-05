@@ -153,16 +153,15 @@ static void uartRXTask(void *args __attribute__((unused))){
     xSemaphoreTake(uartRXSemaphore,portMAX_DELAY); //Should go first
     
     while(receiveBuffer[receiveBufferPos]){
-      if(receiveBuffer[receiveBufferPos] == '%'){
+      if((receiveBuffer[receiveBufferPos] == '%') ||
+	 receiveBuffer[receiveBufferPos] == '|'){
 	char secondToken = receiveBuffer[receiveBufferPos];
 	char parseBuffer[100] = {0};
 	int parseBufferPos = 0;
 	receiveBuffer[receiveBufferPos] = 0;
 	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
 
-
       ENTER:
-
 	while(!receiveBuffer[receiveBufferPos]);
 	if(receiveBuffer[receiveBufferPos] != secondToken){
 	  parseBuffer[parseBufferPos++] = receiveBuffer[receiveBufferPos];
@@ -171,20 +170,49 @@ static void uartRXTask(void *args __attribute__((unused))){
 	}else{
 	  goto EXIT;
 	}
-
 	goto ENTER;
-
       EXIT:
 
 	parseBuffer[parseBufferPos++]= 0;
 
+	//INTERPRET
 	if(strncmp(parseBuffer, "CONNECT",7) == 0){
-	  sendToLCDQueue(connectedStatus, 1);	  
+	  setBLEConnected(1);
+	  sendToLCDQueue(connectedStatus, 1);
 	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
 	  sendToLCDQueue(connectedStatus, 0);
+	  //stopTimers();
+	  setBLEConnected(0);
+	  xSemaphoreGive(adcSemaphore);//Should go after setBLEConnected(0)
+	}else if(secondToken == '|'){
+
+	  //Begin at char 2 since first is for sender integration:
+	  uint8_t messageType = parseBuffer[1];
+
+	  if(messageType == 1){
+	    //Get minDistToTravel
+	    uint8_t minDTT = parseBuffer[2];
+	    //setMinDistToTravel(strtol(hexByteBuffer,NULL,16));
+
+	    //Get desiredCountDir
+	    uint8_t dCD = parseBuffer[2];
+	    //setDesiredCountDir(strtol(hexByteBuffer,NULL,16));
+
+	    //Get desiredRepDir
+	    uint8_t dRD = parseBuffer[3];
+	    //setDesiredRepDir(strtol(hexByteBuffer,NULL,16));
+
+	    //startTimers();
+	    //writeEncoderStartValue();
+	    
+	  }else if(messageType == 2){
+	    //stopTimers();
+	  }else if(messageType == 3){
+	    xSemaphoreGive(adcSemaphore);
+	  }
+	  
 	}
 
-	//interpret();
 	receiveBuffer[receiveBufferPos] = 0;
 	receiveBufferPos = (receiveBufferPos + 1) % UART_RX_BUFFER_LEN;
       }else{
@@ -199,7 +227,7 @@ static void uartRXTask(void *args __attribute__((unused))){
 static void uartTXTask(void *args __attribute__((unused))){
   
   for(;;){
-    printString("HOLO");
+    //    printString("HOLO");
     vTaskDelay(pdMS_TO_TICKS(1000));
 
   }
