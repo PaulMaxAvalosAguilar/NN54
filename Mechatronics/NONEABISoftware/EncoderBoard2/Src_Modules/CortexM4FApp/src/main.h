@@ -51,6 +51,9 @@ typedef struct lcdData_t{
 
 //connection State machine
 extern uint32_t bluetoothConnected;
+extern uint32_t minDistToTravel;
+extern uint32_t desiredCounterDirection;
+extern uint32_t desiredRepDir;
 
 void sendToLCDQueue(LCDMessage_t messageType,
 		    uint32_t displayValue);

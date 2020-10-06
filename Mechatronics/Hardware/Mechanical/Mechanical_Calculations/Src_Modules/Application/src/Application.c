@@ -59,8 +59,20 @@ int main(int argc, char *argv[]){
   flechaGlobal.angulo = 90;
   flechaGlobal.offset = .1;
 
-  cleanScreen();
-  calculations();
+  uint32_t number = 65279;
+  uint8_t firstByteNumber = (uint8_t)number;
+  uint8_t augmented = 1;
+
+  if( (number != 0) && (number > 255) && ((number & (number-1)) == 0)){
+    firstByteNumber++;
+    augmented = 2;
+  }
+
+  printf("%02X%02X%02X\n",((number>>8)+1), firstByteNumber, augmented);
+
+  
+  //  cleanScreen();
+  //  calculations();
 
   return 0;
 }

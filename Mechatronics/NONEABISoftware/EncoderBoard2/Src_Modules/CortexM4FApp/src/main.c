@@ -21,6 +21,10 @@ QueueHandle_t lcdQueue;
 
 static volatile uint32_t counter = 0;
 uint32_t bluetoothConnected = 0;
+uint32_t minDistToTravel = 0;
+uint32_t desiredCounterDirection = 0;
+uint32_t desiredRepDir = 0;
+
 
 void USART1_IRQHandler(void);
 void TIM2_IRQHandler(void);
@@ -186,23 +190,16 @@ static void uartRXTask(void *args __attribute__((unused))){
 	  xSemaphoreGive(adcSemaphore);//Should go after setBLEConnected(0)
 	}else if(secondToken == '|'){
 
-	  //Begin at char 2 since first is for sender integration:
 	  uint8_t messageType = parseBuffer[1];
-
 	  if(messageType == 1){
-	    //Get minDistToTravel
-	    uint8_t minDTT = parseBuffer[2];
-	    //setMinDistToTravel(strtol(hexByteBuffer,NULL,16));
 
-	    //Get desiredCountDir
-	    uint8_t dCD = parseBuffer[2];
-	    //setDesiredCountDir(strtol(hexByteBuffer,NULL,16));
-
-	    //Get desiredRepDir
-	    uint8_t dRD = parseBuffer[3];
-	    //setDesiredRepDir(strtol(hexByteBuffer,NULL,16));
+	    minDistToTravel = ((parseBuffer[2]-1) << 8) |
+	      ((parseBuffer[4]-1)? parseBuffer[3]-1 : parseBuffer[3]);
+	    desiredCounterDirection = parseBuffer[5]-1;
+	    desiredRepDir = parseBuffer[6]-1;
 
 	    //startTimers();
+	    xSemaphoreGive(encoderSemaphore);
 	    //writeEncoderStartValue();
 	    
 	  }else if(messageType == 2){
@@ -727,6 +724,7 @@ int main(void)
   //---------------------CONFIGURE RTOS-------------------------
 
   adcSemaphore = xSemaphoreCreateBinary();
+  encoderSemaphore = xSemaphoreCreateBinary();
   uartRXSemaphore = xSemaphoreCreateBinary();
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
 
