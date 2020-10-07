@@ -14,48 +14,46 @@ extern char receiveBuffer[UART_RX_BUFFER_LEN];
 extern SemaphoreHandle_t adcSemaphore;
 extern SemaphoreHandle_t encoderSemaphore;
 extern SemaphoreHandle_t uartRXSemaphore;
-extern QueueHandle_t TXQueue;
+extern QueueHandle_t uartTXQueue;
 extern QueueHandle_t lcdQueue;
 
 //Queue and Semaphore sizes------------------
 #define LCD_QUEUE_SIZE                20
 #define TX_QUEUE_SIZE                 20
 
-//uartTXTask -------------------------
-typedef enum DataSource_t{
-			  adcSender,
-			  encoderSender
-}DataSource_t;
+//Queue structures---------------------------
+typedef enum messageTypes_t{
+			    encoderData,
+			    encoderStart,
+			    connectedStatus,
+			    batteryLevel,
+			    chargingStatus
+}messageTypes_t;
 
-typedef struct commData_t{
-  DataSource_t eDataSource;
+typedef struct uartTXData_t{
+  messageTypes_t messageType;
   uint16_t traveledDistanceOrADC;
   uint16_t meanPropulsiveVelocity;
   uint16_t peakVelocity;
-} commData_t;
-
-//uartRXTask --------------------------
-
-//lcdTask -----------------------------------
-typedef enum LCDMessage_t{
-			  connectedStatus,
-			  batteryLevel,
-			  chargingStatus
-}LCDMessage_t;
+} uartTXData_t;
 
 typedef struct lcdData_t{
-  LCDMessage_t messageType;
+  messageTypes_t messageType;
   uint32_t displayValue;  
 }lcdData_t;
-//lcdTask -----------------------------------
 
-//connection State machine
+
+//EncoderVariables----------------------------
 extern uint32_t bluetoothConnected;
 extern uint32_t minDistToTravel;
 extern uint32_t desiredCounterDirection;
 extern uint32_t desiredRepDir;
 
-void sendToLCDQueue(LCDMessage_t messageType,
+void sendToUARTTXQueue(messageTypes_t messageType,
+		       uint16_t traveledDistanceOrADC,
+		       uint16_t meanPropulsiveVelocity,
+		       uint16_t peakVelocity);
+void sendToLCDQueue(messageTypes_t messageType,
 		    uint32_t displayValue);
 void printString(const char myString[]);
 void setBLEConnected(uint8_t boolean);

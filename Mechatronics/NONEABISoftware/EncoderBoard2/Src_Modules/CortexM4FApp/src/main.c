@@ -33,7 +33,20 @@ char* reverse(char *buffer, int i, int j);
 char* itoa(int value, char* buffer, int base);
 char* uitoa(unsigned int value, char* buffer, int base);
 
-void sendToLCDQueue(LCDMessage_t messageType,
+void sendToUARTTXQueue(messageTypes_t messageType,
+		       uint16_t traveledDistanceOrADC,
+		       uint16_t meanPropulsiveVelocity,
+		       uint16_t peakVelocity){
+  uartTXData_t dataToSend;
+  dataToSend.messageType = messageType;
+  dataToSend.traveledDistanceOrADC = traveledDistanceOrADC;
+  dataToSend.meanPropulsiveVelocity = meanPropulsiveVelocity;
+  dataToSend.peakVelocity = peakVelocity;
+
+  xQueueSendToBack(uartTXQueue,&dataToSend,0);
+}
+
+void sendToLCDQueue(messageTypes_t messageType,
 		    uint32_t displayValue){
   lcdData_t dataToSend;
   dataToSend.messageType = messageType;
@@ -192,11 +205,9 @@ static void uartRXTask(void *args __attribute__((unused))){
 
 	  uint8_t messageType = parseBuffer[1];
 	  if(messageType == 1){
-
-	    minDistToTravel = ((parseBuffer[2]-1) << 8) |
-	      ((parseBuffer[4]-1)? parseBuffer[3]-1 : parseBuffer[3]);
-	    desiredCounterDirection = parseBuffer[5]-1;
-	    desiredRepDir = parseBuffer[6]-1;
+	    minDistToTravel = (parseBuffer[3]>>1) | ((parseBuffer[2] & 0xFE)<<6);
+	    desiredCounterDirection = parseBuffer[4]-1;
+	    desiredRepDir = parseBuffer[5]-1;
 
 	    //startTimers();
 	    xSemaphoreGive(encoderSemaphore);
@@ -222,11 +233,21 @@ static void uartRXTask(void *args __attribute__((unused))){
 }
 
 static void uartTXTask(void *args __attribute__((unused))){
+
+  uartTXData_t receivedData;
+  char buffer[20];
   
   for(;;){
-    //    printString("HOLO");
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    xQueueReceive(uartTXQueue, &receivedData, portMAX_DELAY);
 
+    if(receivedData.messageType == encoderStart){
+
+    }else if(receivedData.messageType == encoderData){
+
+    }else if(receivedData.messageType == batteryLevel){
+      itoa(receivedData.traveledDistanceOrADC,buffer,10);
+      printString(buffer);
+    }
   }
 }
 
@@ -240,7 +261,7 @@ static void lcdTask(void *args __attribute__((unused))){
   uint32_t lastVoltage = 0;
 
   lcd_init();
-  lcdPutsBlinkFree(" SDT ENCODER     BLE",0);
+  lcdPutsBlinkFree("  Paul's Inventions   ",0);
   
   for(;;){
 
@@ -315,8 +336,10 @@ static void adcTask(void *args __attribute__((unused))){
     adcData = ADC1->DR;//Read data register and clear EOC flag
     while(ADC1->CR & ADC_CR_ADSTART);
 
-    sendToLCDQueue(batteryLevel,(adcData * 6104/10000)*2);
-    //    sendTOuartTXQueue();
+    adcData = (adcData * 6104/10000)*2;
+
+    sendToLCDQueue(batteryLevel, adcData);
+    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
 
     if(getBLEConnected()){
       xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
@@ -726,6 +749,7 @@ int main(void)
   adcSemaphore = xSemaphoreCreateBinary();
   encoderSemaphore = xSemaphoreCreateBinary();
   uartRXSemaphore = xSemaphoreCreateBinary();
+  uartTXQueue = xQueueCreate(TX_QUEUE_SIZE, sizeof(uartTXData_t));
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
 
   xTaskCreate(uartRXTask, "uartRXTask",100, NULL, 3, NULL);
@@ -743,21 +767,6 @@ int main(void)
   
   while (1)
   {
-
-    /*
-    printString("\x31""Hola\n");
-
-    for(int i = 1; i < 1000000;i++);
-    for(int i = 1; i < 1000000;i++);
-    */
-
-    /*
-    while(receiveBuffer[g]){
-      //      printf("%c",receiveBuffer[g]);
-      receiveBuffer[g] = 0;
-      g = (g+1) % UART_RX_BUFFER_LEN;
-    }
-    */
 
     /*
     uint32_t count=LPTIM1->CNT;
@@ -821,23 +830,6 @@ int main(void)
     sprintf(buffer, "%lu", count);
     lcdPutsBlinkFree(buffer,2);
 
-    if(receiveBuffer[g]){
-      printString(receiveBuffer+g);
-    
-      while(receiveBuffer[g]){
-	receiveBuffer[g] = 0;
-	g = (g+1) % UART_RX_BUFFER_LEN;
-
-      }
-    }
-
-    */
-    
-    /*
-    if(USART1->ISR & USART_ISR_RXNE){
-      g = (USART1->RDR) & 0X00FF;
-      printf("%c\n",g);
-    };
     */
   }
 }
@@ -879,3 +871,12 @@ void EXTI15_10_IRQHandler(){
   
 }
 
+
+/*
+  uint16_t number2 = 16300;
+  uint8_t low = ((number2 & 0x7F) << 1) | 1;
+  uint8_t high = (number2>>6) | 1;
+
+  printf("%02X%02X\n",high, low);
+
+ */
