@@ -3,8 +3,9 @@
 #include "queue.h"
 #include "semphr.h"
 #include "stm32g431xx.h"
-#include "lcd.h"
+#include "LCD/lcd.h"
 #include "main.h"
+#include "CUSTOM/itoa.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,9 +30,7 @@ uint32_t desiredRepDir = 0;
 void USART1_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
-char* reverse(char *buffer, int i, int j);
-char* itoa(int value, char* buffer, int base);
-char* uitoa(unsigned int value, char* buffer, int base);
+
 
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrADC,
@@ -55,20 +54,6 @@ void sendToLCDQueue(messageTypes_t messageType,
   xQueueSendToBack(lcdQueue,&dataToSend,0);
 }
 
-// inline function to swap two numbers
-static inline void myswap(char *x, char *y) {
-	char t = *x; *x = *y; *y = t;
-}
-
-void printString(const char myString[]){
-  DMA1_Channel2->CCR &= ~DMA_CCR_EN;//Channel disable
-  DMA1_Channel2->CMAR = (uint32_t)myString;//DMA source address
-  DMA1_Channel2->CNDTR = strlen(myString);//DMA length
-  DMA1_Channel2->CCR |= DMA_CCR_EN;//Channel enable
-  while(!(DMA1->ISR & DMA_ISR_TCIF2));//Wait till transfere complete
-  DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
-}
-
 void setBLEConnected(uint8_t boolean){
   taskENTER_CRITICAL();
   bluetoothConnected = boolean;
@@ -85,81 +70,22 @@ uint8_t getBLEConnected(){
   return bleConnectionStatus;
 }
 
-
-
-// function to reverse buffer[i..j]
-char* reverse(char *buffer, int i, int j){
-	while (i < j)
-		myswap(&buffer[i++], &buffer[j--]);
-	return buffer;
+void printString(const char myString[]){
+  DMA1_Channel2->CCR &= ~DMA_CCR_EN;//Channel disable
+  DMA1_Channel2->CMAR = (uint32_t)myString;//DMA source address
+  DMA1_Channel2->CNDTR = strlen(myString);//DMA length
+  DMA1_Channel2->CCR |= DMA_CCR_EN;//Channel enable
+  while(!(DMA1->ISR & DMA_ISR_TCIF2));//Wait till transfere complete
+  DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
 }
 
-// Iterative function to implement itoa() function in C
-char* itoa(int value, char* buffer, int base){
-	// invalid input
-	if (base < 2 || base > 32)
-		return buffer;
-
-	// consider absolute value of number
-	int n = value;
-
-	int i = 0;
-	while (n)
-	{
-		int r = n % base;
-		if (r >= 10) 
-			buffer[i++] = 65 + (r - 10);
-		else
-			buffer[i++] = 48 + r;
-		n = n / base;
-	}
-
-	// if number is 0
-	if (i == 0)
-		buffer[i++] = '0';
-	// If base is 10 and value is negative, the resulting string 
-	// is preceded with a minus sign (-)
-	// With any other base, value is always considered unsigned
-	if (value < 0 && base == 10)
-		buffer[i++] = '-';
-	buffer[i] = '\0'; // null terminate string
-	// reverse the string and return it
-	return reverse(buffer, 0, i - 1);
+static inline void initializeTimers(void){
+  RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
 }
 
-char* uitoa(unsigned int value, char* buffer, int base){
-	// invalid input
-	if (base < 2 || base > 32)
-		return buffer;
-
-	// consider absolute value of number
-	unsigned int n = value;
-
-	int i = 0;
-	while (n)
-	{
-		unsigned int r = n % base;
-		if (r >= 10) 
-			buffer[i++] = 65 + (r - 10);
-		else
-			buffer[i++] = 48 + r;
-		n = n / base;
-	}
-
-	// if number is 0
-	if (i == 0)
-		buffer[i++] = '0';
-	// If base is 10 and value is negative, the resulting string 
-	// is preceded with a minus sign (-)
-	// With any other base, value is always considered unsigned
-	if (base == 10)
-		buffer[i++] = '-';
-	buffer[i] = '\0'; // null terminate string
-	// reverse the string and return it
-	return reverse(buffer, 0, i - 1);
+static inline void stopTimers(void){
+  RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
 }
-
-
 
 static void uartRXTask(void *args __attribute__((unused))){
 
@@ -198,23 +124,23 @@ static void uartRXTask(void *args __attribute__((unused))){
 	  sendToLCDQueue(connectedStatus, 1);
 	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
 	  sendToLCDQueue(connectedStatus, 0);
-	  //stopTimers();
+	  stopTimers();
 	  setBLEConnected(0);
 	  xSemaphoreGive(adcSemaphore);//Should go after setBLEConnected(0)
 	}else if(secondToken == '|'){
 
-	  uint8_t messageType = parseBuffer[1];
+	  uint8_t messageType = parseBuffer[0];
 	  if(messageType == 1){
-	    minDistToTravel = (parseBuffer[3]>>1) | ((parseBuffer[2] & 0xFE)<<6);
-	    desiredCounterDirection = parseBuffer[4]-1;
-	    desiredRepDir = parseBuffer[5]-1;
+	    minDistToTravel = (parseBuffer[2]>>1) | ((parseBuffer[1] & 0xFE)<<6);
+	    desiredCounterDirection = parseBuffer[3]-1;
+	    desiredRepDir = parseBuffer[4]-1;
 
-	    //startTimers();
+	    initializeTimers();
 	    xSemaphoreGive(encoderSemaphore);
 	    //writeEncoderStartValue();
 	    
 	  }else if(messageType == 2){
-	    //stopTimers();
+	    stopTimers();
 	  }else if(messageType == 3){
 	    xSemaphoreGive(adcSemaphore);
 	  }
@@ -262,9 +188,14 @@ static void lcdTask(void *args __attribute__((unused))){
 
   lcd_init();
   lcdPutsBlinkFree("  Paul's Inventions   ",0);
+
   
   for(;;){
 
+    uitoa(TIM2->CNT,buffer,10);
+    lcdPutsBlinkFree(buffer,3);
+    
+    /*
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
 
     if(receivedData.messageType == connectedStatus){//Connected status message
@@ -298,6 +229,7 @@ static void lcdTask(void *args __attribute__((unused))){
       lcdPutsBlinkFree(buffer, 7);
       
     }
+    */
   }    
 }
 
@@ -640,9 +572,9 @@ int main(void)
   RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
 
   //TIM2 CONFIGURATION
-  /*
-  TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI1SEL)) | (0b0000 << TIM_TISEL_TI1SEL_Pos);//tim_ti1_in source
-  TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI2SEL)) | (0b0000 << TIM_TISEL_TI2SEL_Pos);//tim_ti2_in source
+
+  TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI1SEL)) | (0b0000 << TIM_TISEL_TI1SEL_Pos);//tim_ti1 input on TIMx_CH1
+  TIM2->TISEL = (TIM2->TISEL & (~TIM_TISEL_TI2SEL)) | (0b0000 << TIM_TISEL_TI2SEL_Pos);//tim_ti2 input on TIMx_CH2
   TIM2->CCER |= (TIM_CCER_CC1NP | TIM_CCER_CC1P);//edge selection both edges for tim_ti1 source
   //TIM2->CCER |= (TIM_CCER_CC2NP | TIM_CCER_CC2P);//edge selection both edges for tim_ti2 source
   TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_IC1F)) | (0b0011 << TIM_CCMR1_IC1F_Pos);//Tim_ti1 filtered for 8 clock cycles
@@ -650,14 +582,15 @@ int main(void)
   TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC1S)) | (0b01 << TIM_CCMR1_CC1S_Pos);//(input mode)Tim_ic1 mapping on tim_ti1 
   //TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC2S)) | (0b01 << TIM_CCMR1_CC2S_Pos);//(input mode)Tim_ic2 mapping on tim_ti2
   TIM2->CCER |= (TIM_CCER_CC1E);//Capture enabled for Capture register 1 and 2
-  */
-
-  //  TIM2->CR2 |= TIM_CR2_TI1S;// ti1_in ti2_in source XORed
-  TIM2->ARR = 0XFFFFFFFF;//Preescaler
-  TIM2->PSC = 4;//Preescaler
-  TIM2->CNT = 0XFFFFFFFF;
+  
+  TIM2->CR2 |= TIM_CR2_TI1S;// tim_ti1 and tim_ti2 inputs XORed on tim_ti1
   TIM2->DIER = TIM_DIER_CC1IE;//Enable Interrupts
-  TIM2->CR1 |= TIM_CR1_CEN; //Counter enable
+  TIM2->ARR = 0XFFFFFFFF;//Preescaler
+  TIM2->PSC = 4;//Preescaler / actual value = TIM2->PSC + 1 
+  TIM2->CNT = 0XFFFFFFFF;//For PSC value to be accounted inmediatly after update
+  TIM2->CR1 |= TIM_CR1_CEN; //Start tim2Counter
+
+  RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM2EN;//Disable TIM2 clock  
 
   //---------------------CONFIGURE EXTI-------------------------
   RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;//Enable SYSCFG clock
@@ -735,15 +668,6 @@ int main(void)
   CORDIC->CSR &= ~CORDIC_CSR_NARGS;//Only one 32 bit write
   CORDIC->CSR |= CORDIC_CSR_NRES;//Two results, two reads necessary
   
-
-  //---------------------CONFIGURE NVIC--------------------------
-  
-  NVIC_SetPriorityGrouping(0); //4 bits for pre-emption 0 bit for subpriority
-
-  NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 1, 0));
-  NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),2, 0));
-  
   //---------------------CONFIGURE RTOS-------------------------
 
   adcSemaphore = xSemaphoreCreateBinary();
@@ -757,12 +681,19 @@ int main(void)
   xTaskCreate(lcdTask,"lcdTask",100, NULL, 2, NULL);
   xTaskCreate(adcTask,"adcTask",100,NULL,1,NULL);
 
-  //---------------------ENABLE INTERRUPTS---------------------------
+  //---------------------CONFIGURE NVIC---------------------------
 
+  NVIC_SetPriorityGrouping(0); //4 bits for pre-emption 0 bit for subpriority
+
+  NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 1, 0));
+  NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),2, 0));
+  
   //  NVIC_EnableIRQ(TIM2_IRQn);
   NVIC_EnableIRQ(EXTI15_10_IRQn);
   NVIC_EnableIRQ(USART1_IRQn);
 
+  //---------------------START RTOS-------------------------------
   vTaskStartScheduler();
   
   while (1)

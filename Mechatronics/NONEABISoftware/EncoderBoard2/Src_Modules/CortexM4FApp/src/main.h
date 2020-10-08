@@ -55,8 +55,8 @@ void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t peakVelocity);
 void sendToLCDQueue(messageTypes_t messageType,
 		    uint32_t displayValue);
-void printString(const char myString[]);
 void setBLEConnected(uint8_t boolean);
 uint8_t getBLEConnected(void);
+void printString(const char myString[]);
 
 #endif
