@@ -1,0 +1,50 @@
+DESCRIPTION OF THE PROTOCOL
+
+1.- 0 should be interpreted as a null terminator always, henceforth no 0's other than null
+    characters should be used in the implementation. This is so because characters of 0 are to be
+    interpreted as null characters and as such might notify there are no more characters to be
+    parsed or buffered. In this way compatibility and reliability is assured with different
+    possible implementations.
+
+2.- Character initiator and terminator:
+    There should be a character at the beginning and end of each 20 bytes ble payload as to indicate
+    where the message begins and ends. This is so if the central or peripheral would be using
+    a protocol which provides a uart like service with no delimitation of what each 20 bytes payload
+    both devices could still interpretate what the intended message is.
+
+3.- The first byte after the initiator character should be the message type which values are to be
+    interpreted with a clear division between central message types and peripheral message types as
+    for if there is a mechanism which notifies every characteristic value change without
+    distinguishing wheter that change is due to own made writing of the characteristic or due to
+    external writing whoever reads the payload (message) can know wheter that change is due to its
+    own or external actions.
+
+    Central message types should not be written by the central, only by the
+    periphereal and viceversa with peripheareal message types, in this way directionality is
+    achieved, eg: Should a message be received with a central code in the central then the message
+    can be excluded and be assumed as a notification of own central actions, the same behaviour
+    would be expected with the periphereal.
+
+
+4.- More than one byte numerical values should be encoded with a special format which has a the
+    first bit set to one, as to comply with the first rule
+
+    A common implementation for doing a split of a 2 byte value in two which complies with the spec
+    might be as follows:
+
+    uint16_t numberToEncode = 16300;	
+    uint8_t low = ((numberToEncode & 0x7F) << 1) | 1;
+    uint8_t high = (numberToEncode>>6) | 1;
+
+    printf("%02X%02X\n",high, low);
+
+    Note that original 2 byte max value is reduced.
+
+The specific implementation of this protocol is made with:
+
+2.- 7C as the initiator and terminator character
+3.- 01 to 128 are chosen as encoder (periphereal) values, 129 to 256 are chosen as app (central)
+    values
+    
+    
+    

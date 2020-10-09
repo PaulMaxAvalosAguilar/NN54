@@ -87,6 +87,17 @@ static inline void stopTimers(void){
   RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
 }
 
+static inline void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
+  static uint8_t lowPart = 0;
+  static uint8_t highPart = 0;
+  
+  lowPart = ((numberToEncode & 0x7F) << 1) | 1;
+  highPart = (numberToEncode >>6) | 1;
+  twoByteBuffer[0] = highPart;
+  twoByteBuffer[1] = lowPart;
+  twoByteBuffer[2] = 0;
+}
+
 static void uartRXTask(void *args __attribute__((unused))){
 
   uint32_t receiveBufferPos = 0;
@@ -137,14 +148,14 @@ static void uartRXTask(void *args __attribute__((unused))){
 
 	    initializeTimers();
 	    xSemaphoreGive(encoderSemaphore);
-	    //writeEncoderStartValue();
+	    sendToUARTTXQueue(encoderStart,0,0,0);
 	    
 	  }else if(messageType == 2){
 	    stopTimers();
+	    sendToUARTTXQueue(encoderStop,0,0,0);
 	  }else if(messageType == 3){
 	    xSemaphoreGive(adcSemaphore);
-	  }
-	  
+	  }	  
 	}
 
 	receiveBuffer[receiveBufferPos] = 0;
@@ -162,18 +173,51 @@ static void uartTXTask(void *args __attribute__((unused))){
 
   uartTXData_t receivedData;
   char buffer[20];
+  char twoByteBuffer[3];
+
   
   for(;;){
     xQueueReceive(uartTXQueue, &receivedData, portMAX_DELAY);
+    
+    strcpy(buffer,"|");
+      
+    if(receivedData.messageType == encoderData){
+      twoByteBuffer[0] = 129;
+      twoByteBuffer[1] = 0;
+      strcat(buffer, twoByteBuffer);
+      
+      encodeTwoBytes(twoByteBuffer, receivedData.traveledDistanceOrADC);
+      strcat(buffer, twoByteBuffer);
 
-    if(receivedData.messageType == encoderStart){
+      encodeTwoBytes(twoByteBuffer, receivedData.meanPropulsiveVelocity);
+      strcat(buffer, twoByteBuffer);
 
-    }else if(receivedData.messageType == encoderData){
+      encodeTwoBytes(twoByteBuffer, receivedData.peakVelocity);
+      strcat(buffer, twoByteBuffer);
 
+    }else if(receivedData.messageType == encoderStart){
+      twoByteBuffer[0] = 130;
+      twoByteBuffer[1] = 0;
+      strcat(buffer, twoByteBuffer);
+      
     }else if(receivedData.messageType == batteryLevel){
-      itoa(receivedData.traveledDistanceOrADC,buffer,10);
-      printString(buffer);
+
+      twoByteBuffer[0] = 131;
+      twoByteBuffer[1] = 0;
+      strcat(buffer, twoByteBuffer);
+
+      encodeTwoBytes(twoByteBuffer, receivedData.traveledDistanceOrADC);
+      strcat(buffer, twoByteBuffer);
+      
+    }else if(receivedData.messageType == encoderStop){
+      twoByteBuffer[0] = 132;
+      twoByteBuffer[1] = 0;
+      strcat(buffer, twoByteBuffer);
+      
     }
+
+    strcat(buffer,"|");
+    printString(buffer);
   }
 }
 
@@ -192,10 +236,6 @@ static void lcdTask(void *args __attribute__((unused))){
   
   for(;;){
 
-    uitoa(TIM2->CNT,buffer,10);
-    lcdPutsBlinkFree(buffer,3);
-    
-    /*
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
 
     if(receivedData.messageType == connectedStatus){//Connected status message
@@ -229,7 +269,6 @@ static void lcdTask(void *args __attribute__((unused))){
       lcdPutsBlinkFree(buffer, 7);
       
     }
-    */
   }    
 }
 
@@ -242,13 +281,13 @@ static void adcTask(void *args __attribute__((unused))){
     
     taskENTER_CRITICAL();
     ADC1->CFGR2 |= ADC_CFGR2_BULB;//Bulb sampling
-    ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 4 bits
+    ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 8 bits
     ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSR)) | (0b111 << ADC_CFGR2_OVSR_Pos);//Oversampling ratio 256x
     ADC1->CFGR2 &= ~ADC_CFGR2_ROVSE;//Regular oversampling disabled
 
     ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
-    ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b000 << ADC_SMPR1_SMP5_Pos);//Sample time 2.5 clock cycles
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (18 << ADC_SQR1_SQ1_Pos);//1st conversion on IN18
+    ADC1->SMPR2 = (ADC1->SMPR2 & (~ADC_SMPR2_SMP18)) | (0b000 << ADC_SMPR2_SMP18_Pos);//Sample time 2.5 clock cycles
     
     ADC1->CR |= ADC_CR_ADSTART;//Start conversion
     while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
@@ -258,7 +297,7 @@ static void adcTask(void *args __attribute__((unused))){
     ADC1->CFGR2 |= ADC_CFGR2_ROVSE;//Regular oversampling enabled
     
     ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//2nd conversion on IN5
+    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
     ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b111 << ADC_SMPR1_SMP5_Pos);//Sample time 640.5 clock cycles
     
     ADC1->CR |= ADC_CR_ADSTART;//Start conversion
@@ -268,7 +307,7 @@ static void adcTask(void *args __attribute__((unused))){
     adcData = ADC1->DR;//Read data register and clear EOC flag
     while(ADC1->CR & ADC_CR_ADSTART);
 
-    adcData = (adcData * 6104/10000)*2;
+    adcData = (adcData * 6104/10000) * 2;
 
     sendToLCDQueue(batteryLevel, adcData);
     sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
@@ -801,13 +840,3 @@ void EXTI15_10_IRQHandler(){
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   
 }
-
-
-/*
-  uint16_t number2 = 16300;
-  uint8_t low = ((number2 & 0x7F) << 1) | 1;
-  uint8_t high = (number2>>6) | 1;
-
-  printf("%02X%02X\n",high, low);
-
- */

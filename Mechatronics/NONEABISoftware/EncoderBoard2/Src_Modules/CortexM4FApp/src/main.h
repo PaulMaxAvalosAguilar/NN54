@@ -25,6 +25,7 @@ extern QueueHandle_t lcdQueue;
 typedef enum messageTypes_t{
 			    encoderData,
 			    encoderStart,
+			    encoderStop,
 			    connectedStatus,
 			    batteryLevel,
 			    chargingStatus
