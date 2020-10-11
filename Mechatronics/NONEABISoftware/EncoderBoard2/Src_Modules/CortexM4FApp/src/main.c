@@ -644,7 +644,7 @@ int main(void)
   TIM3->DIER = TIM_DIER_UIE;//Enable update interrupt
   TIM3->CR1 |= TIM_CR1_URS;//Only counter overflow generates interrupt
   TIM3->ARR = 0xFFFF;//Autoreload register
-  TIM3->PSC = 0xFFFF;//Preescaler / actual value = TIM3->PSC + 1 
+  TIM3->PSC = 0xF;//Preescaler / actual value = TIM3->PSC + 1 
   TIM3->EGR = TIM_EGR_UG;//Generate update
 
 
