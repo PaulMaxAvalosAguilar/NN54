@@ -315,7 +315,7 @@ static void adcTask(void *args __attribute__((unused))){
     if(getBLEConnected()){
       xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
     }else{
-      vTaskDelay(pdMS_TO_TICKS(500));
+      vTaskDelay(pdMS_TO_TICKS(3000));
     }
   }
 }
@@ -623,14 +623,36 @@ int main(void)
   TIM2->CCER |= (TIM_CCER_CC1E);//Capture enabled for Capture register 1 and 2
   
   TIM2->CR2 |= TIM_CR2_TI1S;// tim_ti1 and tim_ti2 inputs XORed on tim_ti1
-  TIM2->DIER = TIM_DIER_CC1IE;//Enable Interrupts
-  TIM2->ARR = 0XFFFFFFFF;//Preescaler
+  TIM2->DIER = TIM_DIER_CC1IE;//Enable capture 1 interrupt 
+  TIM2->CR1 |= TIM_CR1_URS;//Only counter overflow generates interrupt
+  TIM2->ARR = 0XFFFFFFFF;//Auto reload register
   TIM2->PSC = 4;//Preescaler / actual value = TIM2->PSC + 1 
-  TIM2->CNT = 0XFFFFFFFF;//For PSC value to be accounted inmediatly after update
+  TIM2->CNT = 0;//For PSC value to be accounted inmediatly after update
+  TIM2->EGR |= TIM_EGR_UG;//Generate update
+
   TIM2->CR1 |= TIM_CR1_CEN; //Start tim2Counter
 
-  RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM2EN;//Disable TIM2 clock  
+  RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM2EN;//Disable TIM2 clock
 
+  //---------------------CONFIGURE TIM3-------------------------
+  RCC->APB1ENR1 |= RCC_APB1ENR1_TIM3EN;//Enable TIM3 clock
+
+  //TIM3 CONFIGURATION
+
+
+  TIM3->CR1 |= TIM_CR1_OPM;//One pulse mode
+  TIM3->DIER = TIM_DIER_UIE;//Enable update interrupt
+  TIM3->CR1 |= TIM_CR1_URS;//Only counter overflow generates interrupt
+  TIM3->ARR = 0xFFFF;//Autoreload register
+  TIM3->PSC = 0xFFFF;//Preescaler / actual value = TIM3->PSC + 1 
+  TIM3->EGR = TIM_EGR_UG;//Generate update
+
+
+  /*
+    TIM3->CNT = 0;
+    TIM3->CR1 |= TIM_CR1_CEN;
+   */
+  
   //---------------------CONFIGURE EXTI-------------------------
   RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;//Enable SYSCFG clock
 
@@ -733,10 +755,21 @@ int main(void)
   NVIC_EnableIRQ(USART1_IRQn);
 
   //---------------------START RTOS-------------------------------
-  vTaskStartScheduler();
+  //  vTaskStartScheduler();
+
+  char buffer[20];
+  lcd_init();
+  lcdPutsBlinkFree("INIT",0);
+
+
+
+  TIM3->CR1 |= TIM_CR1_CEN;
   
   while (1)
   {
+    uitoa(TIM3->CNT, buffer,10);
+    lcdPutsBlinkFree(buffer,5);
+     
 
     /*
     uint32_t count=LPTIM1->CNT;
@@ -839,4 +872,76 @@ void EXTI15_10_IRQHandler(){
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   
+}
+
+#define portNVIC_SYSTICK_CTRL_REG			( * ( ( volatile uint32_t * ) 0xe000e010 ) )
+#define portNVIC_SYSTICK_ENABLE_BIT			( 1UL << 0UL )
+
+static inline void enterLPR(void){
+
+  RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b00 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
+  RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);//CPU freq 195.312 Khz
+  PWR->CR1 |= PWR_CR1_LPR;
+  while(!(PWR->SR2 & PWR_SR2_REGLPS));//Wait till low power regulator started
+  while(!(PWR->SR2 & PWR_SR2_REGLPF));//Wait till regulator is in low power mode
+  
+}
+
+static inline void exitLPR(void){
+  
+    PWR->CR1 &= ~PWR_CR1_LPR;
+    while((PWR->SR2 & PWR_SR2_REGLPF));
+    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b0000 << RCC_CFGR_HPRE_Pos);//CPU freq 50 mhz
+    RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b10 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
+
+}
+
+void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
+
+  eSleepModeStatus eSleepStatus;
+
+  portNVIC_SYSTICK_CTRL_REG &= ~portNVIC_SYSTICK_ENABLE_BIT;  //Stop the SysTick
+  //Disable interrupts
+  __asm volatile( "cpsid i" ::: "memory" );
+  __asm volatile( "dsb" );
+  __asm volatile( "isb" );
+
+  eSleepStatus = eTaskConfirmSleepModeStatus();
+  
+  if( eSleepStatus == eAbortSleep ){
+
+    portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;//Restart systick
+    __asm volatile( "cpsie i" ::: "memory" );//reenable interrupts
+    
+  }else{
+      
+    if(eSleepStatus == eNoTasksWaitingTimeout){
+
+      enterLPR();
+      
+      //Wait for interrupt
+      __asm volatile( "dsb" ::: "memory" );
+      __asm volatile( "wfi" );
+      __asm volatile( "isb" );
+    }else{
+
+      enterLPR();
+      
+      //Wait for interrupt
+      __asm volatile( "dsb" ::: "memory" );
+      __asm volatile( "wfi" );
+      __asm volatile( "isb" );
+    }
+
+    exitLPR();
+
+    vTaskStepTick( xExpectedIdleTime);
+
+    //Reenable interrupts
+    __asm volatile( "cpsie i" ::: "memory" );
+    __asm volatile( "dsb" );
+    __asm volatile( "isb" );
+
+    portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;//Restart systick
+  }
 }
