@@ -118,5 +118,11 @@ standard names. */
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 
+/*extern void pre(uint32_t ticks);
+extern void post(uint32_t ticks);
+
+#define configPRE_SLEEP_PROCESSING( xModifiableIdleTime ) pre(xExpectedIdleTime)
+#define configPOST_SLEEP_PROCESSING( xExpectedIdleTime ) post(xExpectedIdleTime)
+*/
 #endif /* FREERTOS_CONFIG_H */
 

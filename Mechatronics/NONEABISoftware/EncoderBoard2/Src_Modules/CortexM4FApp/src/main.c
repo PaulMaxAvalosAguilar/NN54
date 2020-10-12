@@ -26,9 +26,9 @@ uint32_t minDistToTravel = 0;
 uint32_t desiredCounterDirection = 0;
 uint32_t desiredRepDir = 0;
 
-
-void USART1_IRQHandler(void);
 void TIM2_IRQHandler(void);
+void TIM3_IRQHandler(void);
+void USART1_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 
 
@@ -620,14 +620,14 @@ int main(void)
   //TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_IC2F)) | (0b0011 << TIM_CCMR1_IC2F_Pos);//Tim_ti2 filtered for 8 clock cycles
   TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC1S)) | (0b01 << TIM_CCMR1_CC1S_Pos);//(input mode)Tim_ic1 mapping on tim_ti1 
   //TIM2->CCMR1 = (TIM2->CCMR1 & (~TIM_CCMR1_CC2S)) | (0b01 << TIM_CCMR1_CC2S_Pos);//(input mode)Tim_ic2 mapping on tim_ti2
-  TIM2->CCER |= (TIM_CCER_CC1E);//Capture enabled for Capture register 1 and 2
+  TIM2->CCER |= (TIM_CCER_CC1E);//Capture enabled for Capture register 1
   
   TIM2->CR2 |= TIM_CR2_TI1S;// tim_ti1 and tim_ti2 inputs XORed on tim_ti1
   TIM2->DIER = TIM_DIER_CC1IE;//Enable capture 1 interrupt 
   TIM2->CR1 |= TIM_CR1_URS;//Only counter overflow generates interrupt
   TIM2->ARR = 0XFFFFFFFF;//Auto reload register
   TIM2->PSC = 4;//Preescaler / actual value = TIM2->PSC + 1 
-  TIM2->CNT = 0;//For PSC value to be accounted inmediatly after update
+  TIM2->CNT = 0;
   TIM2->EGR |= TIM_EGR_UG;//Generate update
 
   TIM2->CR1 |= TIM_CR1_CEN; //Start tim2Counter
@@ -638,20 +638,14 @@ int main(void)
   RCC->APB1ENR1 |= RCC_APB1ENR1_TIM3EN;//Enable TIM3 clock
 
   //TIM3 CONFIGURATION
-
-
   TIM3->CR1 |= TIM_CR1_OPM;//One pulse mode
-  TIM3->DIER = TIM_DIER_UIE;//Enable update interrupt
+  TIM3->DIER |= TIM_DIER_UIE;//Enable update interrupt
   TIM3->CR1 |= TIM_CR1_URS;//Only counter overflow generates interrupt
-  TIM3->ARR = 0xFFFF;//Autoreload register
-  TIM3->PSC = 0xF;//Preescaler / actual value = TIM3->PSC + 1 
+  TIM3->PSC = 9999; //Preescaler for .051" at 195.3125Khz / actual value = TIM3->PSC +1
   TIM3->EGR = TIM_EGR_UG;//Generate update
+  TIM3->CNT = 0;
 
-
-  /*
-    TIM3->CNT = 0;
-    TIM3->CR1 |= TIM_CR1_CEN;
-   */
+  RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM3EN;//Enable TIM3 clock
   
   //---------------------CONFIGURE EXTI-------------------------
   RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;//Enable SYSCFG clock
@@ -747,29 +741,23 @@ int main(void)
   NVIC_SetPriorityGrouping(0); //4 bits for pre-emption 0 bit for subpriority
 
   NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  NVIC_SetPriority(TIM3_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 1, 0));
   NVIC_SetPriority(EXTI15_10_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),2, 0));
   
   //  NVIC_EnableIRQ(TIM2_IRQn);
+  NVIC_EnableIRQ(TIM3_IRQn);
   NVIC_EnableIRQ(EXTI15_10_IRQn);
   NVIC_EnableIRQ(USART1_IRQn);
 
   //---------------------START RTOS-------------------------------
-  //  vTaskStartScheduler();
-
-  char buffer[20];
-  lcd_init();
-  lcdPutsBlinkFree("INIT",0);
+  
+  vTaskStartScheduler();
 
 
-
-  TIM3->CR1 |= TIM_CR1_CEN;
   
   while (1)
   {
-    uitoa(TIM3->CNT, buffer,10);
-    lcdPutsBlinkFree(buffer,5);
-     
 
     /*
     uint32_t count=LPTIM1->CNT;
@@ -841,6 +829,12 @@ void TIM2_IRQHandler(){
   TIM2->SR &= ~TIM_SR_CC1IF;
   counter = TIM2->CCR1;
 }
+     
+void TIM3_IRQHandler(){
+  uint32_t status = TIM3->SR;
+  TIM3->SR = 0;
+
+}
 
 void USART1_IRQHandler(){
   USART1->ICR |= USART_ICR_IDLECF;
@@ -880,7 +874,7 @@ void EXTI15_10_IRQHandler(){
 static inline void enterLPR(void){
 
   RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b00 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
-  RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);//CPU freq 195.312 Khz
+  RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);//CPU freq 195.3125 Khz
   PWR->CR1 |= PWR_CR1_LPR;
   while(!(PWR->SR2 & PWR_SR2_REGLPS));//Wait till low power regulator started
   while(!(PWR->SR2 & PWR_SR2_REGLPF));//Wait till regulator is in low power mode
@@ -896,7 +890,14 @@ static inline void exitLPR(void){
 
 }
 
+
 void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
+
+  //Formula used to determine ARR value:
+  // #ticksMissing * (second/#Ticks) * (timer_counter_Unit/time_in_seconds)
+
+  //Formula used to determine elapsed ticks
+  // timCounter * (time_in_seconds/time_counter_Unit) * (#ticks/second)
 
   eSleepModeStatus eSleepStatus;
 
@@ -907,17 +908,22 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
   __asm volatile( "isb" );
 
   eSleepStatus = eTaskConfirmSleepModeStatus();
-  
+
   if( eSleepStatus == eAbortSleep ){
 
     portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;//Restart systick
     __asm volatile( "cpsie i" ::: "memory" );//reenable interrupts
     
   }else{
+
+    RCC->APB1ENR1 |= RCC_APB1ENR1_TIM3EN;//Enable TIM3 clock
+    lcdPutsBlinkFree("SLEEP",3);    
       
     if(eSleepStatus == eNoTasksWaitingTimeout){
 
       enterLPR();
+      TIM3->ARR = 65535;
+      TIM3->CR1 |= TIM_CR1_CEN;
       
       //Wait for interrupt
       __asm volatile( "dsb" ::: "memory" );
@@ -926,6 +932,8 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
     }else{
 
       enterLPR();
+      TIM3->ARR = (xExpectedIdleTime * (1000 / configTICK_RATE_HZ) )/ 51;
+      TIM3->CR1 |= TIM_CR1_CEN;
       
       //Wait for interrupt
       __asm volatile( "dsb" ::: "memory" );
@@ -933,15 +941,33 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
       __asm volatile( "isb" );
     }
 
-    exitLPR();
 
-    vTaskStepTick( xExpectedIdleTime);
+    TIM3->CR1 &= ~TIM_CR1_CEN;
+    exitLPR();
+    vTaskStepTick(xExpectedIdleTime);
+    TIM3->CNT = 0;
+
+
+    lcdPutsBlinkFree("",3);    
 
     //Reenable interrupts
     __asm volatile( "cpsie i" ::: "memory" );
     __asm volatile( "dsb" );
     __asm volatile( "isb" );
 
+    RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM3EN;//Disable TIM3 clock, should go after interrupts enabling
     portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;//Restart systick
   }
 }
+
+
+/*
+void pre(uint32_t ticks){
+    lcdPutsBlinkFree("SLEEP",3);    
+
+}
+
+void post(uint32_t ticks){
+    lcdPutsBlinkFree("",3);    
+}
+*/
