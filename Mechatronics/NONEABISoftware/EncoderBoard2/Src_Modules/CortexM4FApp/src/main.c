@@ -148,8 +148,6 @@ static void uartRXTask(void *args __attribute__((unused))){
 	  uint8_t messageType = parseBuffer[0];
 	  if(messageType == 1){
 	    minDistToTravel = decodeTwoBytes(parseBuffer[1], parseBuffer[2]);
-	    itoa(minDistToTravel,parseBuffer,10);
-	    lcdPutsBlinkFree(parseBuffer,4);
 	    desiredCounterDirection = parseBuffer[3]-1;
 	    desiredRepDir = parseBuffer[4]-1;
 
