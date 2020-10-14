@@ -831,9 +831,7 @@ void TIM2_IRQHandler(){
 }
      
 void TIM3_IRQHandler(){
-  uint32_t status = TIM3->SR;
-  TIM3->SR = 0;
-
+  TIM3->SR = ~TIM_SR_UIF;
 }
 
 void USART1_IRQHandler(){
@@ -894,10 +892,10 @@ static inline void exitLPR(void){
 void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
 
   //Formula used to determine ARR value:
-  // #ticksMissing * (second/#Ticks) * (timer_counter_Unit/time_in_seconds)
+  // #ticksMissing * (1 second/#Ticks) * (1 timer_counter_Unit/time_in_seconds)
 
   //Formula used to determine elapsed ticks
-  // timCounter * (time_in_seconds/time_counter_Unit) * (#ticks/second)
+  // timCounter * (time_in_seconds/1 time_counter_Unit) * (#ticks/1second)
 
   eSleepModeStatus eSleepStatus;
 
@@ -944,9 +942,12 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
 
     TIM3->CR1 &= ~TIM_CR1_CEN;
     exitLPR();
-    vTaskStepTick(xExpectedIdleTime);
-    TIM3->CNT = 0;
 
+    ((TIM3->SR & TIM_SR_UIF) && (TIM3->CNT == 0))?
+      vTaskStepTick(xExpectedIdleTime):
+      vTaskStepTick((TIM2->CNT * 51 * configTICK_RATE_HZ)/1000);
+
+    TIM3->CNT = 0;
 
     lcdPutsBlinkFree("",3);    
 
