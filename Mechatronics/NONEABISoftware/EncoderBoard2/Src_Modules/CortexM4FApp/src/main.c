@@ -98,6 +98,11 @@ static inline void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
   twoByteBuffer[2] = 0;
 }
 
+static inline uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
+
+  return (lsb>>1) | ((msb & 0xFE)<<6);
+}
+
 static void uartRXTask(void *args __attribute__((unused))){
 
   uint32_t receiveBufferPos = 0;
@@ -142,7 +147,9 @@ static void uartRXTask(void *args __attribute__((unused))){
 
 	  uint8_t messageType = parseBuffer[0];
 	  if(messageType == 1){
-	    minDistToTravel = (parseBuffer[2]>>1) | ((parseBuffer[1] & 0xFE)<<6);
+	    minDistToTravel = decodeTwoBytes(parseBuffer[1], parseBuffer[2]);
+	    itoa(minDistToTravel,parseBuffer,10);
+	    lcdPutsBlinkFree(parseBuffer,4);
 	    desiredCounterDirection = parseBuffer[3]-1;
 	    desiredRepDir = parseBuffer[4]-1;
 
@@ -755,73 +762,10 @@ int main(void)
   vTaskStartScheduler();
 
 
-  
   while (1)
   {
 
-    /*
-    uint32_t count=LPTIM1->CNT;
 
-    sprintf(buffer, "%lu", counter);
-    lcdPutsBlinkFree(buffer,2);
-
-    sprintf(buffer, "%lu", charging);
-    lcdPutsBlinkFree(buffer,3);
-
-    intoa(count,buffer,10);
-    lcdPutsBlinkFree(buffer,5);
-    */
-
-
-    /*
-    for(int i = 1; i < 3000000;i++);
-    sprintf(buffer, "1");
-    lcdPutsBlinkFree(buffer,3);
-
-    for(int i = 1; i < 3000000;i++);
-    sprintf(buffer, "2");
-    lcdPutsBlinkFree(buffer,3);
-
-    for(int i = 1; i < 3000000;i++);
-    sprintf(buffer, "3");
-    lcdPutsBlinkFree(buffer,3);
-
-    for(int i = 1; i < 3000000;i++);
-    sprintf(buffer, "4");
-    lcdPutsBlinkFree(buffer,3);
-
-    for(int i = 1; i < 3000000;i++);
-    sprintf(buffer, "5");
-    lcdPutsBlinkFree(buffer,3);
-
-    __asm volatile( "cpsid i" ::: "memory" );
-    __asm volatile( "dsb" );
-    __asm volatile( "isb" );
-    RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b00 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
-    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b1110 << RCC_CFGR_HPRE_Pos);//CPU freq 195.312 Khz
-    PWR->CR1 |= PWR_CR1_LPR;
-    while(!(PWR->SR2 & PWR_SR2_REGLPS));//Wait till low power regulator started
-    while(!(PWR->SR2 & PWR_SR2_REGLPF));//Wait till regulator is in low power mode
-    printString("\x31""Hola\n");
-    lcdPutsBlinkFree("9",3);
-    __WFI();
-    PWR->CR1 &= ~PWR_CR1_LPR;
-    while((PWR->SR2 & PWR_SR2_REGLPF));
-    RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_HPRE)) | (0b0000 << RCC_CFGR_HPRE_Pos);//CPU freq 50 mhz
-    RCC->CCIPR = (RCC->CCIPR & (~RCC_CCIPR_LPTIM1SEL)) | (0b10 << RCC_CCIPR_LPTIM1SEL_Pos);//PCLK selected as LPTIM1 clock
-    printString("\x31""Adios\n");
-    lcdPutsBlinkFree("10",3);
-    __asm volatile( "cpsie i" ::: "memory" );
-    __asm volatile( "dsb" );
-    __asm volatile( "isb" );
-
-
-    uint32_t count=LPTIM1->CNT;
-
-    sprintf(buffer, "%lu", count);
-    lcdPutsBlinkFree(buffer,2);
-
-    */
   }
 }
 
@@ -888,7 +832,6 @@ static inline void exitLPR(void){
 
 }
 
-
 void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
 
   //Formula used to determine ARR value:
@@ -915,7 +858,7 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
   }else{
 
     RCC->APB1ENR1 |= RCC_APB1ENR1_TIM3EN;//Enable TIM3 clock
-    lcdPutsBlinkFree("SLEEP",3);    
+    lcdPutsBlinkFree("SLEEP",4);    
       
     if(eSleepStatus == eNoTasksWaitingTimeout){
 
@@ -949,7 +892,7 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
 
     TIM3->CNT = 0;
 
-    lcdPutsBlinkFree("",3);    
+    lcdPutsBlinkFree("",4);    
 
     //Reenable interrupts
     __asm volatile( "cpsie i" ::: "memory" );
@@ -960,15 +903,3 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime ){
     portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;//Restart systick
   }
 }
-
-
-/*
-void pre(uint32_t ticks){
-    lcdPutsBlinkFree("SLEEP",3);    
-
-}
-
-void post(uint32_t ticks){
-    lcdPutsBlinkFree("",3);    
-}
-*/

@@ -54,7 +54,8 @@
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
-#define configUSE_TICKLESS_IDLE         1
+#define configUSE_TICKLESS_IDLE         0
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP  (1000 * configTICK_RATE_HZ)/1000
 #define configUSE_IDLE_HOOK		0
 #define configUSE_TICK_HOOK		0
 #define configCPU_CLOCK_HZ		( ( unsigned long ) 50000000 )	
@@ -70,7 +71,6 @@
 #define configUSE_MUTEXES		0
 #define configCHECK_FOR_STACK_OVERFLOW	0
 #define configUSE_QUEUE_SETS            0
-#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP  (1000 * configTICK_RATE_HZ)/1000
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
@@ -118,11 +118,5 @@ standard names. */
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 
-/*extern void pre(uint32_t ticks);
-extern void post(uint32_t ticks);
-
-#define configPRE_SLEEP_PROCESSING( xModifiableIdleTime ) pre(xExpectedIdleTime)
-#define configPOST_SLEEP_PROCESSING( xExpectedIdleTime ) post(xExpectedIdleTime)
-*/
 #endif /* FREERTOS_CONFIG_H */
 
