@@ -58,6 +58,6 @@ void sendToLCDQueue(messageTypes_t messageType,
 		    uint32_t displayValue);
 void setBLEConnected(uint8_t boolean);
 uint8_t getBLEConnected(void);
-void printString(const char myString[]);
+void printStringUART(const char myString[]);
 
 #endif

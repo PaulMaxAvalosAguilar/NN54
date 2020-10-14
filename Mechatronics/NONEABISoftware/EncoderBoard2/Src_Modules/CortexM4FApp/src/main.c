@@ -70,7 +70,7 @@ uint8_t getBLEConnected(){
   return bleConnectionStatus;
 }
 
-void printString(const char myString[]){
+void printStringUART(const char myString[]){
   DMA1_Channel2->CCR &= ~DMA_CCR_EN;//Channel disable
   DMA1_Channel2->CMAR = (uint32_t)myString;//DMA source address
   DMA1_Channel2->CNDTR = strlen(myString);//DMA length
@@ -222,7 +222,7 @@ static void uartTXTask(void *args __attribute__((unused))){
     }
 
     strcat(buffer,"|");
-    printString(buffer);
+    printStringUART(buffer);
   }
 }
 
