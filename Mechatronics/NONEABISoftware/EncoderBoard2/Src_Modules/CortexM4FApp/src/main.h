@@ -17,7 +17,7 @@ extern SemaphoreHandle_t uartRXSemaphore;
 extern QueueHandle_t uartTXQueue;
 extern QueueHandle_t lcdQueue;
 
-//Queue and Semaphore sizes------------------
+//Queue sizes------------------
 #define LCD_QUEUE_SIZE                20
 #define TX_QUEUE_SIZE                 20
 

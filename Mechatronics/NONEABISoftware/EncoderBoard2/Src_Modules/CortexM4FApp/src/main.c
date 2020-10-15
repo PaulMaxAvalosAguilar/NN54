@@ -84,6 +84,7 @@ static inline void createTask(TaskFunction_t pvTaskCode,
   
   taskENTER_CRITICAL();
 
+  //Two instances of the same task are not allowed
   if(*taskHandle != NULL){
     vTaskDelete(*taskHandle);
     *taskHandle = NULL;
@@ -209,33 +210,50 @@ static void uartRXTask(void *args __attribute__((unused))){
 
 	//INTERPRET
 	if(strncmp(parseBuffer, "CONNECT",7) == 0){
+	  
 	  sendToLCDQueue(connectedStatus, 1);
 	  deleteTask(&adcFreeTaskHandle);
 	  createTask(adcWaitTask,"adcWaitTask",100,NULL,1,&adcWaitTaskHandle);
+	  
 	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
-	  deleteTask(&encoderTaskHandle);//In case no stop was ever received
-	  stopTimers();//In case no stop was ever received, should go after deleting encoder task
+
+	  //In case no stop was ever received-----------------------------------
+	  deleteTask(&encoderTaskHandle);
+	  stopTimers();//Should go after deleting encoder task
+	  //In case no stop was ever received-----------------------------------
 	  sendToLCDQueue(connectedStatus, 0);
 	  deleteTask(&adcWaitTaskHandle);
 	  createTask(adcFreeTask,"adcFreeTask",100,NULL,1,&adcFreeTaskHandle);
+	  
 	}else if(secondToken == '|'){
 
 	  uint8_t messageType = parseBuffer[0];
 	  if(messageType == 1){
+	    
 	    minDistToTravel = decodeTwoBytes(parseBuffer[1], parseBuffer[2]);
 	    desiredCounterDirection = parseBuffer[3]-1;
 	    desiredRepDir = parseBuffer[4]-1;
 
-	    initializeTimers();//Should go before creating encoderTask
-	    sendToUARTTXQueue(encoderStart,0,0,0);//Should go before creating encoderTask
+	    //Should go before creating encoderTask------------------------------
+	    (adcWaitTaskHandle != NULL)? vTaskSuspend(adcWaitTaskHandle): "";
+	    initializeTimers();
+	    sendToUARTTXQueue(encoderStart,0,0,0);
+	    //Should go before creating encoderTask------------------------------
 	    createTask(encoderTask, "encoderTask",100,NULL, 4,&encoderTaskHandle);
 	    
 	  }else if(messageType == 2){
+	    
 	    deleteTask(&encoderTaskHandle);
-	    sendToUARTTXQueue(encoderStop,0,0,0);//Should go after deleting encoderTask
-	    stopTimers();//Should go after deleting encoderTask
+	    //Should go after deleting encoderTask-------------------------------
+	    sendToUARTTXQueue(encoderStop,0,0,0);
+	    stopTimers();
+	    vTaskResume(adcWaitTaskHandle);
+	    //Should go after deleting encoderTask-------------------------------
+	    
 	  }else if(messageType == 3){
+	    
 	    xSemaphoreGive(adcSemaphore);
+	    
 	  }	  
 	}
 
