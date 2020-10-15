@@ -44,12 +44,17 @@ typedef struct lcdData_t{
 }lcdData_t;
 
 
+//Tasks Handles------------------------------
+extern TaskHandle_t encoderTaskHandle;
+extern TaskHandle_t adcHandle;
+
 //EncoderVariables----------------------------
 extern uint32_t bluetoothConnected;
 extern uint32_t minDistToTravel;
 extern uint32_t desiredCounterDirection;
 extern uint32_t desiredRepDir;
 
+//Helper functions
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrADC,
 		       uint16_t meanPropulsiveVelocity,

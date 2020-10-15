@@ -20,11 +20,22 @@ SemaphoreHandle_t uartRXSemaphore;
 QueueHandle_t uartTXQueue;
 QueueHandle_t lcdQueue;
 
+//Task Handles-------------------------------
+TaskHandle_t encoderTaskHandle = NULL;
+TaskHandle_t acdHandle = NULL;
+
 static volatile uint32_t counter = 0;
 uint32_t bluetoothConnected = 0;
 uint32_t minDistToTravel = 0;
 uint32_t desiredCounterDirection = 0;
 uint32_t desiredRepDir = 0;
+
+//Internal functions-------------------------
+static void encoderTask(void *args);
+static void uartRXTask(void *args);
+static void uartTXTask(void *args);
+static void lcdTask(void *args);
+static void adcTask(void *args);
 
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
@@ -79,6 +90,30 @@ void printStringUART(const char myString[]){
   DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
 }
 
+static inline void createEncoderTask(void){
+  taskENTER_CRITICAL();
+
+  if(encoderTaskHandle != NULL){
+    vTaskDelete(encoderTaskHandle);
+    encoderTaskHandle = NULL;
+  }
+
+  xTaskCreate(encoderTask, "encoderTask", 100, NULL, 3, &encoderTaskHandle);
+
+  taskEXIT_CRITICAL();
+}
+
+static inline void deleteEncoderTask(void){
+  taskENTER_CRITICAL();
+
+  if(encoderTaskHandle != NULL){
+    vTaskDelete(encoderTaskHandle);
+    encoderTaskHandle = NULL;
+  }
+
+  taskEXIT_CRITICAL();
+}
+
 static inline void initializeTimers(void){
   RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
 }
@@ -99,8 +134,16 @@ static inline void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
 }
 
 static inline uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
-
+  
   return (lsb>>1) | ((msb & 0xFE)<<6);
+}
+
+static void encoderTask(void *args __attribute__((unused))){
+
+  for(;;){
+    sendToUARTTXQueue(encoderData,100,100,100);
+    vTaskDelay(1600);
+  }
 }
 
 static void uartRXTask(void *args __attribute__((unused))){
@@ -143,6 +186,7 @@ static void uartRXTask(void *args __attribute__((unused))){
 	  stopTimers();
 	  setBLEConnected(0);
 	  xSemaphoreGive(adcSemaphore);//Should go after setBLEConnected(0)
+	  deleteEncoderTask();//In case no stop was ever received
 	}else if(secondToken == '|'){
 
 	  uint8_t messageType = parseBuffer[0];
@@ -154,10 +198,12 @@ static void uartRXTask(void *args __attribute__((unused))){
 	    initializeTimers();
 	    xSemaphoreGive(encoderSemaphore);
 	    sendToUARTTXQueue(encoderStart,0,0,0);
+	    createEncoderTask();
 	    
 	  }else if(messageType == 2){
 	    stopTimers();
 	    sendToUARTTXQueue(encoderStop,0,0,0);
+	    deleteEncoderTask();
 	  }else if(messageType == 3){
 	    xSemaphoreGive(adcSemaphore);
 	  }	  
@@ -184,10 +230,10 @@ static void uartTXTask(void *args __attribute__((unused))){
   for(;;){
     xQueueReceive(uartTXQueue, &receivedData, portMAX_DELAY);
     
-    strcpy(buffer,"|");
+    strcpy(buffer,"|");//Protocol Message initiator character 
       
     if(receivedData.messageType == encoderData){
-      twoByteBuffer[0] = 129;
+      twoByteBuffer[0] = 129;//Central code for encoder data
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
       
@@ -201,13 +247,13 @@ static void uartTXTask(void *args __attribute__((unused))){
       strcat(buffer, twoByteBuffer);
 
     }else if(receivedData.messageType == encoderStart){
-      twoByteBuffer[0] = 130;
+      twoByteBuffer[0] = 130;//Central code for encoderStart
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
       
     }else if(receivedData.messageType == batteryLevel){
 
-      twoByteBuffer[0] = 131;
+      twoByteBuffer[0] = 131;//Central code for batteryLevel
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
 
@@ -215,13 +261,13 @@ static void uartTXTask(void *args __attribute__((unused))){
       strcat(buffer, twoByteBuffer);
       
     }else if(receivedData.messageType == encoderStop){
-      twoByteBuffer[0] = 132;
+      twoByteBuffer[0] = 132;//Central code
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
       
     }
 
-    strcat(buffer,"|");
+    strcat(buffer,"|");//Protocol Message terminator character
     printStringUART(buffer);
   }
 }
