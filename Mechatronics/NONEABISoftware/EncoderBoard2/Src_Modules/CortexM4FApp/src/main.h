@@ -46,23 +46,16 @@ typedef struct lcdData_t{
 
 //Tasks Handles------------------------------
 extern TaskHandle_t encoderTaskHandle;
-extern TaskHandle_t adcHandle;
+extern TaskHandle_t adcFreeHandle;
+extern TaskHandle_t adcWaitHandle;
 
-//EncoderVariables----------------------------
-extern uint32_t bluetoothConnected;
-extern uint32_t minDistToTravel;
-extern uint32_t desiredCounterDirection;
-extern uint32_t desiredRepDir;
-
-//Helper functions
+//Helper functions---------------------------
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrADC,
 		       uint16_t meanPropulsiveVelocity,
 		       uint16_t peakVelocity);
 void sendToLCDQueue(messageTypes_t messageType,
 		    uint32_t displayValue);
-void setBLEConnected(uint8_t boolean);
-uint8_t getBLEConnected(void);
 void printStringUART(const char myString[]);
 
 #endif

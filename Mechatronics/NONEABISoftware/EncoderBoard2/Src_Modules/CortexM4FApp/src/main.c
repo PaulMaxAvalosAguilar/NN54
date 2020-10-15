@@ -22,7 +22,8 @@ QueueHandle_t lcdQueue;
 
 //Task Handles-------------------------------
 TaskHandle_t encoderTaskHandle = NULL;
-TaskHandle_t acdHandle = NULL;
+TaskHandle_t adcFreeTaskHandle = NULL;
+TaskHandle_t adcWaitTaskHandle = NULL;
 
 static volatile uint32_t counter = 0;
 uint32_t bluetoothConnected = 0;
@@ -35,13 +36,13 @@ static void encoderTask(void *args);
 static void uartRXTask(void *args);
 static void uartTXTask(void *args);
 static void lcdTask(void *args);
-static void adcTask(void *args);
+static void adcFreeTask(void *args);
+static void adcWaitTask(void *args);
 
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
 void USART1_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
-
 
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrADC,
@@ -65,22 +66,6 @@ void sendToLCDQueue(messageTypes_t messageType,
   xQueueSendToBack(lcdQueue,&dataToSend,0);
 }
 
-void setBLEConnected(uint8_t boolean){
-  taskENTER_CRITICAL();
-  bluetoothConnected = boolean;
-  taskEXIT_CRITICAL();
-}
-
-uint8_t getBLEConnected(){
-  uint8_t bleConnectionStatus;
-  
-  taskENTER_CRITICAL();
-  bleConnectionStatus = bluetoothConnected;
-  taskEXIT_CRITICAL();
-
-  return bleConnectionStatus;
-}
-
 void printStringUART(const char myString[]){
   DMA1_Channel2->CCR &= ~DMA_CCR_EN;//Channel disable
   DMA1_Channel2->CMAR = (uint32_t)myString;//DMA source address
@@ -90,28 +75,38 @@ void printStringUART(const char myString[]){
   DMA1->IFCR |= DMA_IFCR_CTCIF2;//Clear transfere complete  
 }
 
-static inline void createEncoderTask(void){
+static inline void createTask(TaskFunction_t pvTaskCode,
+			      const char *const pcName,
+			      configSTACK_DEPTH_TYPE usStackDepth,
+			      void *pvParameters,
+			      UBaseType_t uxPriority,
+			      TaskHandle_t *taskHandle){
+  
   taskENTER_CRITICAL();
 
-  if(encoderTaskHandle != NULL){
-    vTaskDelete(encoderTaskHandle);
-    encoderTaskHandle = NULL;
+  if(*taskHandle != NULL){
+    vTaskDelete(*taskHandle);
+    *taskHandle = NULL;
   }
 
-  xTaskCreate(encoderTask, "encoderTask", 100, NULL, 3, &encoderTaskHandle);
+  xTaskCreate(pvTaskCode, pcName, usStackDepth,
+	      pvParameters, uxPriority, taskHandle);
 
   taskEXIT_CRITICAL();
+
 }
 
-static inline void deleteEncoderTask(void){
+static inline void deleteTask(TaskHandle_t *pxTask){
+  
   taskENTER_CRITICAL();
 
-  if(encoderTaskHandle != NULL){
-    vTaskDelete(encoderTaskHandle);
-    encoderTaskHandle = NULL;
+  if(*pxTask != NULL){
+    vTaskDelete(*pxTask); 
+    *pxTask = NULL;
   }
 
   taskEXIT_CRITICAL();
+  
 }
 
 static inline void initializeTimers(void){
@@ -120,6 +115,40 @@ static inline void initializeTimers(void){
 
 static inline void stopTimers(void){
   RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM2EN;//Enable TIM2 clock
+}
+
+static inline uint32_t readADC(void){
+  uint32_t adcData;
+  
+  taskENTER_CRITICAL();
+  ADC1->CFGR2 |= ADC_CFGR2_BULB;//Bulb sampling
+  ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 8 bits
+  ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSR)) | (0b111 << ADC_CFGR2_OVSR_Pos);//Oversampling ratio 256x
+  ADC1->CFGR2 &= ~ADC_CFGR2_ROVSE;//Regular oversampling disabled
+
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (18 << ADC_SQR1_SQ1_Pos);//1st conversion on IN18
+  ADC1->SMPR2 = (ADC1->SMPR2 & (~ADC_SMPR2_SMP18)) | (0b000 << ADC_SMPR2_SMP18_Pos);//Sample time 2.5 clock cycles
+    
+  ADC1->CR |= ADC_CR_ADSTART;//Start conversion
+  while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
+  adcData = ADC1->DR;//Read data register and clear EOC flag
+  while(ADC1->CR & ADC_CR_ADSTART);
+
+  ADC1->CFGR2 |= ADC_CFGR2_ROVSE;//Regular oversampling enabled
+    
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
+  ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
+  ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b111 << ADC_SMPR1_SMP5_Pos);//Sample time 640.5 clock cycles
+    
+  ADC1->CR |= ADC_CR_ADSTART;//Start conversion
+  taskEXIT_CRITICAL();
+    
+  while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
+  adcData = ADC1->DR;//Read data register and clear EOC flag
+  while(ADC1->CR & ADC_CR_ADSTART);
+
+  return adcData;
 }
 
 static inline void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
@@ -138,11 +167,12 @@ static inline uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
   return (lsb>>1) | ((msb & 0xFE)<<6);
 }
 
+
 static void encoderTask(void *args __attribute__((unused))){
 
   for(;;){
     sendToUARTTXQueue(encoderData,100,100,100);
-    vTaskDelay(1600);
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 
@@ -179,14 +209,15 @@ static void uartRXTask(void *args __attribute__((unused))){
 
 	//INTERPRET
 	if(strncmp(parseBuffer, "CONNECT",7) == 0){
-	  setBLEConnected(1);
 	  sendToLCDQueue(connectedStatus, 1);
+	  deleteTask(&adcFreeTaskHandle);
+	  createTask(adcWaitTask,"adcWaitTask",100,NULL,1,&adcWaitTaskHandle);
 	}else if(strncmp(parseBuffer, "DISCONNECT", 10) == 0){
+	  deleteTask(&encoderTaskHandle);//In case no stop was ever received
+	  stopTimers();//In case no stop was ever received, should go after deleting encoder task
 	  sendToLCDQueue(connectedStatus, 0);
-	  stopTimers();
-	  setBLEConnected(0);
-	  xSemaphoreGive(adcSemaphore);//Should go after setBLEConnected(0)
-	  deleteEncoderTask();//In case no stop was ever received
+	  deleteTask(&adcWaitTaskHandle);
+	  createTask(adcFreeTask,"adcFreeTask",100,NULL,1,&adcFreeTaskHandle);
 	}else if(secondToken == '|'){
 
 	  uint8_t messageType = parseBuffer[0];
@@ -195,15 +226,14 @@ static void uartRXTask(void *args __attribute__((unused))){
 	    desiredCounterDirection = parseBuffer[3]-1;
 	    desiredRepDir = parseBuffer[4]-1;
 
-	    initializeTimers();
-	    xSemaphoreGive(encoderSemaphore);
-	    sendToUARTTXQueue(encoderStart,0,0,0);
-	    createEncoderTask();
+	    initializeTimers();//Should go before creating encoderTask
+	    sendToUARTTXQueue(encoderStart,0,0,0);//Should go before creating encoderTask
+	    createTask(encoderTask, "encoderTask",100,NULL, 4,&encoderTaskHandle);
 	    
 	  }else if(messageType == 2){
-	    stopTimers();
-	    sendToUARTTXQueue(encoderStop,0,0,0);
-	    deleteEncoderTask();
+	    deleteTask(&encoderTaskHandle);
+	    sendToUARTTXQueue(encoderStop,0,0,0);//Should go after deleting encoderTask
+	    stopTimers();//Should go after deleting encoderTask
 	  }else if(messageType == 3){
 	    xSemaphoreGive(adcSemaphore);
 	  }	  
@@ -324,51 +354,30 @@ static void lcdTask(void *args __attribute__((unused))){
 }
 
 
-static void adcTask(void *args __attribute__((unused))){
+static void adcFreeTask(void *args __attribute__((unused))){
   
   uint32_t adcData = 0;
 
   for(;;){
-    
-    taskENTER_CRITICAL();
-    ADC1->CFGR2 |= ADC_CFGR2_BULB;//Bulb sampling
-    ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSS)) | (0b1000 << ADC_CFGR2_OVSS_Pos);//Shift 8 bits
-    ADC1->CFGR2 |= (ADC1->CFGR2 & (~ADC_CFGR2_OVSR)) | (0b111 << ADC_CFGR2_OVSR_Pos);//Oversampling ratio 256x
-    ADC1->CFGR2 &= ~ADC_CFGR2_ROVSE;//Regular oversampling disabled
 
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (18 << ADC_SQR1_SQ1_Pos);//1st conversion on IN18
-    ADC1->SMPR2 = (ADC1->SMPR2 & (~ADC_SMPR2_SMP18)) | (0b000 << ADC_SMPR2_SMP18_Pos);//Sample time 2.5 clock cycles
-    
-    ADC1->CR |= ADC_CR_ADSTART;//Start conversion
-    while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
-    adcData = ADC1->DR;//Read data register and clear EOC flag
-    while(ADC1->CR & ADC_CR_ADSTART);
+    adcData = (readADC() * 6104/10000) * 2;
+    sendToLCDQueue(batteryLevel, adcData);
 
-    ADC1->CFGR2 |= ADC_CFGR2_ROVSE;//Regular oversampling enabled
-    
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_L)) | (0b0000 << ADC_SQR1_L_Pos);//1 conversion
-    ADC1->SQR1 = (ADC1->SQR1 & ~(ADC_SQR1_SQ1)) | (5 << ADC_SQR1_SQ1_Pos);//1st conversion on IN5
-    ADC1->SMPR1 = (ADC1->SMPR1 & (~ADC_SMPR1_SMP5)) | (0b111 << ADC_SMPR1_SMP5_Pos);//Sample time 640.5 clock cycles
-    
-    ADC1->CR |= ADC_CR_ADSTART;//Start conversion
-    taskEXIT_CRITICAL();
-    
-    while(!(ADC1->ISR & ADC_ISR_EOC));//Wait till conversion finished
-    adcData = ADC1->DR;//Read data register and clear EOC flag
-    while(ADC1->CR & ADC_CR_ADSTART);
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
-    adcData = (adcData * 6104/10000) * 2;
+  }
+}
 
+static void adcWaitTask(void *args __attribute__((unused))){
+  uint32_t adcData = 0;
+  
+  for(;;){
+    xSemaphoreTake(adcSemaphore,portMAX_DELAY);
+    
+    adcData = (readADC() * 6104/10000) * 2;
     sendToLCDQueue(batteryLevel, adcData);
     sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
-
-    if(getBLEConnected()){
-      xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
-    }else{
-      vTaskDelay(pdMS_TO_TICKS(3000));
-    }
-  }
+  }  
 }
 
 /*
@@ -785,7 +794,7 @@ int main(void)
   xTaskCreate(uartRXTask, "uartRXTask",100, NULL, 3, NULL);
   xTaskCreate(uartTXTask, "uartTXTask",100, NULL, 2, NULL);
   xTaskCreate(lcdTask,"lcdTask",100, NULL, 2, NULL);
-  xTaskCreate(adcTask,"adcTask",100,NULL,1,NULL);
+  xTaskCreate(adcFreeTask, "adcFreeTask", 100, NULL,1, &adcFreeTaskHandle);
 
   //---------------------CONFIGURE NVIC---------------------------
 
