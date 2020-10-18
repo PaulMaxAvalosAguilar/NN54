@@ -71,6 +71,7 @@
 #define configUSE_MUTEXES		0
 #define configCHECK_FOR_STACK_OVERFLOW	0
 #define configUSE_QUEUE_SETS            0
+#define configUSE_TASK_NOTIFICATIONS    1
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */

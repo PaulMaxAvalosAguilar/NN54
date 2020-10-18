@@ -14,14 +14,12 @@
 char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
 
 //Queue and Semaphore handles----------------
-SemaphoreHandle_t adcSemaphore;
-SemaphoreHandle_t encoderSemaphore;
-SemaphoreHandle_t uartRXSemaphore;
 QueueHandle_t uartTXQueue;
 QueueHandle_t lcdQueue;
 
 //Task Handles-------------------------------
 TaskHandle_t encoderTaskHandle = NULL;
+TaskHandle_t uartRXTaskHandle = NULL;
 TaskHandle_t adcFreeTaskHandle = NULL;
 TaskHandle_t adcWaitTaskHandle = NULL;
 
@@ -182,8 +180,8 @@ static void uartRXTask(void *args __attribute__((unused))){
   uint32_t receiveBufferPos = 0;
 
   for(;;){
-    
-    xSemaphoreTake(uartRXSemaphore,portMAX_DELAY); //Should go first
+
+    ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
     
     while(receiveBuffer[receiveBufferPos]){
       if((receiveBuffer[receiveBufferPos] == '%') ||
@@ -251,9 +249,8 @@ static void uartRXTask(void *args __attribute__((unused))){
 	    //Should go after deleting encoderTask-------------------------------
 	    
 	  }else if(messageType == 3){
-	    
-	    xSemaphoreGive(adcSemaphore);
-	    
+
+	    (adcWaitTaskHandle != NULL)? xTaskNotifyGive(adcWaitTaskHandle) : 0;
 	  }	  
 	}
 
@@ -390,7 +387,8 @@ static void adcWaitTask(void *args __attribute__((unused))){
   uint32_t adcData = 0;
   
   for(;;){
-    xSemaphoreTake(adcSemaphore,portMAX_DELAY);
+
+    ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
     
     adcData = (readADC() * 6104/10000) * 2;
     sendToLCDQueue(batteryLevel, adcData);
@@ -803,13 +801,10 @@ int main(void)
   
   //---------------------CONFIGURE RTOS-------------------------
 
-  adcSemaphore = xSemaphoreCreateBinary();
-  encoderSemaphore = xSemaphoreCreateBinary();
-  uartRXSemaphore = xSemaphoreCreateBinary();
   uartTXQueue = xQueueCreate(TX_QUEUE_SIZE, sizeof(uartTXData_t));
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
 
-  xTaskCreate(uartRXTask, "uartRXTask",100, NULL, 3, NULL);
+  xTaskCreate(uartRXTask, "uartRXTask",100, NULL, 3, &uartRXTaskHandle);
   xTaskCreate(uartTXTask, "uartTXTask",100, NULL, 2, NULL);
   xTaskCreate(lcdTask,"lcdTask",100, NULL, 2, NULL);
   xTaskCreate(adcFreeTask, "adcFreeTask", 100, NULL,1, &adcFreeTaskHandle);
@@ -853,8 +848,7 @@ void USART1_IRQHandler(){
   USART1->ICR |= USART_ICR_IDLECF;
 
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  configASSERT(uartRXSemaphore );
-  xSemaphoreGiveFromISR(uartRXSemaphore,&xHigherPriorityTaskWoken);
+  vTaskNotifyGiveFromISR(uartRXTaskHandle,&xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
 }
