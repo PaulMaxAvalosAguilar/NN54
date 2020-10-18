@@ -10,7 +10,7 @@
 #define UART_RX_BUFFER_LEN 256
 extern char receiveBuffer[UART_RX_BUFFER_LEN];
 
-//Queue and Semaphore handles----------------
+//Queue handles----------------
 extern QueueHandle_t uartTXQueue;
 extern QueueHandle_t lcdQueue;
 
@@ -40,18 +40,19 @@ typedef struct lcdData_t{
   uint32_t displayValue;  
 }lcdData_t;
 
-//Task structures----------------------------
-typedef struct encoderTaskParamTypes_t{
-  
-
-}encoderTaskParamTypes_t;
-
-
 //Tasks Handles------------------------------
 extern TaskHandle_t encoderTaskHandle;
 extern TaskHandle_t uartRXTaskHandle;
 extern TaskHandle_t adcFreeTaskHandle;
 extern TaskHandle_t adcWaitTaskHandle;
+
+//Task structures----------------------------
+typedef struct encoderTaskParamTypes_t{
+  uint32_t minDistToTravel;
+  uint16_t desiredCounterDirection;
+  uint16_t desiredRepDirection;
+
+}encoderTaskParamTypes_t;
 
 //Helper functions---------------------------
 void sendToUARTTXQueue(messageTypes_t messageType,

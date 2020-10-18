@@ -23,12 +23,6 @@ TaskHandle_t uartRXTaskHandle = NULL;
 TaskHandle_t adcFreeTaskHandle = NULL;
 TaskHandle_t adcWaitTaskHandle = NULL;
 
-static volatile uint32_t counter = 0;
-uint32_t bluetoothConnected = 0;
-uint32_t minDistToTravel = 0;
-uint32_t desiredCounterDirection = 0;
-uint32_t desiredRepDir = 0;
-
 //Internal functions-------------------------
 static void encoderTask(void *args);
 static void uartRXTask(void *args);
@@ -169,6 +163,15 @@ static inline uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
 
 static void encoderTask(void *args __attribute__((unused))){
 
+  encoderTaskParamTypes_t receivedData;
+  receivedData = *(encoderTaskParamTypes_t *)args;
+
+  char buffer[20];
+
+  uint32_t minDistToTravel = receivedData.minDistToTravel;
+  uint32_t desiredCounterDirection = receivedData.desiredCounterDirection;
+  uint32_t desiredRepDirection = receivedData.desiredRepDirection;
+
   for(;;){
     sendToUARTTXQueue(encoderData,100,100,100);
     vTaskDelay(pdMS_TO_TICKS(1000));
@@ -177,6 +180,7 @@ static void encoderTask(void *args __attribute__((unused))){
 
 static void uartRXTask(void *args __attribute__((unused))){
 
+  encoderTaskParamTypes_t dataToSend;
   uint32_t receiveBufferPos = 0;
 
   for(;;){
@@ -227,17 +231,18 @@ static void uartRXTask(void *args __attribute__((unused))){
 
 	  uint8_t messageType = parseBuffer[0];
 	  if(messageType == 1){
-	    
-	    minDistToTravel = decodeTwoBytes(parseBuffer[1], parseBuffer[2]);
-	    desiredCounterDirection = parseBuffer[3]-1;
-	    desiredRepDir = parseBuffer[4]-1;
+
+	    dataToSend.minDistToTravel = decodeTwoBytes(parseBuffer[1], parseBuffer[2]);
+	    dataToSend.desiredCounterDirection = parseBuffer[3]-1;
+	    dataToSend.desiredRepDirection = parseBuffer[4]-1;
 
 	    //Should go before creating encoderTask------------------------------
 	    (adcWaitTaskHandle != NULL)? vTaskSuspend(adcWaitTaskHandle): "";
 	    initializeTimers();
 	    sendToUARTTXQueue(encoderStart,0,0,0);
 	    //Should go before creating encoderTask------------------------------
-	    createTask(encoderTask, "encoderTask",100,NULL, 4,&encoderTaskHandle);
+	    createTask(encoderTask, "encoderTask",100,&dataToSend, 4,
+		       &encoderTaskHandle);
 	    
 	  }else if(messageType == 2){
 	    
@@ -249,7 +254,7 @@ static void uartRXTask(void *args __attribute__((unused))){
 	    //Should go after deleting encoderTask-------------------------------
 	    
 	  }else if(messageType == 3){
-
+	    dataToSend.minDistToTravel++;
 	    (adcWaitTaskHandle != NULL)? xTaskNotifyGive(adcWaitTaskHandle) : 0;
 	  }	  
 	}
@@ -837,7 +842,7 @@ int main(void)
 
 void TIM2_IRQHandler(){
   TIM2->SR &= ~TIM_SR_CC1IF;
-  counter = TIM2->CCR1;
+  uint32_t counter = TIM2->CCR1;
 }
      
 void TIM3_IRQHandler(){
