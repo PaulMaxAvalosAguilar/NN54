@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.2.1
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.3.1
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -445,112 +445,167 @@ void xPortSysTickHandler( void )
 
 #if( configUSE_TICKLESS_IDLE == 1 )
 
-extern void lcdPutsBlinkFree(const char *g, int ypos);
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/timer.h>
+	__attribute__((weak)) void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
+	{
+	uint32_t ulReloadValue, ulCompleteTickPeriods, ulCompletedSysTickDecrements;
+	TickType_t xModifiableIdleTime;
 
-void vApplicationSleep(TickType_t xExpectedIdleTime){
+		/* Make sure the SysTick reload value does not overflow the counter. */
+		if( xExpectedIdleTime > xMaximumPossibleSuppressedTicks )
+		{
+			xExpectedIdleTime = xMaximumPossibleSuppressedTicks;
+		}
 
-  eSleepModeStatus eSleepStatus;
-  /* Stop the SysTick momentarily.  The time the SysTick is stopped for
-     is accounted for as best it can be, but using the tickless mode will
-     inevitably result in some tiny drift of the time maintained by the
-     kernel with respect to calendar time. */
-  portNVIC_SYSTICK_CTRL_REG &= ~portNVIC_SYSTICK_ENABLE_BIT;
+		/* Stop the SysTick momentarily.  The time the SysTick is stopped for
+		is accounted for as best it can be, but using the tickless mode will
+		inevitably result in some tiny drift of the time maintained by the
+		kernel with respect to calendar time. */
+		portNVIC_SYSTICK_CTRL_REG &= ~portNVIC_SYSTICK_ENABLE_BIT;
 
+		/* Calculate the reload value required to wait xExpectedIdleTime
+		tick periods.  -1 is used because this code will execute part way
+		through one of the tick periods. */
+		ulReloadValue = portNVIC_SYSTICK_CURRENT_VALUE_REG + ( ulTimerCountsForOneTick * ( xExpectedIdleTime - 1UL ) );
+		if( ulReloadValue > ulStoppedTimerCompensation )
+		{
+			ulReloadValue -= ulStoppedTimerCompensation;
+		}
 
-  /* Enter a critical section but don't use the taskENTER_CRITICAL()
-     method as that will mask interrupts that should exit sleep mode. */
+		/* Enter a critical section but don't use the taskENTER_CRITICAL()
+		method as that will mask interrupts that should exit sleep mode. */
+		__asm volatile( "cpsid i" ::: "memory" );
+		__asm volatile( "dsb" );
+		__asm volatile( "isb" );
 
-  __asm volatile( "cpsid i" ::: "memory" );
-  __asm volatile( "dsb" );
-  __asm volatile( "isb" );
+		/* If a context switch is pending or a task is waiting for the scheduler
+		to be unsuspended then abandon the low power entry. */
+		if( eTaskConfirmSleepModeStatus() == eAbortSleep )
+		{
+			/* Restart from whatever is left in the count register to complete
+			this tick period. */
+			portNVIC_SYSTICK_LOAD_REG = portNVIC_SYSTICK_CURRENT_VALUE_REG;
 
-  eSleepStatus = eTaskConfirmSleepModeStatus();
+			/* Restart SysTick. */
+			portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
 
-  /* If a context switch is pending or a task is waiting for the scheduler
-     to be unsuspended then abandon the low power entry. */
-  if( eSleepStatus == eAbortSleep )
+			/* Reset the reload register to the value required for normal tick
+			periods. */
+			portNVIC_SYSTICK_LOAD_REG = ulTimerCountsForOneTick - 1UL;
 
-    {
+			/* Re-enable interrupts - see comments above the cpsid instruction()
+			above. */
+			__asm volatile( "cpsie i" ::: "memory" );
+		}
+		else
+		{
+			/* Set the new reload value. */
+			portNVIC_SYSTICK_LOAD_REG = ulReloadValue;
 
-      /* Restart from whatever is left in the count register to complete
-	 this tick period. */
-      portNVIC_SYSTICK_LOAD_REG = portNVIC_SYSTICK_CURRENT_VALUE_REG;
+			/* Clear the SysTick count flag and set the count value back to
+			zero. */
+			portNVIC_SYSTICK_CURRENT_VALUE_REG = 0UL;
 
-      /* Restart SysTick. */
-      portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
+			/* Restart SysTick. */
+			portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
 
-      /* Reset the reload register to the value required for normal tick
-	 periods. */
-      portNVIC_SYSTICK_LOAD_REG = ulTimerCountsForOneTick - 1UL;
+			/* Sleep until something happens.  configPRE_SLEEP_PROCESSING() can
+			set its parameter to 0 to indicate that its implementation contains
+			its own wait for interrupt or wait for event instruction, and so wfi
+			should not be executed again.  However, the original expected idle
+			time variable must remain unmodified, so a copy is taken. */
+			xModifiableIdleTime = xExpectedIdleTime;
+			configPRE_SLEEP_PROCESSING( xModifiableIdleTime );
+			if( xModifiableIdleTime > 0 )
+			{
+				__asm volatile( "dsb" ::: "memory" );
+				__asm volatile( "wfi" );
+				__asm volatile( "isb" );
+			}
+			configPOST_SLEEP_PROCESSING( xExpectedIdleTime );
 
-      /* Re-enable interrupts - see comments above the cpsid instruction()
-	 above. */
-      __asm volatile( "cpsie i" ::: "memory" );
-    }
+			/* Re-enable interrupts to allow the interrupt that brought the MCU
+			out of sleep mode to execute immediately.  see comments above
+			__disable_interrupt() call above. */
+			__asm volatile( "cpsie i" ::: "memory" );
+			__asm volatile( "dsb" );
+			__asm volatile( "isb" );
 
-  else{
-    lcdPutsBlinkFree("S", 4);
-    
-    if(eSleepStatus == eNoTasksWaitingTimeout){
-      __asm volatile( "dsb" ::: "memory" );
-      __asm volatile( "wfi" );
-      __asm volatile( "isb" );
+			/* Disable interrupts again because the clock is about to be stopped
+			and interrupts that execute while the clock is stopped will increase
+			any slippage between the time maintained by the RTOS and calendar
+			time. */
+			__asm volatile( "cpsid i" ::: "memory" );
+			__asm volatile( "dsb" );
+			__asm volatile( "isb" );
 
-    }else{
-      
-      rcc_periph_clock_enable(RCC_TIM3);
-      nvic_enable_irq(NVIC_TIM3_IRQ);
+			/* Disable the SysTick clock without reading the
+			portNVIC_SYSTICK_CTRL_REG register to ensure the
+			portNVIC_SYSTICK_COUNT_FLAG_BIT is not cleared if it is set.  Again,
+			the time the SysTick is stopped for is accounted for as best it can
+			be, but using the tickless mode will inevitably result in some tiny
+			drift of the time maintained by the kernel with respect to calendar
+			time*/
+			portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT | portNVIC_SYSTICK_INT_BIT );
 
-      TIM_ARR(TIM3) = (xExpectedIdleTime * (10000 / configTICK_RATE_HZ) )/ 9;
-      TIM_CNT(TIM3) = 1;
-      TIM3_PSC = 65535;
+			/* Determine if the SysTick clock has already counted to zero and
+			been set back to the current reload value (the reload back being
+			correct for the entire expected idle time) or if the SysTick is yet
+			to count to zero (in which case an interrupt other than the SysTick
+			must have brought the system out of sleep mode). */
+			if( ( portNVIC_SYSTICK_CTRL_REG & portNVIC_SYSTICK_COUNT_FLAG_BIT ) != 0 )
+			{
+				uint32_t ulCalculatedLoadValue;
 
-      
-      TIM3_CR1 |= TIM_CR1_OPM;
+				/* The tick interrupt is already pending, and the SysTick count
+				reloaded with ulReloadValue.  Reset the
+				portNVIC_SYSTICK_LOAD_REG with whatever remains of this tick
+				period. */
+				ulCalculatedLoadValue = ( ulTimerCountsForOneTick - 1UL ) - ( ulReloadValue - portNVIC_SYSTICK_CURRENT_VALUE_REG );
 
-      timer_enable_irq(TIM3, TIM_DIER_UIE);
-      
-      TIM_CR1(TIM3) |= TIM_CR1_CEN;
+				/* Don't allow a tiny value, or values that have somehow
+				underflowed because the post sleep hook did something
+				that took too long. */
+				if( ( ulCalculatedLoadValue < ulStoppedTimerCompensation ) || ( ulCalculatedLoadValue > ulTimerCountsForOneTick ) )
+				{
+					ulCalculatedLoadValue = ( ulTimerCountsForOneTick - 1UL );
+				}
 
+				portNVIC_SYSTICK_LOAD_REG = ulCalculatedLoadValue;
 
-      
-      __asm volatile( "dsb" ::: "memory" );
-      __asm volatile( "wfi" );
-      __asm volatile( "isb" );
+				/* As the pending tick will be processed as soon as this
+				function exits, the tick value maintained by the tick is stepped
+				forward by one less than the time spent waiting. */
+				ulCompleteTickPeriods = xExpectedIdleTime - 1UL;
+			}
+			else
+			{
+				/* Something other than the tick interrupt ended the sleep.
+				Work out how long the sleep lasted rounded to complete tick
+				periods (not the ulReload value which accounted for part
+				ticks). */
+				ulCompletedSysTickDecrements = ( xExpectedIdleTime * ulTimerCountsForOneTick ) - portNVIC_SYSTICK_CURRENT_VALUE_REG;
 
-      vTaskStepTick( xExpectedIdleTime);
+				/* How many complete tick periods passed while the processor
+				was waiting? */
+				ulCompleteTickPeriods = ulCompletedSysTickDecrements / ulTimerCountsForOneTick;
 
-      
-      /* Exit with interrpts enabled. */
-      __asm volatile( "cpsie i" ::: "memory" );
-      __asm volatile( "dsb" );
-      __asm volatile( "isb" );
-      
-      rcc_periph_clock_disable(RCC_TIM3);
-      nvic_disable_irq(NVIC_TIM3_IRQ);
-    }
-    lcdPutsBlinkFree("----", 4);    
+				/* The reload value is set to whatever fraction of a single tick
+				period remains. */
+				portNVIC_SYSTICK_LOAD_REG = ( ( ulCompleteTickPeriods + 1UL ) * ulTimerCountsForOneTick ) - ulCompletedSysTickDecrements;
+			}
 
-    /* Exit with interrpts enabled. */
-    __asm volatile( "cpsie i" ::: "memory" );
-    __asm volatile( "dsb" );
-    __asm volatile( "isb" );
+			/* Restart SysTick so it runs from portNVIC_SYSTICK_LOAD_REG
+			again, then set portNVIC_SYSTICK_LOAD_REG back to its standard
+			value. */
+			portNVIC_SYSTICK_CURRENT_VALUE_REG = 0UL;
+			portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
+			vTaskStepTick( ulCompleteTickPeriods );
+			portNVIC_SYSTICK_LOAD_REG = ulTimerCountsForOneTick - 1UL;
 
-    portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
-  }
-  
-}
-
-void tim3_isr(void)
-{
-  if (timer_get_flag(TIM3, TIM_SR_UIF)) {
-    /* Clear compare interrupt flag. */
-    timer_clear_flag(TIM3, TIM_SR_UIF);
-  }
-}
+			/* Exit with interrupts enabled. */
+			__asm volatile( "cpsie i" ::: "memory" );
+		}
+	}
 
 #endif /* configUSE_TICKLESS_IDLE */
 /*-----------------------------------------------------------*/
