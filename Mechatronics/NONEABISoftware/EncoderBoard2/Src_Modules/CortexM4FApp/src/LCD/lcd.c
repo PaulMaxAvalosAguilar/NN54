@@ -11,13 +11,13 @@ uint8_t lcdSendBuffer[256];
 
 void lcd_command(uint8_t cmd[], uint8_t size) {
   cmd[0] = 0x00;// 0x00 for command, 0x40 for data
-    i2c_transmit_dma(LCD_I2C_ADR, cmd,size);
+  i2c_transmit_dma(LCD_I2C_ADR, cmd,size);
   //i2c_transmit_polling(LCD_I2C_ADR, cmd,size);
 }
 
 void lcd_data(uint8_t data[], uint16_t size) {
   data[0] = 0x40; // 0x00 for command, 0x40 for data
-    i2c_transmit_dma(LCD_I2C_ADR, data,size);
+  i2c_transmit_dma(LCD_I2C_ADR, data,size);
     //i2c_transmit_polling(LCD_I2C_ADR, data,size);
 }
 
@@ -101,9 +101,6 @@ void lcd_gotoxy(uint8_t x, uint8_t y){
 }
 
 void lcd_puts(const char* s){
-
-  uint8_t bufferLen = (strlen(s) * FONT_COLUMNS)+ 1; 
-  uint8_t buffer[bufferLen];
 
   int count = 0;
 

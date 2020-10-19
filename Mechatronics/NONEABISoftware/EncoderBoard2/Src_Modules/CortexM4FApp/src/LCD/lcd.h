@@ -25,12 +25,6 @@ extern "C" {
 	#define YES		1
 #endif
 
-
-#define LCD_DISP_ON		0xAF
-
-#define WHITE			0x01
-#define BLACK			0x00
-
 #define DISPLAY_WIDTH		128
 #define DISPLAY_HEIGHT		64
 

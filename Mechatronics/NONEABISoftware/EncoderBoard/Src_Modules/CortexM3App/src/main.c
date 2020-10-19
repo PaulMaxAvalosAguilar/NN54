@@ -11,6 +11,7 @@
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/i2c.h>
 #include <libopencm3/stm32/exti.h>
 #include "printf.h"
 #include "lcd.h"
@@ -84,8 +85,6 @@ uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel);
 uint8_t maxDistAs(uint16_t counter, uint16_t lastMaxDist);
 uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist);
 
-void lcdPutsBlinkFree(const char *g, int ypos);
-
 uint8_t (*goingDesiredCountDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
 uint8_t (*hasTraveledMinDist[2])(uint16_t, uint16_t) = {minDistTraveledDes,
 						      minDistTraveledAs};
@@ -152,6 +151,16 @@ static void configurePeriphereals(void){
 		GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN,
 		GPIO8|GPIO9);			
   gpio_set(GPIOB,GPIO8|GPIO9);
+
+  i2c_peripheral_disable(I2C1);
+  i2c_reset(I2C1);
+  I2C_CR1(I2C1) &= ~I2C_CR1_STOP;	// Clear stop
+  i2c_set_standard_mode(I2C1);	// 100 kHz mode
+  i2c_set_clock_frequency(I2C1,I2C_CR2_FREQ_36MHZ); // APB Freq
+  i2c_set_trise(I2C1,36);		// 1000 ns
+  i2c_set_dutycycle(I2C1,I2C_CCR_DUTY_DIV2);
+  i2c_set_ccr(I2C1,180);		// 100 kHz <= 180 * 1 /36M
+  i2c_peripheral_enable(I2C1);
   //I2C
 
   //UART
@@ -222,29 +231,6 @@ read_adc(uint8_t channel) {
 }
 
 
-void lcdPutsBlinkFree(const char *g, int ypos){
-  int i = 0;
-  char text[22];//max used characters used plus null terminator
-  int blankchars;
-
-  while(*(g + i)){
-    if(i >20) break;
-    text[i] = *(g +i);
-    i++;
-  }
-
-  blankchars = 21 -i;
-  while(blankchars){
-    text[i] = ' ';
-    blankchars--;
-    i++;
-  }
-  text[i] = '\0';
-  lcd_gotoxy(0, ypos);
-  lcd_puts(text);
-  
-}
-
 static void communicationTask(void *args __attribute__((unused))) {
 
   commData_t dataStruct;
@@ -285,12 +271,17 @@ static void communicationTask(void *args __attribute__((unused))) {
 static void lcdTask(void *args __attribute__((unused))){
   lcdData_t receivedData;
   char buffer[22];
-  lcd_init(LCD_DISP_ON);
+  char numBuffer[5];
+
   uint16_t lineState = 0;
   uint32_t lastVoltage = 0;
   
+  lcd_init();
+  
   for(;;){
+    
     xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
+    
     if(receivedData.messageType == turnOnMessage){
       lcdPutsBlinkFree(" SDT ENCODER",0);
       
@@ -552,21 +543,22 @@ void tim1_up_isr(){
 }
 
 void exti15_10_isr(){
-  exti_reset_request(EXTI12);
+  
+  exti_reset_request(EXTI12);//Clear flag
+  
   uint16_t lineState = GPIOB_IDR;
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   lcdData_t dataToSend;
 
+  dataToSend.messageType = chargingStatus;  
+
   if( (lineState & (1 <<12)) != 0){
-    dataToSend.messageType = chargingStatus;
     dataToSend.displayValue = 1;
     xQueueSendToBackFromISR(lcdQueue, &dataToSend,&xHigherPriorityTaskWoken);
   }else{
-    dataToSend.messageType = chargingStatus;
     dataToSend.displayValue = 0;
     xQueueSendToBackFromISR(lcdQueue, &dataToSend,&xHigherPriorityTaskWoken);
   }
-
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
