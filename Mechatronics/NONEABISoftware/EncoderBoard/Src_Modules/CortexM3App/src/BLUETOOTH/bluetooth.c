@@ -9,7 +9,7 @@
 #include "bluetooth.h"
 #include "uart.h"
 #include "printf.h"
-#include "queueSending.h"
+#include "main.h"
 
 //PRIVATE SERVICE CHARACTERISTIC UUID (no more than 1 in rn4020)
 const char private_service_UUID[] = "11223344556677889900AABBCCDDEEFF";
@@ -73,7 +73,7 @@ void setPrivateCharacteristic(const char *service,
 void setName(char *string);//No >  6 bytes when using private serviceo
 void turnOffSubscription(void);
 void startTimers(void);
-void stopTimers(void);
+//void stopTimers(void);
 void writeEncoderStartValue(void);
 
 //-------------- USART PARSING FUNCTIONS----------
@@ -83,8 +83,12 @@ int parseUUIDLine(const char* line);
 void unlockWaitingLineParsing(charLineBuffer_t *,
 			      int* waitingState, int *errorDetection);
 
-//-------------- RN4020 configuration
+//-------------- RN4020 configuration------------
 void bluetoothConfig(int configuration);
+
+//-------------- rtos task---------------------
+static void adcFreeTask(void *args __attribute__((unused)));
+static void adcWaitTask(void *args __attribute__((unused)));
 
 
 void writeEncoderValues(uint16_t value0,
@@ -366,6 +370,7 @@ void startTimers(){
   xSemaphoreGive(encoderSemaphore);
 }
 
+/*
 void stopTimers(){
 
   setENCODERStarted(0);
@@ -375,6 +380,7 @@ void stopTimers(){
   rcc_periph_clock_disable(RCC_TIM1);    // TIM1
   rcc_periph_clock_disable(RCC_TIM2);    // TIM2
 }
+*/
 
 void writeEncoderStartValue(){
   runLockingCOMMAND(&characteristicStatus.isNotifying
@@ -421,9 +427,9 @@ int parseWVLine(const char* line){
     startTimers();
     writeEncoderStartValue();
   }else if(messageType ==2){
-    stopTimers();
+    //    stopTimers();
   }else if(messageType == 3){
-    xSemaphoreGive(adcSemaphore);
+    (adcWaitTaskHandle != NULL)? xTaskNotifyGive(adcWaitTaskHandle) : 0;
   }
 
   return 1;
@@ -540,13 +546,16 @@ void genericLineParsing(charLineBuffer_t *clb){
   
   //INTERPRET
   if(strstr(stdLine, "Connection End") != NULL){
-    sendToLCDQueue(connectedStatus,0);
 
-    setBLEConnected(0);
-    xSemaphoreGive(adcSemaphore);
+    //In case no stop was ever received-----------------------------------
+    //    deleteTask(&encoderTaskHandle);
+    //    stopTimers();//Should go after deleting encoder task
+    //In case no stop was ever received-----------------------------------
+    sendToLCDQueue(connectedStatus, 0);
+    deleteTask(&adcWaitTaskHandle);
+    createTask(adcFreeTask,"adcFreeTask",100,NULL,1,&adcFreeTaskHandle);
 
-    stopTimers();
-    
+
     characteristicStatus.isNotifying = 0;
 
     if(characteristicStatus.notificationEnabled){
@@ -558,7 +567,9 @@ void genericLineParsing(charLineBuffer_t *clb){
   
   }else if(strstr(stdLine,"Connected") != NULL){
     sendToLCDQueue(connectedStatus,1);
-    setBLEConnected(1);
+    deleteTask(&adcFreeTaskHandle);
+    createTask(adcWaitTask,"adcWaitTask",100,NULL,1,&adcWaitTaskHandle);
+
   }else if(strstr(stdLine, "Bonded") != NULL){
       
   }else if(parseWVLine(stdLine)){
@@ -569,7 +580,7 @@ void genericLineParsing(charLineBuffer_t *clb){
     
   }else if(strstr(stdLine, "CMD")!= NULL){
     sendToLCDQueue(bleConfig,0);
-    bluetoothConfig(1);
+    bluetoothConfig(0);
     sendLS();
     stopAdvertising();
     advertise();	  
@@ -607,4 +618,31 @@ void bluetoothConfig(int configuration){
   }else if(configuration == 2){
     setFactoryReset(2);
   }
+}
+
+static void adcFreeTask(void *args __attribute__((unused))) {
+
+  uint32_t adcData = 0;
+  
+  for(;;){
+    
+    adcData = readADC();
+
+    sendToLCDQueue(batteryLevel,adcData);
+
+    vTaskDelay(pdMS_TO_TICKS(4000));
+  }
+}
+
+static void adcWaitTask(void *args __attribute__((unused))){
+  uint32_t adcData = 0;
+  
+  for(;;){
+
+    ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
+    
+    adcData = readADC();
+    sendToLCDQueue(batteryLevel, adcData);
+    //    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
+  }  
 }

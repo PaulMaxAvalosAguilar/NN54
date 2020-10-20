@@ -17,7 +17,7 @@
 #include "lcd.h"
 #include "uart.h"
 #include "ring.h"
-#include "queueSending.h"
+#include "main.h"
 #include "bluetooth.h"
 #include <string.h>
 
@@ -52,6 +52,109 @@
 #define KIN1_GetCycleCounter()			\
   KIN1_DWT_CYCCNT
 /*!< Read cycle counter register */
+
+
+//Queue handles----------------
+QueueHandle_t uartTXQueue;
+QueueHandle_t lcdQueue;
+QueueHandle_t communicationQueue;
+QueueSetHandle_t communicationQueueSet;
+
+SemaphoreHandle_t encoderSemaphore;
+
+//Task Handles-------------------------------
+//TaskHandle_t encoderTaskHandle = NULL;
+//TaskHandle_t uartRXTaskHandle = NULL;
+TaskHandle_t adcFreeTaskHandle = NULL;
+TaskHandle_t adcWaitTaskHandle = NULL;
+
+void sendToUARTTXQueue(messageTypes_t messageType,
+		       uint16_t traveledDistanceOrADC,
+		       uint16_t meanPropulsiveVelocity,
+		       uint16_t peakVelocity){
+  uartTXData_t dataToSend;
+  dataToSend.messageType = messageType;
+  dataToSend.traveledDistanceOrADC = traveledDistanceOrADC;
+  dataToSend.meanPropulsiveVelocity = meanPropulsiveVelocity;
+  dataToSend.peakVelocity = peakVelocity;
+
+  xQueueSendToBack(uartTXQueue,&dataToSend,0);
+
+}
+void sendToLCDQueue(messageTypes_t messageType,
+		    uint32_t displayValue){
+  lcdData_t dataToSend;
+  dataToSend.messageType = messageType;
+  dataToSend.displayValue = displayValue;
+
+  xQueueSendToBack(lcdQueue,&dataToSend,0);
+}
+
+void createTask(TaskFunction_t pvTaskCode,
+			      const char *const pcName,
+			      configSTACK_DEPTH_TYPE usStackDepth,
+			      void *pvParameters,
+			      UBaseType_t uxPriority,
+			      TaskHandle_t *taskHandle){
+  
+  taskENTER_CRITICAL();
+
+  //Two instances of the same task are not allowed
+  if(*taskHandle != NULL){
+    vTaskDelete(*taskHandle);
+    *taskHandle = NULL;
+  }
+
+  xTaskCreate(pvTaskCode, pcName, usStackDepth,
+	      pvParameters, uxPriority, taskHandle);
+
+  taskEXIT_CRITICAL();
+
+}
+
+void deleteTask(TaskHandle_t *pxTask){
+  
+  taskENTER_CRITICAL();
+
+  if(*pxTask != NULL){
+    vTaskDelete(*pxTask); 
+    *pxTask = NULL;
+  }
+
+  taskEXIT_CRITICAL();
+  
+}
+
+void initializeTimers(void){
+
+}
+
+void stopTimers(void){
+
+}
+
+uint32_t readADC(void){
+
+  uint32_t voltageSupply;
+  uint32_t adcData;
+  uint8_t channel[1];
+
+  adc_set_sample_time(ADC1,ADC_CHANNEL_VREF,ADC_SMPR_SMP_239DOT5CYC);
+  channel[0] = ADC_CHANNEL_VREF;
+  adc_set_regular_sequence(ADC1,1,channel);
+  adc_start_conversion_direct(ADC1);
+  while ( !adc_eoc(ADC1) );
+  voltageSupply = 4914000/adc_read_regular(ADC1);
+
+  adc_set_sample_time(ADC1,ADC_CHANNEL1,ADC_SMPR_SMP_239DOT5CYC);
+  channel[0] = ADC_CHANNEL1;
+  adc_set_regular_sequence(ADC1,1,channel);
+  adc_start_conversion_direct(ADC1);
+  while ( !adc_eoc(ADC1) );
+  adcData = (adc_read_regular(ADC1) * voltageSupply / 4095) *2;
+
+  return adcData;
+}
 
 //encoderTask -------------------------------
 typedef struct encoderValues_t{
@@ -219,21 +322,9 @@ static void configurePeriphereals(void){
 
 }
 
-static uint16_t
-read_adc(uint8_t channel) {
-
-	adc_set_sample_time(ADC1,channel,ADC_SMPR_SMP_239DOT5CYC);
-	adc_set_regular_sequence(ADC1,1,&channel);
-	adc_start_conversion_direct(ADC1);
-	while ( !adc_eoc(ADC1) )
-		taskYIELD();
-	return adc_read_regular(ADC1);
-}
-
-
 static void communicationTask(void *args __attribute__((unused))) {
 
-  commData_t dataStruct;
+  uartTXData_t receivedData;
 
   charLineBuffer_t *charLineBuffer;
   QueueSetMemberHandle_t xHandle;
@@ -246,15 +337,15 @@ static void communicationTask(void *args __attribute__((unused))) {
     xHandle = xQueueSelectFromSet(communicationQueueSet,portMAX_DELAY);//Should go first
 
     if( xHandle == ( QueueSetMemberHandle_t ) communicationQueue){
-      xQueueReceive(communicationQueue, &dataStruct,0);//Should go first
+      xQueueReceive(communicationQueue, &receivedData,0);//Should go first
       
       
-      if(dataStruct.eDataSource == encoderSender){
-	writeEncoderValues(dataStruct.traveledDistanceOrADC,
-			   dataStruct.meanPropulsiveVelocity,
-			   dataStruct.peakVelocity);
-      }else if(dataStruct.eDataSource == adcSender){
-	sendToLCDQueue(batteryLevel,dataStruct.traveledDistanceOrADC);
+      if(receivedData.messageType == encoderData){
+	writeEncoderValues(receivedData.traveledDistanceOrADC,
+			   receivedData.meanPropulsiveVelocity,
+			   receivedData.peakVelocity);
+      }else if(receivedData.messageType == batteryLevel){
+	sendToLCDQueue(batteryLevel,receivedData.traveledDistanceOrADC);
       }
       
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
@@ -310,44 +401,39 @@ static void lcdTask(void *args __attribute__((unused))){
 	      "       Batt: %lu", lastVoltage);
       lcdPutsBlinkFree(buffer, 7);
       
-    }else if(receivedData.messageType == encoder){
+    }else if(receivedData.messageType == encoderData){
       sprintf(buffer, "%lu", receivedData.displayValue);
       lcdPutsBlinkFree(buffer,5);
     }
   }
 }
 
-static void adcTask(void *args __attribute__((unused))) {
+static void adcFreeTask(void *args __attribute__((unused))) {
 
-  uint16_t voltageSupply = 0;
-  uint16_t adc1Voltage = 0;
-  adc_start_conversion_direct(ADC1);
-  voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
-  adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
+  uint32_t adcData = 0;
   
   for(;;){
     
-    //1.20 - 4095             INVERSE RULE OF 3
-    //V+   - ADC_CHANNEL_VREF
-    
-    //V+ - 4095              DIRECT RULE OF 3
-    // x  - ADC_CHANNEL1
-    
-    voltageSupply = 4914000/read_adc(ADC_CHANNEL_VREF);
-    adc1Voltage = (read_adc(ADC_CHANNEL1) * voltageSupply / 4095) *2;
+    adcData = readADC();
 
-    sendToCommunicationQueue(adcSender,adc1Voltage,0,0);
+    sendToLCDQueue(batteryLevel,adcData);
 
-    if(getBLEConnected()){
-      xSemaphoreTake(adcSemaphore,portMAX_DELAY);      
-    }else{
-      vTaskDelay(pdMS_TO_TICKS(4000));
-    }
-
+    vTaskDelay(pdMS_TO_TICKS(4000));
   }
 }
 
+static void adcWaitTask(void *args __attribute__((unused))){
+  uint32_t adcData = 0;
+  
+  for(;;){
 
+    ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
+    
+    adcData = readADC();
+    sendToLCDQueue(batteryLevel, adcData);
+    //    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
+  }  
+}
 
 static void encoderTask(void *args __attribute__((unused))){
 
@@ -464,10 +550,10 @@ static void encoderTask(void *args __attribute__((unused))){
       }
       
       if(canCountRep){
-	sendToCommunicationQueue(encoderSender,
-				 lastMaxCounter,
-				 meanPropVel/meanPropVelCount,
-				 peakVel);
+	sendToUARTTXQueue(encoderData,
+			  lastMaxCounter,
+			  meanPropVel/meanPropVelCount,
+			  peakVel);
 	minDistTraveled = 0;
 	canCountRep = 0;
 
@@ -572,10 +658,9 @@ int main(void)
   ring_buffer_init(&encoder_ring, encoder_buffer, sizeof(encoder_buffer[0]),
 							 sizeof(encoder_buffer));
 
-  communicationQueue =  xQueueCreate(COMMUNICATION_QUEUE_SIZE, sizeof(commData_t));
+  uartTXQueue = xQueueCreate(TX_QUEUE_SIZE, sizeof(uartTXData_t));
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
 
-  adcSemaphore = xSemaphoreCreateBinary();
   encoderSemaphore = xSemaphoreCreateBinary();
 
   communicationQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
@@ -584,7 +669,7 @@ int main(void)
   
   xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
   xTaskCreate(lcdTask,"lcdTask",200, NULL, 2, NULL);
-  xTaskCreate(adcTask,"adcTask",200,NULL,2,NULL);
+  xTaskCreate(adcFreeTask,"adcFreeTask",100,NULL,2,&adcFreeTaskHandle);
   xTaskCreate(uartRxTask, "uartRxTask", 300,NULL, 3, NULL);
   xTaskCreate(encoderTask,"encoderTask",300,NULL,4,NULL);
 

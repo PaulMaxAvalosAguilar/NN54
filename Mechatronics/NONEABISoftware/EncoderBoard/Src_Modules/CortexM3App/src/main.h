@@ -13,10 +13,15 @@ extern char receiveBuffer[UART_RX_BUFFER_LEN];
 //Queue handles----------------
 extern QueueHandle_t uartTXQueue;
 extern QueueHandle_t lcdQueue;
+extern QueueHandle_t communicationQueue;
+extern QueueSetHandle_t communicationQueueSet;
+
+extern SemaphoreHandle_t encoderSemaphore;
 
 //Queue sizes------------------
 #define LCD_QUEUE_SIZE                20
 #define TX_QUEUE_SIZE                 20
+#define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + 1
 
 //Queue structures---------------------------
 typedef enum messageTypes_t{
@@ -63,6 +68,15 @@ void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t peakVelocity);
 void sendToLCDQueue(messageTypes_t messageType,
 		    uint32_t displayValue);
-void printStringUART(const char myString[]);
+void createTask(TaskFunction_t pvTaskCode,
+		const char *const pcName,
+		configSTACK_DEPTH_TYPE usStackDepth,
+		void *pvParameters,
+		UBaseType_t uxPriority,
+		TaskHandle_t *taskHandle);
+void deleteTask(TaskHandle_t *pxTask);
+void initializeTimers(void);
+void stopTimers(void);
+uint32_t readADC(void);
 
 #endif
