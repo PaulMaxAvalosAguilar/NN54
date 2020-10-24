@@ -295,11 +295,10 @@ int parseWVLine(const char* line){
 
     //Should go before creating encoderTask------------------------------
     (adcWaitTaskHandle != NULL)? vTaskSuspend(adcWaitTaskHandle): "";
-    ring_buffer_clear(&encoder_ring);//Should go before initializeTimers()
-    initializeTimers();//Clock gating
-    gpio_clear(GPIOA, GPIO4);//Activate sensors
-    writeEncoderStartValue();//sendToUARTTXQueue(encoderStart,0,0,0) equivalent
-
+    initializeTimers();
+    gpio_clear(GPIOA, GPIO4);
+    writeEncoderStartValue();
+    //    sendToUARTTXQueue(encoderStart,0,0,0);
     //Should go before creating encoderTask------------------------------
     createTask(encoderTask, "encoderTask",100,&dataToSend, 4,
 	       &encoderTaskHandle);

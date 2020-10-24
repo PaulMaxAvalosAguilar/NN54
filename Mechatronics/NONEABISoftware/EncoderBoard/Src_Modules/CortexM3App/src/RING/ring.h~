@@ -22,6 +22,4 @@ void memcopy(void *destref, const void *srcref, size_t count);
 int ring_buffer_put(ring_t *ring, const void *data);
 int ring_buffer_get(ring_t *ring, void *data);
 
-void ring_buffer_clear(ring_t *ring);
-
 #endif

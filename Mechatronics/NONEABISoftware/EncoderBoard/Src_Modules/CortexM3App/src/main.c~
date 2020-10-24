@@ -146,7 +146,8 @@ void initializeTimers(void){
 
   rcc_periph_clock_enable(RCC_TIM1);    // TIM1
   rcc_periph_clock_enable(RCC_TIM2);    // TIM2
-
+  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
+  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
   //32bit Timer
 
   //TIM1 
@@ -173,8 +174,6 @@ void initializeTimers(void){
   timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
 
   TIM1_PSC = 72;
-  TIM1_CNT = 0;
-  overflowCounter = 0;
   TIM1_CR1 |= TIM_CR1_CEN;  
   //TIM1
 
@@ -198,6 +197,8 @@ void initializeTimers(void){
 
 void stopTimers(void){
 
+  nvic_disable_irq(NVIC_TIM1_CC_IRQ);
+  nvic_disable_irq(NVIC_TIM1_UP_IRQ);
   rcc_periph_clock_disable(RCC_TIM1);    // TIM1
   rcc_periph_clock_disable(RCC_TIM2);    // TIM2
   
@@ -345,8 +346,6 @@ static void configurePeriphereals(void){
   
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_enable_irq(NVIC_EXTI15_10_IRQ);
-  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
-  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM3_IRQ,(0 << 4));
@@ -461,6 +460,8 @@ static void adcFreeTask(void *args __attribute__((unused))) {
 
 void tim1_cc_isr(){
 
+  //  uint32_t cyclesBefore = KIN1_GetCycleCounter();
+
   if(TIM1_SR & TIM_SR_CC1IF){
     //Rising Edge B
     capturedTime = (overflowCounter << 16) | TIM1_CCR1;
@@ -477,10 +478,20 @@ void tim1_cc_isr(){
 
   encInterruptValues.inputCapture = capturedTime;
   
+  // while((uint16_t)TIM2_CNT == tim2Counter);
   tim2Counter = (uint16_t)TIM2_CNT;
   encInterruptValues.encoderCounter = tim2Counter;
   
   ring_buffer_put(&encoder_ring, (encoderValues_t*)&encInterruptValues);
+
+  /*
+  uint32_t cyclesAfter = KIN1_GetCycleCounter();
+  uint32_t cycleDiff = cyclesAfter - cyclesBefore;
+
+  char buffer[22];  
+  sprintf(buffer,  "%lu", cycleDiff);
+  lcdPutsBlinkFree(buffer, 5);
+  */
 
 }
 

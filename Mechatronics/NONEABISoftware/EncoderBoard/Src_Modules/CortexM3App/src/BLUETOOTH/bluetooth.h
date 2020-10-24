@@ -11,18 +11,6 @@
 void writeEncoderValues(uint16_t value0,
 			 uint16_t value1,
 			 uint16_t value2);
-void setBLEConnected(uint8_t boolean);
-uint8_t getBLEConnected(void);
-void setENCODERStarted(uint8_t boolean);
-uint8_t getENCODERStarted(void);
-
-void setMinDistToTravel(uint16_t value);
-uint16_t getMinDistToTravel(void);
-void setDesiredCountDir(uint8_t value);
-uint8_t getDesiredCountDir(void);
-void setDesiredRepDir(uint8_t value);
-uint8_t getDesiredRepDir(void);
-
 //-------------- USART PARSING FUNCTIONS----------
 void genericLineParsing(charLineBuffer_t *);
 

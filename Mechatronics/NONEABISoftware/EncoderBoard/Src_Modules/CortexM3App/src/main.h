@@ -1,29 +1,42 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-//Mathematical defs--------------------------
+#include "FreeRTOS.h"
+#include "ring.h"
+
+#define ENCODERINITIAL_VALUE 32767
+
+//Mathematical defs-----------------------------
 #define BITS31 2147483648.0f
 #define PI 3.14159265f
 #define degToRads(x) ((x) * PI)/180.0
 
-//UART RX------------------------------------
+//BUFFER LENGTHS-----------------------------------
 #define UART_RX_BUFFER_LEN 256
 extern char receiveBuffer[UART_RX_BUFFER_LEN];
 
-//Queue handles----------------
-extern QueueHandle_t uartTXQueue;
-extern QueueHandle_t lcdQueue;
-extern QueueHandle_t communicationQueue;
-extern QueueSetHandle_t communicationQueueSet;
+#define ENCODER_BUFFER_LEN 256
 
-extern SemaphoreHandle_t encoderSemaphore;
+#if ((ENCODER_BUFFER_LEN - 1) & ENCODER_BUFFER_LEN) == 0
+#else
+#warning ENCODER_BUFFER NOT POWER OF 2
+#endif
 
-//Queue sizes------------------
+//Queue sizes-------------------------------------
 #define LCD_QUEUE_SIZE                20
 #define TX_QUEUE_SIZE                 20
-#define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + 1
+#define SEMAPHORE_SIZE                 1
+#define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + SEMAPHORE_SIZE
 
-//Queue structures---------------------------
+//Ring buffer handles---------------------------------
+extern ring_t encoder_ring;
+
+//Queue handles---------------------------------
+extern QueueHandle_t lcdQueue;
+extern QueueHandle_t uartTXQueue;
+extern QueueSetHandle_t communicationQueueSet;
+
+//Queue structures------------------------------
 typedef enum messageTypes_t{
 			    turnOnMessage,
 			    bleConfig,
@@ -47,21 +60,31 @@ typedef struct lcdData_t{
   uint32_t displayValue;  
 }lcdData_t;
 
-//Tasks Handles------------------------------
+//Tasks Handles-----------------------------------
 extern TaskHandle_t encoderTaskHandle;
-extern TaskHandle_t uartRXTaskHandle;
 extern TaskHandle_t adcFreeTaskHandle;
 extern TaskHandle_t adcWaitTaskHandle;
 
-//Task structures----------------------------
+//Task structures---------------------------------
 typedef struct encoderTaskParamTypes_t{
   uint32_t minDistToTravel;
   uint16_t desiredCounterDirection;
   uint16_t desiredRepDirection;
-
 }encoderTaskParamTypes_t;
 
-//Helper functions---------------------------
+//RingBuffer structures------------------------------
+typedef struct encoderValues_t{
+  uint16_t encoderCounter;
+  uint32_t inputCapture;
+} encoderValues_t;
+
+//Encoder variables--------------------------
+extern uint8_t (*goingDesiredCountDir[2])(uint16_t, uint16_t);
+extern uint8_t (*hasTraveledMinDist[2])(uint16_t, uint16_t);
+extern uint8_t (*hasReturnedToInitial[2])(uint16_t, uint16_t);
+extern uint8_t (*canCountMaxDist[2])(uint16_t,uint16_t);
+
+//RTOS Helper functions---------------------------
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrADC,
 		       uint16_t meanPropulsiveVelocity,
@@ -79,4 +102,18 @@ void initializeTimers(void);
 void stopTimers(void);
 uint32_t readADC(void);
 
+//EncoderHelper functions-------------------------
+uint8_t descendente(uint16_t a, uint16_t b);
+uint8_t ascendente(uint16_t a, uint16_t b);
+uint8_t minDistTraveledDes(uint16_t counter, uint16_t minDistToTravel);
+uint8_t minDistTraveledAs(uint16_t counter, uint16_t minDistToTravel);
+uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel);
+uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel);
+uint8_t maxDistAs(uint16_t counter, uint16_t lastMaxDist);
+uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist);
+
+
+
 #endif
+
+

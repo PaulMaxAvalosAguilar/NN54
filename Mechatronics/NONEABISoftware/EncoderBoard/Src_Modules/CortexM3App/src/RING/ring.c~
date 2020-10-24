@@ -45,6 +45,7 @@ inline void memcopy(void *destref, const void *srcref, size_t count){
 }
 
 int ring_buffer_put(ring_t *ring, const void *data){
+  int status = -1;
   
   //Chek if can insert
   if(!ring_buffer_full(ring)){
@@ -54,13 +55,14 @@ int ring_buffer_put(ring_t *ring, const void *data){
     memcopy((uint8_t*)ring->buf + position,data,ring->s_elem);
     ring->head++;
 
-    return 0;
+    status = 0;
   }
-  return -1;  
+  return status;  
 }
 
 
 int ring_buffer_get(ring_t *ring, void *data){
+  int status = -1;
   
   //Chek if can insert
   if(!ring_buffer_empty(ring)){
@@ -70,15 +72,8 @@ int ring_buffer_get(ring_t *ring, void *data){
     memcopy(data, (uint8_t *)ring->buf + position, ring->s_elem);
     ring->tail++;
 
-    return 0;
+    status = 0;
     
   }
-  return -1;
-}
-
-void ring_buffer_clear(ring_t *ring){
-
-  ring->head = 0;
-  ring->tail = 0;
-  
+  return status;
 }
