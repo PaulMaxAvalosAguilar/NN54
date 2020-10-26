@@ -5,6 +5,7 @@
 #include "ring.h"
 
 #define ENCODERINITIAL_VALUE 32767
+#define ENCODERSTEPDISTANCEINMILLS 4084
 
 //Mathematical defs-----------------------------
 #define BITS31 2147483648.0f
@@ -79,10 +80,10 @@ typedef struct encoderValues_t{
 } encoderValues_t;
 
 //Encoder variables--------------------------
-extern uint8_t (*goingDesiredCountDir[2])(uint16_t, uint16_t);
-extern uint8_t (*hasTraveledMinDist[2])(uint16_t, uint16_t);
-extern uint8_t (*hasReturnedToInitial[2])(uint16_t, uint16_t);
-extern uint8_t (*canCountMaxDist[2])(uint16_t,uint16_t);
+extern uint8_t (*goingDesiredCountDir[2])(uint32_t, uint32_t);
+extern uint8_t (*hasTraveledMinDist[2])(uint32_t, uint32_t);
+extern uint8_t (*hasReturnedToInitial[2])(uint32_t, uint32_t);
+extern uint8_t (*newMaxRomDetected[2])(uint32_t,uint32_t);
 
 //RTOS Helper functions---------------------------
 void sendToUARTTXQueue(messageTypes_t messageType,
@@ -103,16 +104,14 @@ void stopTimers(void);
 uint32_t readADC(void);
 
 //EncoderHelper functions-------------------------
-uint8_t descendente(uint16_t a, uint16_t b);
-uint8_t ascendente(uint16_t a, uint16_t b);
-uint8_t minDistTraveledDes(uint16_t counter, uint16_t minDistToTravel);
-uint8_t minDistTraveledAs(uint16_t counter, uint16_t minDistToTravel);
-uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel);
-uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel);
-uint8_t maxDistAs(uint16_t counter, uint16_t lastMaxDist);
-uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist);
-
-
+uint8_t descendente(uint32_t a, uint32_t b);
+uint8_t ascendente(uint32_t a, uint32_t b);
+uint8_t minDistTraveledDes(uint32_t counter, uint32_t minDistToTravel);
+uint8_t minDistTraveledAs(uint32_t counter, uint32_t minDistToTravel);
+uint8_t returnedToInitialDes(uint32_t counter, uint32_t minDistToTravel);
+uint8_t returnedToInitialAs(uint32_t counter, uint32_t minDistToTravel);
+uint8_t maxRomAs(uint32_t counter, uint32_t lastMaxDist);
+uint8_t maxRomDes(uint32_t counter, uint32_t lastMaxDist);
 
 #endif
 

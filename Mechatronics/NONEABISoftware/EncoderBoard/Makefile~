@@ -42,8 +42,7 @@ flash: Application
 FILECOMAND := 'file ./$(TARGETDIRECTORY)/$(VERSION)/$(TARGET).elf'
 
 debug:
-#openocd -f stlink.cfg -c "transport select hla_swd" -f stm32f1x.cfg
-	arm-none-eabi-gdb -ex 'target extended localhost:3333' \
+	arm-none-eabi-gdb -ex 'target extended localhost:4242' \
 	-ex $(FILECOMAND) -ex 'monitor reset halt' 
 
 #Clean PART

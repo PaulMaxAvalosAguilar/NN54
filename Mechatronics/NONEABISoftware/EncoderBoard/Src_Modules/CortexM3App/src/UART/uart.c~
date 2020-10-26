@@ -4,6 +4,7 @@
 #include <libopencm3/stm32/dma.h>
 #include "uart.h"
 #include "ring.h"
+#include "printf.h"
 #include <string.h>
 #include "task.h"
 

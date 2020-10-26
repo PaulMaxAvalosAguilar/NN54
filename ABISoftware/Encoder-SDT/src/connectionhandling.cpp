@@ -302,7 +302,9 @@ void ConnectionHandling::serviceScanDone()
         connect(encoderService.get(), &QLowEnergyService::descriptorWritten,
                 this, &ConnectionHandling::confirmedDescriptorWritten);
         qDebug()<<"Encoder service created.";
-        encoderService->discoverDetails();
+        QTimer::singleShot(0, [=] () {
+                        encoderService->discoverDetails();
+                    });
     }else{
         qDebug()<<"Encoder service not created.";
     }
@@ -364,7 +366,7 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
             }
             uvalue = parsedValue.toUInt(nullptr,16);
             parsedValue.clear();
-            setTraveledDist( ( (abs(uvalue-32767))*4084 )/10000 );
+            setTraveledDist(uvalue);
 
             for(auto iterator = hexValue.begin()+6; iterator < hexValue.begin() + 10;
                 iterator++){

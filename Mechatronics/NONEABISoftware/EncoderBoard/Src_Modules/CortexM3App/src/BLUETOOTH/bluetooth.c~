@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #include "bluetooth.h"
 #include "uart.h"
-#include "printf.h"
+#include "CUSTOM/PRINTF/printf.h"
+#include "CUSTOM/MATH/abs.h"
 #include "main.h"
 #include "ring.h"
 #include "lcd.h"
@@ -69,8 +70,6 @@ void setPrivateCharacteristic(const char *service,
 			      uint8_t securityFlag);
 void setName(char *string);//No >  6 bytes when using private serviceo
 void turnOffSubscription(void);
-void startTimers(void);
-//void stopTimers(void);
 void writeEncoderStartValue(void);
 
 //-------------- USART PARSING FUNCTIONS----------
@@ -295,12 +294,13 @@ int parseWVLine(const char* line){
 
     //Should go before creating encoderTask------------------------------
     (adcWaitTaskHandle != NULL)? vTaskSuspend(adcWaitTaskHandle): "";
-    initializeTimers();
-    gpio_clear(GPIOA, GPIO4);
-    writeEncoderStartValue();
-    //    sendToUARTTXQueue(encoderStart,0,0,0);
+    ring_buffer_clear(&encoder_ring);//Should go before initializeTimers()
+    initializeTimers();//Clock gating
+    gpio_clear(GPIOA, GPIO4);//Activate sensors
+    writeEncoderStartValue();//sendToUARTTXQueue(encoderStart,0,0,0) equivalent
+
     //Should go before creating encoderTask------------------------------
-    createTask(encoderTask, "encoderTask",100,&dataToSend, 4,
+    createTask(encoderTask, "encoderTask",200,&dataToSend, 4,
 	       &encoderTaskHandle);
     
   }else if(messageType ==2){
@@ -533,55 +533,50 @@ static void adcWaitTask(void *args __attribute__((unused))){
   }  
 }
 
-static void encoderTask(void *args __attribute__((unused))){
+static __attribute__((optimize("O0"))) void encoderTask(void *args __attribute__((unused))){
 
-  encoderValues_t receiveEncValues;  
-  encoderTaskParamTypes_t receivedData;
-  receivedData = *(encoderTaskParamTypes_t *)args;
+  volatile encoderValues_t receiveEncValues;  
+  volatile encoderTaskParamTypes_t taskParam;
+  taskParam = *(encoderTaskParamTypes_t *)args;
+
+  //Direction variables
+  volatile uint32_t desiredDirFollowed = 0;
 
   //Distance calculation variables
-  uint16_t lastPosition = ENCODERINITIAL_VALUE;
-  uint8_t elapsedPosition = 0;
-  uint32_t elapsedDistance = 0;
-  uint16_t lastMaxCounter = ENCODERINITIAL_VALUE;
+  volatile int32_t lastPosition = ENCODERINITIAL_VALUE;
+  volatile uint32_t elapsedPosition = 0;
+  volatile uint32_t elapsedDistance = 0;
 
   //Time calculation variables
-  uint32_t lastTime = 0;
-  uint32_t elapsedTime = 0;
-  uint8_t desiredDirFollowed = 0;
+  volatile uint32_t lastTime = 0;
+  volatile uint32_t elapsedTime = 0;
 
   //Velocity Calulcation Variables
-  uint32_t lastVelocity = 0;
-  uint32_t currentVelocity = 0;
+  volatile uint32_t currentVelocity = 0;
+  volatile uint32_t lastVelocity = 0;
   
-  uint32_t meanPropVelCount = 0;
-  uint32_t meanPropVel = 0;
-  uint32_t peakVel = 0;
+  volatile uint32_t meanPropVelCount = 0;
+  volatile uint32_t meanPropVel = 0;
+  volatile uint32_t peakVel = 0;
+
+  //ROM variables
+  volatile uint16_t maxROM = ENCODERINITIAL_VALUE;
 
   //Repetition algorithm variables
-  uint8_t canCountRep = 0;
-  uint8_t  minDistTraveled= 0;
+  volatile uint32_t canCountRep = 0;
+  volatile uint32_t  minDistTraveled= 0;
 
   for(;;){
 
     while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
 
       //VELOCITY ALGORITHM-------------------------------------------------------------------
-      if( (*goingDesiredCountDir[receivedData.desiredCounterDirection])(receiveEncValues.encoderCounter,
+      if( (*goingDesiredCountDir[taskParam.desiredCounterDirection])(receiveEncValues.encoderCounter,
 					   lastPosition) ){
 	desiredDirFollowed = 1;
-	if(receivedData.desiredCounterDirection){
-	  elapsedPosition = receiveEncValues.encoderCounter - lastPosition;
-	}else{
-	  elapsedPosition = lastPosition - receiveEncValues.encoderCounter;
-	}
+	elapsedPosition = custom_abs((int32_t)receiveEncValues.encoderCounter - lastPosition);	
       }else{
 	desiredDirFollowed = 0;
-      }
-
-      if( (*canCountMaxDist[receivedData.desiredRepDirection])(receiveEncValues.encoderCounter,
-					    lastMaxCounter) ){
-	lastMaxCounter = receiveEncValues.encoderCounter;
       }
 
       lastPosition = receiveEncValues.encoderCounter;
@@ -589,11 +584,8 @@ static void encoderTask(void *args __attribute__((unused))){
       lastTime = receiveEncValues.inputCapture;
       
       if(desiredDirFollowed){
-	elapsedDistance = 4084 * elapsedPosition;
+	elapsedDistance = ENCODERSTEPDISTANCEINMILLS * elapsedPosition;
 	currentVelocity = (elapsedDistance * 100) / elapsedTime;
-
-	//Peak Velocity Calculation
-	if(currentVelocity > peakVel) peakVel = currentVelocity;
 
 	//Mean Propulsive Velocity Calculation
 	if(currentVelocity > lastVelocity){
@@ -601,35 +593,56 @@ static void encoderTask(void *args __attribute__((unused))){
 	  meanPropVel += currentVelocity;
 	}
 	lastVelocity = currentVelocity;
+	
+	//Peak Velocity Calculation
+	if(currentVelocity > peakVel) peakVel = currentVelocity;
       }
       //VELOCITY ALGORITHM-----------------------------------------------------------------
 
       //REPETITION ALGORITHM---------------------------------------------------------------
-      if((*hasTraveledMinDist[receivedData.desiredRepDirection])
-	(receiveEncValues.encoderCounter, receivedData.minDistToTravel)){
+
+      if( (*newMaxRomDetected[taskParam.desiredRepDirection])(receiveEncValues.encoderCounter,
+								 maxROM) ){
+	maxROM = receiveEncValues.encoderCounter;
+      }
+
+      /*
+      if((*hasTraveledMinDist[taskParam.desiredRepDirection])
+	(receiveEncValues.encoderCounter, taskParam.minDistToTravel)){
+	minDistTraveled = 1;
+      }
+      */
+
+      volatile uint32_t value  = (uint32_t)custom_abs(maxROM - ENCODERINITIAL_VALUE);
+      if(value >= taskParam.minDistToTravel ){
 	minDistTraveled = 1;
       }
 
-      if(minDistTraveled && (*hasReturnedToInitial[receivedData.desiredRepDirection])
-	 (receiveEncValues.encoderCounter, receivedData.minDistToTravel)){
+      if(minDistTraveled && (*hasReturnedToInitial[taskParam.desiredRepDirection])
+	 (receiveEncValues.encoderCounter, taskParam.minDistToTravel)){
 	canCountRep = 1;
       }
       
       if(canCountRep){
+
 	sendToUARTTXQueue(encoderData,
-			  lastMaxCounter,
+			  maxROM,
 			  meanPropVel/meanPropVelCount,
 			  peakVel);
-	minDistTraveled = 0;
-	canCountRep = 0;
-
-	//Reset Velocity Calculation Variables
-	lastMaxCounter = ENCODERINITIAL_VALUE;
-	lastVelocity = 0;
 	
+	//Velocity Calulcation Variables reset
+	lastVelocity = 0;
+  
 	meanPropVelCount = 0;
 	meanPropVel = 0;
 	peakVel = 0;
+
+	//ROM variables reset
+	maxROM = ENCODERINITIAL_VALUE;
+
+	//Repetition algorithm variables
+	canCountRep = 0;
+	minDistTraveled= 0;
       }
       //REPETITION ALGORITHM---------------------------------------------------------------
     }
@@ -637,3 +650,4 @@ static void encoderTask(void *args __attribute__((unused))){
     vTaskDelay(pdMS_TO_TICKS(50));    
   }
 }
+

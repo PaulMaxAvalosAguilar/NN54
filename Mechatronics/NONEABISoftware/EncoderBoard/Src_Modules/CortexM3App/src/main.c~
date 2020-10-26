@@ -13,7 +13,6 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/i2c.h>
 #include <libopencm3/stm32/exti.h>
-#include "printf.h"
 #include "lcd.h"
 #include "uart.h"
 #include "ring.h"
@@ -68,12 +67,12 @@ TaskHandle_t adcFreeTaskHandle = NULL;
 TaskHandle_t adcWaitTaskHandle = NULL;
 
 //Encoder variables--------------------------
-uint8_t (*goingDesiredCountDir[2])(uint16_t, uint16_t) = {descendente, ascendente};
-uint8_t (*hasTraveledMinDist[2])(uint16_t, uint16_t) = {minDistTraveledDes,
+uint8_t (*goingDesiredCountDir[2])(uint32_t, uint32_t) = {descendente, ascendente};
+uint8_t (*hasTraveledMinDist[2])(uint32_t, uint32_t) = {minDistTraveledDes,
 						      minDistTraveledAs};
-uint8_t (*hasReturnedToInitial[2])(uint16_t, uint16_t) =
-  {returnToInitialDes,returnToInitialAs};
-uint8_t (*canCountMaxDist[2])(uint16_t,uint16_t) = {maxDistDes, maxDistAs};
+uint8_t (*hasReturnedToInitial[2])(uint32_t, uint32_t) =
+  {returnedToInitialDes,returnedToInitialAs};
+uint8_t (*newMaxRomDetected[2])(uint32_t,uint32_t) = {maxRomDes, maxRomAs};
 
 //ISR variables------------------------------
 //Timer ISR variables
@@ -146,62 +145,16 @@ void initializeTimers(void){
 
   rcc_periph_clock_enable(RCC_TIM1);    // TIM1
   rcc_periph_clock_enable(RCC_TIM2);    // TIM2
-  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
-  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
-  //32bit Timer
 
-  //TIM1 
-  TIM1_CCMR1 |= (TIM_CCMR1_CC1S_IN_TI1);//TI1 for CaptureChannel 1
-  TIM1_CCER &= ~(TIM_CCER_CC1P);//Rising Edge
-  TIM1_CCER |= (TIM_CCER_CC1E);//Enable capture on CaptureChannel1
-
-  TIM1_CCMR1 |= (TIM_CCMR1_CC2S_IN_TI1);//TI1 for CaptureChannel 2
-  TIM1_CCER |= (TIM_CCER_CC2P);//Falling Edge
-  TIM1_CCER |= (TIM_CCER_CC2E);//Enable capture on CaptureChannel2
-
-  TIM1_CCMR2 |= (TIM_CCMR2_CC3S_IN_TI3);//TI3 for CaptureChannel 3
-  TIM1_CCER &= ~(TIM_CCER_CC3P);//Rising Edge
-  TIM1_CCER |= (TIM_CCER_CC3E);//Enable capture on CaptureChannel 3  
-
-  TIM1_CCMR2 |= (TIM_CCMR2_CC4S_IN_TI3);//TI3 for CaptureChannel 4
-  TIM1_CCER |= (TIM_CCER_CC4P);//Falling Edge
-  TIM1_CCER |= (TIM_CCER_CC4E);//Enable capture on CaptureChannel 4
-
-  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC3IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
-  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
-
-  TIM1_PSC = 72;
-  TIM1_CR1 |= TIM_CR1_CEN;  
-  //TIM1
-
-  //TIM2
-  gpio_set_mode(GPIOA,
-		GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT,
-		GPIO15);  
-  gpio_set_mode(GPIOB,
-		GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT,
-		GPIO3);
-  TIM2_ARR = 0xFFFF;
-  TIM2_CCMR1 |= (TIM_CCMR1_CC2S_IN_TI2 | TIM_CCMR1_CC1S_IN_TI1);
-  TIM2_CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC2P);
-  TIM2_SMCR |= TIM_SMCR_SMS_EM3;
+  TIM1_CNT = 0;
+  overflowCounter = 0;
   TIM2_CNT = ENCODERINITIAL_VALUE;
-  TIM2_CR1 = TIM_CR1_CEN;
-  //TIM2  
 }
 
 void stopTimers(void){
 
-  nvic_disable_irq(NVIC_TIM1_CC_IRQ);
-  nvic_disable_irq(NVIC_TIM1_UP_IRQ);
   rcc_periph_clock_disable(RCC_TIM1);    // TIM1
-  rcc_periph_clock_disable(RCC_TIM2);    // TIM2
-  
+  rcc_periph_clock_disable(RCC_TIM2);    // TIM2  
 }
 
 uint32_t readADC(void){
@@ -227,40 +180,36 @@ uint32_t readADC(void){
   return adcData;
 }
 
-
-
-
-
-uint8_t descendente(uint16_t a, uint16_t b){
+uint8_t descendente(uint32_t a, uint32_t b){
   return a<b;
 }
 
-uint8_t ascendente(uint16_t a, uint16_t b){
+uint8_t ascendente(uint32_t a, uint32_t b){
   return a>b;
 }
 
-uint8_t minDistTraveledDes(uint16_t counter, uint16_t minDistToTravel){
+uint8_t minDistTraveledDes(uint32_t counter, uint32_t minDistToTravel){
   return (counter <= ENCODERINITIAL_VALUE - minDistToTravel);
 }
 
-uint8_t minDistTraveledAs(uint16_t counter, uint16_t minDistToTravel){
+uint8_t minDistTraveledAs(uint32_t counter, uint32_t minDistToTravel){
   return (counter >= ENCODERINITIAL_VALUE + minDistToTravel);
 }
 
-uint8_t returnToInitialDes(uint16_t counter, uint16_t minDistToTravel){
+uint8_t returnedToInitialDes(uint32_t counter, uint32_t minDistToTravel){
   return (counter > ENCODERINITIAL_VALUE - minDistToTravel);
 }
 
-uint8_t returnToInitialAs(uint16_t counter, uint16_t minDistToTravel){
+uint8_t returnedToInitialAs(uint32_t counter, uint32_t minDistToTravel){
   return (counter < ENCODERINITIAL_VALUE + minDistToTravel);
 }
 
-uint8_t maxDistAs(uint16_t counter, uint16_t lastMaxDist){
-  return (counter > lastMaxDist);
+uint8_t maxRomDes(uint32_t counter, uint32_t lastMaxDist){
+  return (counter < lastMaxDist);
 }
 
-uint8_t maxDistDes(uint16_t counter, uint16_t lastMaxDist){
-  return (counter < lastMaxDist);
+uint8_t maxRomAs(uint32_t counter, uint32_t lastMaxDist){
+  return (counter > lastMaxDist);
 }
 
 static void configurePeriphereals(void){
@@ -341,11 +290,60 @@ static void configurePeriphereals(void){
   gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
 		     AFIO_MAPR_I2C1_REMAP |  //I2C PB8 + PB9
 		     AFIO_MAPR_TIM2_REMAP_PARTIAL_REMAP1 |
-		     AFIO_MAPR_USART1_REMAP  ); //USART PB6 + PB7  
+		     AFIO_MAPR_USART1_REMAP  ); //USART PB6 + PB7
+
+  //TIM 1
+  rcc_periph_clock_enable(RCC_TIM1);    // TIM1
+
+  TIM1_CCMR1 |= (TIM_CCMR1_CC1S_IN_TI1);//TI1 for CaptureChannel 1
+  TIM1_CCER &= ~(TIM_CCER_CC1P);//Rising Edge
+  TIM1_CCER |= (TIM_CCER_CC1E);//Enable capture on CaptureChannel1
+
+  TIM1_CCMR1 |= (TIM_CCMR1_CC2S_IN_TI1);//TI1 for CaptureChannel 2
+  TIM1_CCER |= (TIM_CCER_CC2P);//Falling Edge
+  TIM1_CCER |= (TIM_CCER_CC2E);//Enable capture on CaptureChannel2
+
+  TIM1_CCMR2 |= (TIM_CCMR2_CC3S_IN_TI3);//TI3 for CaptureChannel 3
+  TIM1_CCER &= ~(TIM_CCER_CC3P);//Rising Edge
+  TIM1_CCER |= (TIM_CCER_CC3E);//Enable capture on CaptureChannel 3  
+
+  TIM1_CCMR2 |= (TIM_CCMR2_CC4S_IN_TI3);//TI3 for CaptureChannel 4
+  TIM1_CCER |= (TIM_CCER_CC4P);//Falling Edge
+  TIM1_CCER |= (TIM_CCER_CC4E);//Enable capture on CaptureChannel 4
+
+  timer_enable_irq(TIM1, TIM_DIER_CC1IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC2IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC3IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_CC4IE);//Interrupts
+  timer_enable_irq(TIM1, TIM_DIER_UIE);//Interrupts
+
+  TIM1_PSC = 72;
+  TIM1_CR1 |= TIM_CR1_CEN;  
+
+  //TIM2
+  rcc_periph_clock_enable(RCC_TIM2);    // TIM2
+  gpio_set_mode(GPIOA,
+		GPIO_MODE_INPUT,
+		GPIO_CNF_INPUT_FLOAT,
+		GPIO15);  
+  gpio_set_mode(GPIOB,
+		GPIO_MODE_INPUT,
+		GPIO_CNF_INPUT_FLOAT,
+		GPIO3);
+  TIM2_ARR = 0xFFFF;
+  TIM2_CCMR1 |= (TIM_CCMR1_CC2S_IN_TI2 | TIM_CCMR1_CC1S_IN_TI1);
+  TIM2_CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC2P);
+  TIM2_SMCR |= TIM_SMCR_SMS_EM3;
+  TIM2_CR1 = TIM_CR1_CEN;
+
+  rcc_periph_clock_disable(RCC_TIM1);    // TIM1
+  rcc_periph_clock_disable(RCC_TIM2);    // TIM2
     
   
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_enable_irq(NVIC_EXTI15_10_IRQ);
+  nvic_enable_irq(NVIC_TIM1_CC_IRQ);
+  nvic_enable_irq(NVIC_TIM1_UP_IRQ);
   nvic_set_priority(NVIC_TIM1_CC_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM1_UP_IRQ,(0 << 4));
   nvic_set_priority(NVIC_TIM3_IRQ,(0 << 4));
@@ -382,8 +380,7 @@ static void communicationTask(void *args __attribute__((unused))) {
 			   receivedData.peakVelocity);
       }else if(receivedData.messageType == batteryLevel){
 
-      }
-      
+      }      
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
       xSemaphoreTake(communicationSemaphore,0);//Should go first
       while(serialAvailable()){
@@ -460,8 +457,6 @@ static void adcFreeTask(void *args __attribute__((unused))) {
 
 void tim1_cc_isr(){
 
-  //  uint32_t cyclesBefore = KIN1_GetCycleCounter();
-
   if(TIM1_SR & TIM_SR_CC1IF){
     //Rising Edge B
     capturedTime = (overflowCounter << 16) | TIM1_CCR1;
@@ -478,20 +473,10 @@ void tim1_cc_isr(){
 
   encInterruptValues.inputCapture = capturedTime;
   
-  // while((uint16_t)TIM2_CNT == tim2Counter);
   tim2Counter = (uint16_t)TIM2_CNT;
   encInterruptValues.encoderCounter = tim2Counter;
   
   ring_buffer_put(&encoder_ring, (encoderValues_t*)&encInterruptValues);
-
-  /*
-  uint32_t cyclesAfter = KIN1_GetCycleCounter();
-  uint32_t cycleDiff = cyclesAfter - cyclesBefore;
-
-  char buffer[22];  
-  sprintf(buffer,  "%lu", cycleDiff);
-  lcdPutsBlinkFree(buffer, 5);
-  */
 
 }
 

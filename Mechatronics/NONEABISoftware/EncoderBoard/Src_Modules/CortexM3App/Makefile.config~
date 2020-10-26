@@ -2,6 +2,7 @@
 
 INCDEP      := -I $(HEADERDIR)\
 	    -I $(SRCDIR)/LCD\
+	    -I $(SRCDIR)/PRINTF\
 	    -I $(SRCDIR)/UART\
 	    -I $(SRCDIR)/RING\
 	    -I $(SRCDIR)/BLUETOOTH\

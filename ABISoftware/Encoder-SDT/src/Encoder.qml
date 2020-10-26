@@ -44,8 +44,8 @@ Page{
     }
 
     onTraveledDistChanged: {
-        travellabel.text = traveledDist
-        traveledDistances.push(traveledDist)
+        travellabel.text = traveledDist/10
+        traveledDistances.push(traveledDist/10)
     }
 
     onMeanPropVelChanged: {
