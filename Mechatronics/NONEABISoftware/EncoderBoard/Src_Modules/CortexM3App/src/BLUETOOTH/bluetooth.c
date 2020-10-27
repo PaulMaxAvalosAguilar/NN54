@@ -9,7 +9,7 @@
 #include "bluetooth.h"
 #include "uart.h"
 #include "CUSTOM/PRINTF/printf.h"
-#include "CUSTOM/MATH/abs.h"
+#include "CUSTOM/MATH/math.h"
 #include "main.h"
 #include "ring.h"
 #include "lcd.h"
