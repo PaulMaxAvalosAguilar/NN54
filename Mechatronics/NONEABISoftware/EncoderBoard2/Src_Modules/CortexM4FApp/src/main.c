@@ -24,12 +24,12 @@ TaskHandle_t adcFreeTaskHandle = NULL;
 TaskHandle_t adcWaitTaskHandle = NULL;
 
 //Internal functions-------------------------
-static void encoderTask(void *args);
-static void uartRXTask(void *args);
-static void uartTXTask(void *args);
-static void lcdTask(void *args);
-static void adcFreeTask(void *args);
-static void adcWaitTask(void *args);
+void encoderTask(void *args);
+void uartRXTask(void *args);
+void uartTXTask(void *args);
+void lcdTask(void *args);
+void adcFreeTask(void *args);
+void adcWaitTask(void *args);
 
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);

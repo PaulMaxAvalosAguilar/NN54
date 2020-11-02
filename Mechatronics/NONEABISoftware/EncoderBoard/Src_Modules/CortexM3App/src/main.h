@@ -17,6 +17,7 @@
 extern char receiveBuffer[UART_RX_BUFFER_LEN];
 
 #define ENCODER_BUFFER_LEN 256
+//put extern char encoderBuffer[encoder_BUFFER_LEN];
 
 #if ((ENCODER_BUFFER_LEN - 1) & ENCODER_BUFFER_LEN) == 0
 #else
@@ -30,6 +31,10 @@ extern char receiveBuffer[UART_RX_BUFFER_LEN];
 #define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + SEMAPHORE_SIZE
 
 //Ring buffer handles---------------------------------
+typedef struct charLineBuffer_t{
+  char buf[100];
+  uint16_t terminatorcharposition;
+}charLineBuffer_t;//DELETE!!!
 extern ring_t encoder_ring;
 
 //Queue handles---------------------------------
@@ -85,7 +90,7 @@ extern uint8_t (*hasTraveledMinDist[2])(uint32_t, uint32_t);
 extern uint8_t (*hasReturnedToInitial[2])(uint32_t, uint32_t);
 extern uint8_t (*newMaxRomDetected[2])(uint32_t,uint32_t);
 
-//RTOS Helper functions---------------------------
+//Helper functions---------------------------
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrADC,
 		       uint16_t meanPropulsiveVelocity,
@@ -102,6 +107,10 @@ void deleteTask(TaskHandle_t *pxTask);
 void initializeTimers(void);
 void stopTimers(void);
 uint32_t readADC(void);
+void printStringUART(const char myString[]);
+int serialAvailable(void);//DELETE!!!
+char get_char(void);//DELETE!!!
+charLineBuffer_t *forceReadCharLineUsart(void);//DELETE!!!
 
 //EncoderHelper functions-------------------------
 uint8_t descendente(uint32_t a, uint32_t b);

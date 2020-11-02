@@ -2,7 +2,7 @@
 #define COMMUNICATION
 
 #include <stdint.h>
-#include "uart.h"
+#include "main.h"
 #include "RN4020definitions.h"
 
 //-------------- BLUETOOTH COMMANDS---------------

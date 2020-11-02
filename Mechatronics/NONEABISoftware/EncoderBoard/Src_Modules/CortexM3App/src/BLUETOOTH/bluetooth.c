@@ -7,10 +7,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "bluetooth.h"
-#include "uart.h"
 #include "CUSTOM/PRINTF/printf.h"
 #include "CUSTOM/MATH/math.h"
-#include "main.h"
 #include "ring.h"
 #include "lcd.h"
 
@@ -145,7 +143,7 @@ void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
   va_start(args, format);
   vsnprintf(printBuffer,100,format,args);
   va_end(args);
-  printString(printBuffer);
+  printStringUART(printBuffer);
   //Send Command
 
   int waitingMax = 2;
