@@ -12,6 +12,6 @@ void writeEncoderValues(uint16_t value0,
 			 uint16_t value1,
 			 uint16_t value2);
 //-------------- USART PARSING FUNCTIONS----------
-void genericLineParsing(charLineBuffer_t *);
+void genericParsing(char *line);
 
 #endif

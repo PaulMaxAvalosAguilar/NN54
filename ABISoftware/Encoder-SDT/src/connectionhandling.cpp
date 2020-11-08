@@ -25,7 +25,7 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     seffect(new QSoundEffect)
 
 {
-    connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
+    //connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
     seffect->setSource(QUrl(QStringLiteral("qrc:/SoundEffects/fatigue-alert.wav")));
     seffect->setVolume(1);
 }

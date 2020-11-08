@@ -13,11 +13,12 @@
 #define degToRads(x) ((x) * PI)/180.0
 
 //BUFFER LENGTHS-----------------------------------
-#define UART_RX_BUFFER_LEN 256
+#define UART_RX_BUFFER_LEN 500
 extern char receiveBuffer[UART_RX_BUFFER_LEN];
+extern uint32_t receiveBufferPos;
+extern char parseBuffer[100];
 
 #define ENCODER_BUFFER_LEN 256
-//put extern char encoderBuffer[encoder_BUFFER_LEN];
 
 #if ((ENCODER_BUFFER_LEN - 1) & ENCODER_BUFFER_LEN) == 0
 #else
@@ -78,11 +79,18 @@ typedef struct encoderTaskParamTypes_t{
   uint16_t desiredRepDirection;
 }encoderTaskParamTypes_t;
 
-//RingBuffer structures------------------------------
+//RingBuffer structures---------------------------
 typedef struct encoderValues_t{
   uint16_t encoderCounter;
   uint32_t inputCapture;
 } encoderValues_t;
+
+//Tasks -----------------------------------------
+void encoderTask(void *args);
+void communicationTask(void *args);
+void lcdTask(void *args);
+void adcFreeTask(void *args);
+void adcWaitTask(void *args);
 
 //Encoder variables--------------------------
 extern uint8_t (*goingDesiredCountDir[2])(uint32_t, uint32_t);
@@ -108,9 +116,8 @@ void initializeTimers(void);
 void stopTimers(void);
 uint32_t readADC(void);
 void printStringUART(const char myString[]);
-int serialAvailable(void);//DELETE!!!
-char get_char(void);//DELETE!!!
-charLineBuffer_t *forceReadCharLineUsart(void);//DELETE!!!
+void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
+void getLine(void);
 
 //EncoderHelper functions-------------------------
 uint8_t descendente(uint32_t a, uint32_t b);

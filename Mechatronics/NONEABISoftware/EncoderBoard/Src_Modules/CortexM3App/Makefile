@@ -6,8 +6,12 @@ TARGETDIR   := ../../$(TARGETDIRECTORY)/$(VERSION)
 LIBSDIR     := ../../$(LIBDIRECTORY)/$(VERSION)
 HEADERDIR   := ../../$(HEADERSDIRECTORY)
 
-CCSOURCES   := $(shell find $(SRCDIR) -type f -name *.$(CCEXT))
-CPPSOURCES  := $(shell find $(SRCDIR) -type f -name *.$(CPPEXT))
+#CCSOURCES   := $(shell find $(SRCDIR) -type f -name *.$(CCEXT))
+#CPPSOURCES  := $(shell find $(SRCDIR) -type f -name *.$(CPPEXT))
+rwildcard    = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+CCSOURCES    := $(call rwildcard,$(SRCDIR)/,*.$(CCEXT))
+CPPSOURCES   := $(call rwildcard,$(SRCDIR),*.(CCPEXT))
 
 CCOBJECTS   := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CCSOURCES:.$(CCEXT)=.$(OBJEXT)))
 CPPOBJECTS  := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CPPSOURCES:.$(CPPEXT)=.$(OBJEXT)))
@@ -30,7 +34,7 @@ $(TARGETDIR)/$(TARGET).$(BINEXT): $(TARGETDIR)/$(TARGET).$(ELFEXT)
 
 $(TARGETDIR)/$(TARGET).$(ELFEXT): $(CCOBJECTS) $(CPPOBJECTS)  $(STATLIBS) $(DYNLIBS)
 	@mkdir -p $(dir $@)
-	$(LD) -o $@ $(CCOBJECTS) $(CPPOBJECTS) $(LDFLAGS)
+	$(LD) -o $@ $(CCOBJECTS) $(CPPOBJECTS) $(ASMOBJECTS) $(LDFLAGS)
 	$(SIZE) $(TARGETDIR)/$(TARGET).$(ELFEXT)
 
 -include $(CCDEPENDS)
@@ -42,4 +46,8 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(CCEXT)
 
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(CPPEXT)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< $(INCDEP) -o $@  
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< $(INCDEP) -o $@
+
+$(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(ASMEXT)
+	@mkdir -p $(dir $@)	
+	$(AS) $(ASFLAGS) -c $< $(INCDEP) -o $@

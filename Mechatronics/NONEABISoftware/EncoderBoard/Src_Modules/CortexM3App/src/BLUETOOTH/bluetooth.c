@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include "bluetooth.h"
 #include "CUSTOM/PRINTF/printf.h"
-#include "CUSTOM/MATH/math.h"
 #include "ring.h"
 #include "lcd.h"
 
@@ -35,8 +34,6 @@ typedef enum{
   AOKORERR
 }actions;
 
-uint8_t bluetoothConnected;
-uint8_t encoderStarted;
 typedef struct{
   uint8_t handleFound;
   uint16_t handle;
@@ -45,7 +42,6 @@ typedef struct{
 } characteristicStatus_t;
 characteristicStatus_t  characteristicStatus;
 
-charLineBuffer_t *charLineBufferPtr;
 char printBuffer[100];
 
 
@@ -74,16 +70,12 @@ void writeEncoderStartValue(void);
 int parseWVLine(const char* line);
 int parseWCLine(const char* line);
 int parseUUIDLine(const char* line);
-void unlockWaitingLineParsing(charLineBuffer_t *,
+void unlockWaitingLineParsing(char *buffer,
 			      int* waitingState, int *errorDetection);
 
 //-------------- RN4020 configuration------------
 void bluetoothConfig(int configuration);
 
-//-------------- rtos task---------------------
-static void adcFreeTask(void *args __attribute__((unused)));
-static void adcWaitTask(void *args __attribute__((unused)));
-static void encoderTask(void *args __attribute__((unused)));
 
 
 void writeEncoderValues(uint16_t value0,
@@ -105,7 +97,7 @@ void writeEncoderValues(uint16_t value0,
 
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
 
-  int notifyCheckingIsNull= 1;
+    int notifyCheckingIsNull= 1;
   uint8_t *notifyActive = notifyChecking;
   int previousNotifyActive;
   
@@ -131,12 +123,10 @@ void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
   //by second wait 1->0 lock detection section
   
   //Clean Serial
-  while(serialAvailable()){
-    charLineBufferPtr = forceReadCharLineUsart();
-    genericLineParsing(charLineBufferPtr);
+  while(receiveBuffer[receiveBufferPos]){
+    getLine();
+    genericParsing(parseBuffer);
   }
-
-
 
   //Send Command
   va_list args;
@@ -153,12 +143,13 @@ void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
     int waitingState = 1;
     
     while(waitingState){
-      if(serialAvailable()){
-	charLineBufferPtr = forceReadCharLineUsart();
-	genericLineParsing(charLineBufferPtr);
-	unlockWaitingLineParsing(charLineBufferPtr, &waitingState, &errorDetection);
 
+      if(receiveBuffer[receiveBufferPos]){
+	getLine();
+	genericParsing(parseBuffer);
+	unlockWaitingLineParsing(parseBuffer, &waitingState, &errorDetection);
       }
+      
       //second wait 1->0 lock detection section
       if( (i == 1) && (!(*notifyActive))){
 	waitingState =0; 
@@ -175,7 +166,6 @@ void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
     }
 
   }
-  
 }
 
 void advertise(){
@@ -393,43 +383,27 @@ int parseUUIDLine(const char* line) {
 }
 
 
-void unlockWaitingLineParsing(charLineBuffer_t *clb,
+void unlockWaitingLineParsing(char *buffer,
 				     int* waitingState, int *errorDetection){
-  char *buffer = clb->buf;
-  uint16_t *terminator = &clb->terminatorcharposition;
-  //Change to standard null terminator
-  buffer[*terminator] = '\0';
-
-  char* stdLine = buffer;
-  
   //INTERPRET
-  if((strstr(stdLine, "AOK") != NULL) ||
-     (strstr(stdLine, "END") != NULL)      
+  if((strstr(buffer, "AOK") != NULL) ||
+     (strstr(buffer, "END") != NULL)      
      ){
     *waitingState = 0;
       
-  }else if (strstr(stdLine,"ERR") != NULL){
+  }else if (strstr(buffer,"ERR") != NULL){
     //If an ERR is received no second aok will come therefore we skip
     //otherwise communication is gonna lock waiting for no coming aok
     *errorDetection = 1;
     *waitingState = 0;
   }
-  
-  //Return to line as null terminator
-  buffer[*terminator] = '\n';
 }
 
 
-void genericLineParsing(charLineBuffer_t *clb){
-  char *buffer = clb->buf;
-  uint16_t *terminator = &clb->terminatorcharposition;
-  //Change to standard null terminator
-  buffer[*terminator] = '\0';
-
-  char* stdLine = buffer;
+void genericParsing(char *buffer){
   
   //INTERPRET
-  if(strstr(stdLine, "Connection End") != NULL){
+  if(strstr(buffer, "Connection End") != NULL){
 
     //In case no stop was ever received-----------------------------------
     deleteTask(&encoderTaskHandle);
@@ -450,37 +424,34 @@ void genericLineParsing(charLineBuffer_t *clb){
     unBond();
     advertise();
   
-  }else if(strstr(stdLine,"Connected") != NULL){
+  }else if(strstr(buffer,"Connected") != NULL){
     sendToLCDQueue(connectedStatus,1);
     deleteTask(&adcFreeTaskHandle);
     createTask(adcWaitTask,"adcWaitTask",100,NULL,1,&adcWaitTaskHandle);
 
-  }else if(strstr(stdLine, "Bonded") != NULL){
+  }else if(strstr(buffer, "Bonded") != NULL){
       
-  }else if(parseWVLine(stdLine)){
+  }else if(parseWVLine(buffer)){
 
-  }else if(parseUUIDLine(stdLine)){
+  }else if(parseUUIDLine(buffer)){
     
-  }else if(parseWCLine(stdLine)){
+  }else if(parseWCLine(buffer)){
     
-  }else if(strstr(stdLine, "CMD")!= NULL){
-    sendToLCDQueue(bleConfig,0);
+  }else if(strstr(buffer, "CMD")!= NULL){
+    sendToLCDQueue(bleConfig,1);
     bluetoothConfig(0);
     sendLS();
     stopAdvertising();
     advertise();	  
   }
-
-  //Return to line as null terminator
-  buffer[*terminator] = '\n';
 }
 
-void bluetoothConfig(int configuration){
+void  bluetoothConfig(int configuration){
 
   if(configuration == 1){
 
-    setFactoryReset(1);//Should go first
-    cleanPrivateService();//Should go after Factory reset for services to show
+    //    setFactoryReset(1);//Should go first
+    //    cleanPrivateService();//Should go after Factory reset for services to show
     setFeatures(RN4020_FEATURE_PERIFERAL | RN4020_FEATURE_DO_NOT_SAVE_BONDING
 		| RN4020_FEATURE_NO_DIRECT_ADVERTISE
 		| RN4020_FEATURE_SERVER_ONLY); //SERVER ONLY REDUCES OVERHEAD
@@ -502,146 +473,6 @@ void bluetoothConfig(int configuration){
      
   }else if(configuration == 2){
     setFactoryReset(2);
-  }
-}
-
-static void adcFreeTask(void *args __attribute__((unused))) {
-
-  uint32_t adcData = 0;
-  
-  for(;;){
-    
-    adcData = readADC();
-
-    sendToLCDQueue(batteryLevel,adcData);
-
-    vTaskDelay(pdMS_TO_TICKS(4000));
-  }
-}
-
-static void adcWaitTask(void *args __attribute__((unused))){
-  uint32_t adcData = 0;
-  
-  for(;;){
-
-    ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
-    
-    adcData = readADC();
-    sendToLCDQueue(batteryLevel, adcData);
-    //    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
-  }  
-}
-
-static __attribute__((optimize("O0"))) void encoderTask(void *args __attribute__((unused))){
-
-  encoderValues_t receiveEncValues;  
-  encoderTaskParamTypes_t taskParam;
-  taskParam = *(encoderTaskParamTypes_t *)args;
-
-  //Direction variables
-  uint32_t desiredDirFollowed = 0;
-
-  //Distance calculation variables
-  int32_t lastPosition = ENCODERINITIAL_VALUE;
-  uint32_t elapsedPosition = 0;
-  uint32_t elapsedDistance = 0;
-
-  //Time calculation variables
-  uint32_t lastTime = 0;
-  uint32_t elapsedTime = 0;
-
-  //Velocity Calulcation Variables
-  uint32_t currentVelocity = 0;
-  uint32_t lastVelocity = 0;
-  
-  uint32_t meanPropVelCount = 0;
-  uint32_t meanPropVel = 0;
-  uint32_t peakVel = 0;
-
-  //ROM variables
-  uint16_t maxROM = ENCODERINITIAL_VALUE;
-
-  //Repetition algorithm variables
-  uint32_t canCountRep = 0;
-  uint32_t  minDistTraveled= 0;
-
-  for(;;){
-
-    while(ring_buffer_get(&encoder_ring, &receiveEncValues) != -1){
-
-      //VELOCITY ALGORITHM-------------------------------------------------------------------
-      if( (*goingDesiredCountDir[taskParam.desiredCounterDirection])(receiveEncValues.encoderCounter,
-					   lastPosition) ){
-	desiredDirFollowed = 1;
-	elapsedPosition = custom_abs((int32_t)receiveEncValues.encoderCounter - lastPosition);	
-      }else{
-	desiredDirFollowed = 0;
-      }
-
-      lastPosition = receiveEncValues.encoderCounter;
-      elapsedTime = receiveEncValues.inputCapture - lastTime;
-      lastTime = receiveEncValues.inputCapture;
-      
-      if(desiredDirFollowed){
-	elapsedDistance = ENCODERSTEPDISTANCEINMILLS * elapsedPosition;
-	currentVelocity = (elapsedDistance * 100) / elapsedTime;
-
-	//Mean Propulsive Velocity Calculation
-	if(currentVelocity > lastVelocity){
-	  meanPropVelCount++;
-	  meanPropVel += currentVelocity;
-	}
-	lastVelocity = currentVelocity;
-	
-	//Peak Velocity Calculation
-	if(currentVelocity > peakVel) peakVel = currentVelocity;
-      }
-      //VELOCITY ALGORITHM-----------------------------------------------------------------
-
-      //REPETITION ALGORITHM---------------------------------------------------------------
-
-      if( (*newMaxRomDetected[taskParam.desiredRepDirection])(receiveEncValues.encoderCounter,
-								 maxROM) ){
-	maxROM = receiveEncValues.encoderCounter;
-      }
-
-
-      if((*hasTraveledMinDist[taskParam.desiredRepDirection])
-	(receiveEncValues.encoderCounter, taskParam.minDistToTravel)){
-	minDistTraveled = 1;
-      }
-
-
-      if(minDistTraveled && (*hasReturnedToInitial[taskParam.desiredRepDirection])
-	 (receiveEncValues.encoderCounter, taskParam.minDistToTravel)){
-	canCountRep = 1;
-      }
-      
-      if(canCountRep){
-
-	sendToUARTTXQueue(encoderData,
-			  (custom_abs(maxROM-ENCODERINITIAL_VALUE)* ENCODERSTEPDISTANCEINMILLS)/1000,
-			  meanPropVel/meanPropVelCount,
-			  peakVel);
-	
-	//Velocity Calulcation Variables reset
-	lastVelocity = 0;
-  
-	meanPropVelCount = 0;
-	meanPropVel = 0;
-	peakVel = 0;
-
-	//ROM variables reset
-	maxROM = ENCODERINITIAL_VALUE;
-
-	//Repetition algorithm variables
-	canCountRep = 0;
-	minDistTraveled= 0;
-      }
-      //REPETITION ALGORITHM---------------------------------------------------------------
-    }
-    
-    vTaskDelay(pdMS_TO_TICKS(50));    
   }
 }
 
