@@ -75,8 +75,8 @@ extern TaskHandle_t adcWaitTaskHandle;
 //Task structures---------------------------------
 typedef struct encoderTaskParamTypes_t{
   uint32_t minDistToTravel;
-  uint16_t desiredCounterDirection;
-  uint16_t desiredRepDirection;
+  uint32_t desiredCounterDirection;
+  uint32_t desiredRepDirection;
 }encoderTaskParamTypes_t;
 
 //RingBuffer structures---------------------------
@@ -116,6 +116,8 @@ void initializeTimers(void);
 void stopTimers(void);
 uint32_t readADC(void);
 void printStringUART(const char myString[]);
+void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode);
+uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb);
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
 void getLine(void);
 

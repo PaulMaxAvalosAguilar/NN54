@@ -230,7 +230,7 @@ static void uartRXTask(void *args __attribute__((unused))){
 	}else if(secondToken == '|'){
 
 	  uint8_t messageType = parseBuffer[0];
-	  if(messageType == 1){
+	  if(messageType == 1){//Periphereal mode for Encoder Start
 
 	    dataToSend.minDistToTravel = decodeTwoBytes(parseBuffer[1], parseBuffer[2]);
 	    dataToSend.desiredCounterDirection = parseBuffer[3]-1;
@@ -244,7 +244,7 @@ static void uartRXTask(void *args __attribute__((unused))){
 	    createTask(encoderTask, "encoderTask",100,&dataToSend, 4,
 		       &encoderTaskHandle);
 	    
-	  }else if(messageType == 2){
+	  }else if(messageType == 2){//Periphereal mode for Encoder Stop
 	    
 	    deleteTask(&encoderTaskHandle);
 	    //Should go after deleting encoderTask-------------------------------
@@ -253,7 +253,7 @@ static void uartRXTask(void *args __attribute__((unused))){
 	    vTaskResume(adcWaitTaskHandle);
 	    //Should go after deleting encoderTask-------------------------------
 	    
-	  }else if(messageType == 3){
+	  }else if(messageType == 3){//Periphereal mode for Encoder ADC
 	    dataToSend.minDistToTravel++;
 	    (adcWaitTaskHandle != NULL)? xTaskNotifyGive(adcWaitTaskHandle) : 0;
 	  }	  
@@ -283,7 +283,7 @@ static void uartTXTask(void *args __attribute__((unused))){
     strcpy(buffer,"|");//Protocol Message initiator character 
       
     if(receivedData.messageType == encoderData){
-      twoByteBuffer[0] = 129;//Central code for encoder data
+      twoByteBuffer[0] = 129;//Central code for Encoder Data
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
       
@@ -297,13 +297,13 @@ static void uartTXTask(void *args __attribute__((unused))){
       strcat(buffer, twoByteBuffer);
 
     }else if(receivedData.messageType == encoderStart){
-      twoByteBuffer[0] = 130;//Central code for encoderStart
+      twoByteBuffer[0] = 130;//Central code for Encoder Start
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
       
     }else if(receivedData.messageType == batteryLevel){
 
-      twoByteBuffer[0] = 131;//Central code for batteryLevel
+      twoByteBuffer[0] = 131;//Central code for Battery Level
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
 
@@ -311,7 +311,7 @@ static void uartTXTask(void *args __attribute__((unused))){
       strcat(buffer, twoByteBuffer);
       
     }else if(receivedData.messageType == encoderStop){
-      twoByteBuffer[0] = 132;//Central code
+      twoByteBuffer[0] = 132;//Central code for Encoder Stop
       twoByteBuffer[1] = 0;
       strcat(buffer, twoByteBuffer);
       

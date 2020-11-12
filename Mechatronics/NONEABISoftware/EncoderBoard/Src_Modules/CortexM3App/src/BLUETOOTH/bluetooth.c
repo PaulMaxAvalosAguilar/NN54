@@ -253,32 +253,38 @@ int parseWVLine(const char* line){
     return 0;
   }
 
-  char cbyteBuffer[3];
+  char byteBuffer[3];
 
-  //Begin at line 10 since 00 is expected from sender:
-  //WV,FFFF,00FFBBBBCCDD
-  strncpy(cbyteBuffer, line+10,2);
-  cbyteBuffer[2] = '\n';
-  uint8_t messageType = strtol(cbyteBuffer, NULL, 16);
+  //Begin at line 8
+  //WV,FFFF,7C01FFFF02027C
+  strncpy(byteBuffer, line+10,2);
+  byteBuffer[2] = 0;
+  uint8_t messageType = strtol(byteBuffer, NULL, 16);
 
-  if(messageType == 1){
+  if(messageType == 1){//Periphereal mode for Encoder Start
 
     encoderTaskParamTypes_t dataToSend;
 
     //Get minDistToTravel
-    strncpy(cbyteBuffer, line+12,2);
-    cbyteBuffer[2] = '\n';
-    dataToSend.minDistToTravel = strtol(cbyteBuffer,NULL,16);
+    strncpy(byteBuffer, line+12,2);
+    byteBuffer[2] = 0;
+    uint16_t msb = strtol(byteBuffer,NULL,16);
+
+    strncpy(byteBuffer, line+14,2);
+    byteBuffer[2] = 0;
+    uint16_t lsb = strtol(byteBuffer,NULL,16);
+    
+    dataToSend.minDistToTravel = decodeTwoBytes(msb,lsb);
 
     //Get desiredCountDir
-    strncpy(cbyteBuffer, line+14,2);
-    cbyteBuffer[2] = '\n';
-    dataToSend.desiredCounterDirection = strtol(cbyteBuffer,NULL,16);
+    strncpy(byteBuffer, line+16,2);
+    byteBuffer[2] = 0;
+    dataToSend.desiredCounterDirection = strtol(byteBuffer,NULL,16)-1;
 
     //Get desiredRepDir
-    strncpy(cbyteBuffer, line+16,2);
-    cbyteBuffer[2] = '\n';
-    dataToSend.desiredRepDirection = strtol(cbyteBuffer,NULL,16);
+    strncpy(byteBuffer, line+18,2);
+    byteBuffer[2] = 0;
+    dataToSend.desiredRepDirection = strtol(byteBuffer,NULL,16)-1;
 
     //Should go before creating encoderTask------------------------------
     (adcWaitTaskHandle != NULL)? vTaskSuspend(adcWaitTaskHandle): "";
@@ -292,7 +298,7 @@ int parseWVLine(const char* line){
     createTask(encoderTask, "encoderTask",200,&dataToSend, 4,
 	       &encoderTaskHandle);
     
-  }else if(messageType ==2){
+  }else if(messageType ==2){//Periphereal mode for Encoder Stop
 
     deleteTask(&encoderTaskHandle);
     //Should go after deleting encoderTask-------------------------------
@@ -302,7 +308,7 @@ int parseWVLine(const char* line){
     vTaskResume(adcWaitTaskHandle);
     //Should go after deleting encoderTask-------------------------------
     
-  }else if(messageType == 3){
+  }else if(messageType == 3){//Periphereal mode for Encoder ADC
     (adcWaitTaskHandle != NULL)? xTaskNotifyGive(adcWaitTaskHandle) : 0;
   }
 

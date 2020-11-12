@@ -43,7 +43,7 @@ DESCRIPTION OF THE PROTOCOL
 The specific implementation of this protocol is made with:
 
 2.- 7C as the initiator and terminator character
-3.- 01 to 128 are chosen as encoder (periphereal) values, 129 to 256 are chosen as app (central)
+3.- 01 to 128 are chosen as encoder (periphereal) values, 129 to 255 are chosen as app (central)
     values
     
     

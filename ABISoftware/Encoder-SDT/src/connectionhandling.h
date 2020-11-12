@@ -109,6 +109,9 @@ private slots:
 
 private:
 
+    void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode);
+    uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb);
+
     //QML Properties related
     int connected;
     int activated;

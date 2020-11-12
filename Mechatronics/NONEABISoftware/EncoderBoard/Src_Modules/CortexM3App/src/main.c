@@ -200,6 +200,21 @@ void printStringUART(const char myString[]) {
 
 }
 
+void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
+  static uint8_t lowPart = 0;
+  static uint8_t highPart = 0;
+  
+  lowPart = ((numberToEncode & 0x7F) << 1) | 1;
+  highPart = (numberToEncode >>6) | 1;
+  twoByteBuffer[0] = highPart;
+  twoByteBuffer[1] = lowPart;
+  twoByteBuffer[2] = 0;
+}
+
+uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
+   return (lsb>>1) | ((msb & 0xFE)<<6);
+}
+
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength){
   buffer[*bufferPosition] = 0;
   *bufferPosition = (*bufferPosition + 1) % bufferLength;

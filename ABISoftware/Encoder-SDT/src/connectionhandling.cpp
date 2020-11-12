@@ -25,7 +25,7 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     seffect(new QSoundEffect)
 
 {
-    //connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
+//    connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
     seffect->setSource(QUrl(QStringLiteral("qrc:/SoundEffects/fatigue-alert.wav")));
     seffect->setVolume(1);
 }
@@ -181,12 +181,13 @@ void ConnectionHandling::disconnect()
 void ConnectionHandling::sendADC()
 {
     if(connected){
-        char a = 0;
-        char b = 3;
+        char code = static_cast<char>(3);
 
         QByteArray c;
-        c.append(a);
-        c.append(b);
+        c.append('|');
+        c.append(code);
+
+        c.append('|');
         encoderService->writeCharacteristic(encoderCharacteristic, c);
     }
 }
@@ -194,16 +195,21 @@ void ConnectionHandling::sendADC()
 void ConnectionHandling::sendStart(uint minDistToTravel, uint desiredCountDir, uint desiredRepDir)
 {
     if(connected){
-        char a = 0;
-        char b = 1;
+        char twoByteBuffer[3];
+        encodeTwoBytes(twoByteBuffer,minDistToTravel);
+
+        char code = static_cast<char>(1);
 
         QByteArray c;
-        c.append(a);
-        c.append(b);
+        c.append('|');
+        c.append(code);
 
-        c.append(static_cast<char>(minDistToTravel));
-        c.append(static_cast<char>(desiredCountDir));
-        c.append(static_cast<char>(desiredRepDir));
+        c.append(static_cast<char>(twoByteBuffer[0]));
+        c.append(static_cast<char>(twoByteBuffer[1]));
+        c.append(static_cast<char>(desiredCountDir+1));
+        c.append(static_cast<char>(desiredRepDir+1));
+
+        c.append('|');
         encoderService->writeCharacteristic(encoderCharacteristic, c);
         timer->stop();
         qDebug() << "Start Sended";
@@ -213,12 +219,13 @@ void ConnectionHandling::sendStart(uint minDistToTravel, uint desiredCountDir, u
 void ConnectionHandling::sendStop()
 {
     if(connected){
-        char a = 0;
-        char b = 2;
+        char code = static_cast<char>(2);
 
         QByteArray c;
-        c.append(a);
-        c.append(b);
+        c.append('|');
+        c.append(code);
+
+        c.append('|');
         encoderService->writeCharacteristic(encoderCharacteristic, c);
         timer->start();
         qDebug() << "Stop Sended";
@@ -395,6 +402,24 @@ void ConnectionHandling::confirmedDescriptorWritten(const QLowEnergyDescriptor &
         qDebug() <<"Notifications activated";
         setActivated(true);
     }
+}
+
+void ConnectionHandling::encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
+
+    static uint8_t lowPart = 0;
+    static uint8_t highPart = 0;
+
+    lowPart = ((numberToEncode & 0x7F) << 1) | 1;
+    highPart = (numberToEncode >>6) | 1;
+    twoByteBuffer[0] = highPart;
+    twoByteBuffer[1] = lowPart;
+    twoByteBuffer[2] = 0;
+
+}
+
+uint16_t ConnectionHandling::decodeTwoBytes(uint8_t msb, uint8_t lsb){
+
+  return (lsb>>1) | ((msb & 0xFE)<<6);
 }
 
 

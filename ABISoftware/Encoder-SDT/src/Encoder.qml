@@ -720,7 +720,7 @@ Page{
                         anchors.bottom: parent.bottom
                         width: parent.width/2
                         from: 0
-                        to: 255
+                        to: 16383
                         value: 25
                         editable: true
                     }
