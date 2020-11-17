@@ -8,9 +8,14 @@
 //-------------- BLUETOOTH COMMANDS---------------
 //Only pair characters can be send (one byte in hex) with
 //writing characteristics functions other will be ignored
-void writeEncoderValues(uint16_t value0,
-			 uint16_t value1,
-			 uint16_t value2);
+void writeEncoderValues(uint8_t centralCode,
+			char traveledDistance[3],
+			char meanPropulsiveVelocity[3],
+			char peakVelocity[3]);
+void writeEncoderStartValue(uint8_t centralCode);
+void writeBatteryLevel(uint8_t centralCode,
+		       char level[3]);
+void writeEncoderStop(uint8_t centralCode);
 //-------------- USART PARSING FUNCTIONS----------
 void genericParsing(char *line);
 

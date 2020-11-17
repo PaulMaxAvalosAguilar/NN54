@@ -44,7 +44,6 @@ characteristicStatus_t  characteristicStatus;
 
 char printBuffer[100];
 
-
 //-------------- BLUETOOTH COMMANDS---------------
 //Only pair characters can be send (one byte in hex) with
 //writing characteristics functions other will be ignored
@@ -64,7 +63,6 @@ void setPrivateCharacteristic(const char *service,
 			      uint8_t securityFlag);
 void setName(char *string);//No >  6 bytes when using private serviceo
 void turnOffSubscription(void);
-void writeEncoderStartValue(void);
 
 //-------------- USART PARSING FUNCTIONS----------
 int parseWVLine(const char* line);
@@ -77,22 +75,67 @@ void unlockWaitingLineParsing(char *buffer,
 void bluetoothConfig(int configuration);
 
 
-
-void writeEncoderValues(uint16_t value0,
-			 uint16_t value1,
-			 uint16_t value2){
+void writeEncoderValues(uint8_t centralCode,
+			char traveledDistance[3],
+			char meanPropulsiveVelocity[3],
+			char peakVelocity[3]){
 
   runLockingCOMMAND(&characteristicStatus.isNotifying
 		    ,"SHW,%04X,"
-		    "%02X"
-		    "%04X"
-		    "%04X"
-		    "%04X\n",
+		    "%02X"//Protocol Message initiator character 
+		    "%02X"//Central code for Encoder Data
+		    "%04X"//traveledDistance
+		    "%04X"//meanPropulsiveVelocity
+		    "%04X"//peakVelocity
+		    "%02X\n",//Protocol Message terminator character
 		    characteristicStatus.handle,
-		    255,
-		    value0,
-		    value1,
-		    value2);
+		    '|',
+		    centralCode,
+		    ((traveledDistance[0]<<8) | traveledDistance[1]),
+		    ((meanPropulsiveVelocity[0]<<8) | meanPropulsiveVelocity[1]),
+		    ((peakVelocity[0]<<8) | peakVelocity[1]),
+		    '|');
+}
+
+void writeEncoderStartValue(uint8_t centralCode){
+  runLockingCOMMAND(&characteristicStatus.isNotifying
+		    ,"SHW,%04X,"
+		    "%02X"//Protocol Message initiator character 
+		    "%02X"//Central code for Encoder Start
+		    "%02X\n",//Protocol Message terminator character
+		    characteristicStatus.handle,
+		    '|',
+		    centralCode,
+		    '|');
+}
+
+void writeBatteryLevel(uint8_t centralCode,
+		       char level[3]){
+  runLockingCOMMAND(&characteristicStatus.isNotifying
+		    ,"SHW,%04X,"
+		    "%02X"//Protocol Message initiator character 
+		    "%02X"//Central code for Battery Level
+		    "%04X"//BatteryLevel
+		    "%02X\n",//Protocol Message terminator character
+		    characteristicStatus.handle,
+		    '|',
+		    centralCode,
+		    ((level[0]<<8) | level[1]),
+		    '|');
+
+}
+
+void writeEncoderStop(uint8_t centralCode){
+  runLockingCOMMAND(&characteristicStatus.isNotifying
+		    ,"SHW,%04X,"
+		    "%02X"//Protocol Message initiator character 
+		    "%02X"//Central code for Encoder Stop
+		    "%02X\n",//Protocol Message terminator character
+		    characteristicStatus.handle,
+		    '|',
+		    centralCode,
+		    '|'
+		    );
 }
 
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
@@ -230,8 +273,6 @@ void setName( char *string){
   runLockingCOMMAND(NULL,"SN,%s\n", string);
 }
 
-
-
 void turnOffSubscription(void){
   uint16_t subscriptionHandle =
     characteristicStatus.handle + 1;
@@ -240,75 +281,65 @@ void turnOffSubscription(void){
 		    subscriptionHandle);
 }
 
-void writeEncoderStartValue(){
-  runLockingCOMMAND(&characteristicStatus.isNotifying
-		    ,"SHW,%04X,"
-		    "%02X\n",
-		    characteristicStatus.handle,
-		    200);
-}
-
 int parseWVLine(const char* line){
   if(strncmp(line,"WV,",3) != 0){
     return 0;
   }
 
-  char byteBuffer[3];
+  char twoByteBuffer[5];
 
   //Begin at line 8
   //WV,FFFF,7C01FFFF02027C
-  strncpy(byteBuffer, line+10,2);
-  byteBuffer[2] = 0;
-  uint8_t messageType = strtol(byteBuffer, NULL, 16);
+  strncpy(twoByteBuffer, line+10,2);
+  twoByteBuffer[2] = 0;
+  uint8_t messageType = strtol(twoByteBuffer, NULL, 16);
+  messageType = decodeOneByte(messageType);
 
-  if(messageType == 1){//Periphereal mode for Encoder Start
+  if(messageType == 1){//Periphereal code for Encoder Start
 
     encoderTaskParamTypes_t dataToSend;
 
     //Get minDistToTravel
-    strncpy(byteBuffer, line+12,2);
-    byteBuffer[2] = 0;
-    uint16_t msb = strtol(byteBuffer,NULL,16);
-
-    strncpy(byteBuffer, line+14,2);
-    byteBuffer[2] = 0;
-    uint16_t lsb = strtol(byteBuffer,NULL,16);
-    
-    dataToSend.minDistToTravel = decodeTwoBytes(msb,lsb);
+    strncpy(twoByteBuffer, line+12,4);
+    twoByteBuffer[4] = 0;
+    dataToSend.minDistToTravel = strtol(twoByteBuffer,NULL,16);
+    dataToSend.minDistToTravel = decodeTwoBytes(dataToSend.minDistToTravel>>8,(uint8_t)dataToSend.minDistToTravel);
 
     //Get desiredCountDir
-    strncpy(byteBuffer, line+16,2);
-    byteBuffer[2] = 0;
-    dataToSend.desiredCounterDirection = strtol(byteBuffer,NULL,16)-1;
+    strncpy(twoByteBuffer, line+16,2);
+    twoByteBuffer[2] = 0;
+    dataToSend.desiredCounterDirection = strtol(twoByteBuffer,NULL,16);
+    dataToSend.desiredCounterDirection = decodeOneByte((uint8_t)dataToSend.desiredCounterDirection)-1;
 
     //Get desiredRepDir
-    strncpy(byteBuffer, line+18,2);
-    byteBuffer[2] = 0;
-    dataToSend.desiredRepDirection = strtol(byteBuffer,NULL,16)-1;
+    strncpy(twoByteBuffer, line+18,2);
+    twoByteBuffer[2] = 0;
+    dataToSend.desiredRepDirection = strtol(twoByteBuffer,NULL,16);
+    dataToSend.desiredRepDirection = decodeOneByte((uint8_t)dataToSend.desiredRepDirection)-1;
 
     //Should go before creating encoderTask------------------------------
     (adcWaitTaskHandle != NULL)? vTaskSuspend(adcWaitTaskHandle): "";
 
     gpio_clear(GPIOA, GPIO4);//Activate sensors, should go before initializeTimers()
     initializeTimers();//Clock gating, should go before clearing ring buffer
+    sendToUARTTXQueue(encoderStart,0,0,0);
     ring_buffer_clear(&encoder_ring);//Clear ring buffer
-    writeEncoderStartValue();//sendToUARTTXQueue(encoderStart,0,0,0) equivalent
 
     //Should go before creating encoderTask------------------------------
     createTask(encoderTask, "encoderTask",200,&dataToSend, 4,
 	       &encoderTaskHandle);
     
-  }else if(messageType ==2){//Periphereal mode for Encoder Stop
+  }else if(messageType ==2){//Periphereal code for Encoder Stop
 
     deleteTask(&encoderTaskHandle);
     //Should go after deleting encoderTask-------------------------------
-    //    sendToUARTTXQueue(encoderStop,0,0,0);
+    sendToUARTTXQueue(encoderStop,0,0,0);
     stopTimers();
     gpio_set(GPIOA, GPIO4);
     vTaskResume(adcWaitTaskHandle);
     //Should go after deleting encoderTask-------------------------------
     
-  }else if(messageType == 3){//Periphereal mode for Encoder ADC
+  }else if(messageType == 3){//Periphereal code for Encoder ADC
     (adcWaitTaskHandle != NULL)? xTaskNotifyGive(adcWaitTaskHandle) : 0;
   }
 

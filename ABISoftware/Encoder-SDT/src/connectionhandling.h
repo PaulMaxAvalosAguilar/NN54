@@ -83,10 +83,10 @@ signals:
 
 public slots:
     void disconnect();
-    void sendADC();
     void sendStart(uint minDistToTravel, uint desiredCountDir,
                    uint desiredRepDir);
     void sendStop();
+    void sendADC();
     void saySpeed(uint number);
     void sayCount(uint number);
     void soundeffect();
@@ -109,8 +109,11 @@ private slots:
 
 private:
 
-    void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode);
+    void encodeTwoBytes(char *twoByteBuffer, uint numberToEncode);
     uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb);
+    void encodeOneByte(char *oneByteBuffer, uint32_t numberToEncode);
+    uint8_t decodeOneByte(uint8_t byte);
+
 
     //QML Properties related
     int connected;

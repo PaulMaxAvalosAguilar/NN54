@@ -93,12 +93,12 @@ encoderValues_t encoder_buffer[ENCODER_BUFFER_LEN];
 
 
 void sendToUARTTXQueue(messageTypes_t messageType,
-		       uint16_t traveledDistanceOrADC,
+		       uint16_t traveledDistanceOrBattery,
 		       uint16_t meanPropulsiveVelocity,
 		       uint16_t peakVelocity){
   uartTXData_t dataToSend;
   dataToSend.messageType = messageType;
-  dataToSend.traveledDistanceOrADC = traveledDistanceOrADC;
+  dataToSend.traveledDistanceOrBattery = traveledDistanceOrBattery;
   dataToSend.meanPropulsiveVelocity = meanPropulsiveVelocity;
   dataToSend.peakVelocity = peakVelocity;
 
@@ -201,8 +201,8 @@ void printStringUART(const char myString[]) {
 }
 
 void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
-  static uint8_t lowPart = 0;
-  static uint8_t highPart = 0;
+  uint8_t lowPart = 0;
+  uint8_t highPart = 0;
   
   lowPart = ((numberToEncode & 0x7F) << 1) | 1;
   highPart = (numberToEncode >>6) | 1;
@@ -213,6 +213,17 @@ void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
 
 uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
    return (lsb>>1) | ((msb & 0xFE)<<6);
+}
+
+void encodeOneByte(char *oneByteBuffer, unsigned int numberToEncode){
+  uint8_t lowPart = 0;
+  lowPart = (numberToEncode<<1) | 1;
+  oneByteBuffer[0] = (uint8_t)lowPart;
+  oneByteBuffer[1] = 0;
+}
+
+uint8_t decodeOneByte(uint8_t byte){
+    return byte>>1;
 }
 
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength){
@@ -576,8 +587,9 @@ static void configurePeriphereals(void){
 void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__((unused))) {
 
   uartTXData_t receivedData;
-
   QueueSetMemberHandle_t xHandle;
+  char twoByteBuffers[3][3];
+  char oneByteBuffer[2];
 
   gpio_set(GPIOB, GPIO5);//initializing rn4020
   sendToLCDQueue(turnOnMessage,0);
@@ -588,40 +600,43 @@ void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__
 
     if( xHandle == ( QueueSetMemberHandle_t ) uartTXQueue){
       xQueueReceive(uartTXQueue, &receivedData,0);//Should go first
-      
-      
+
       if(receivedData.messageType == encoderData){
-	writeEncoderValues(receivedData.traveledDistanceOrADC,
-			   receivedData.meanPropulsiveVelocity,
-			   receivedData.peakVelocity);
+	
+	encodeOneByte(oneByteBuffer,64);//Central code for Encoder Data
+	encodeTwoBytes(twoByteBuffers[0],receivedData.traveledDistanceOrBattery);
+	encodeTwoBytes(twoByteBuffers[1],receivedData.meanPropulsiveVelocity);
+	encodeTwoBytes(twoByteBuffers[2],receivedData.peakVelocity);
+	
+	writeEncoderValues(oneByteBuffer[0],
+			   twoByteBuffers[0],
+			   twoByteBuffers[1],
+			   twoByteBuffers[2]);
+	
+      }else if(receivedData.messageType == encoderStart){
+	
+	encodeOneByte(oneByteBuffer,65);//Central code for Encoder Start
+	
+	writeEncoderStartValue(oneByteBuffer[0]);
+
       }else if(receivedData.messageType == batteryLevel){
 
-      }      
+	encodeOneByte(oneByteBuffer,66);//Central code for Encoder Start
+	encodeTwoBytes(twoByteBuffers[0],receivedData.traveledDistanceOrBattery);
+	
+	writeBatteryLevel(oneByteBuffer[0],
+			  twoByteBuffers[0]);
+
+      }else if(receivedData.messageType == encoderStop){
+
+	encodeOneByte(oneByteBuffer,67);//Central code for Encoder Stop
+	
+	writeEncoderStop(oneByteBuffer[0]
+			 );	
+      }
+      
     }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
       xSemaphoreTake(communicationSemaphore,0);//Should go first
-
-      /*
-      while(receiveBuffer[receiveBufferPos]){
-	char parseBuffer[200] = {0};
-	int parseBufferPos = 0;
-
-	while(1){
-	  while(!receiveBuffer[receiveBufferPos]);
-	  if(receiveBuffer[receiveBufferPos] != '\n'){
-	    parseBuffer[parseBufferPos++] = receiveBuffer[receiveBufferPos];
-	    cleanAdvanceBuffer(receiveBuffer, &receiveBufferPos, UART_RX_BUFFER_LEN);
-	  }else{
-	    break;
-	  }
-	}
-	
-	parseBuffer[parseBufferPos++] = 0;
-	cleanAdvanceBuffer(receiveBuffer, &receiveBufferPos, UART_RX_BUFFER_LEN);
-
-	//INTERPRET
-	genericParsing(parseBuffer);
-      }
-      */
 
       while(receiveBuffer[receiveBufferPos]){
 	getLine();
@@ -634,7 +649,6 @@ void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__
 void lcdTask(void *args __attribute__((unused))){
   lcdData_t receivedData;
   char buffer[22];
-  char numBuffer[5];
 
   uint16_t lineState = 0;
   uint32_t lastVoltage = 0;
@@ -673,9 +687,6 @@ void lcdTask(void *args __attribute__((unused))){
 	      "       Batt: %lu", lastVoltage);
       lcdPutsBlinkFree(buffer, 7);
       
-    }else if(receivedData.messageType == encoderData){
-      sprintf(buffer, "%lu", receivedData.displayValue);
-      lcdPutsBlinkFree(buffer,5);
     }
   }
 }
@@ -703,7 +714,7 @@ void adcWaitTask(void *args __attribute__((unused))){
     
     adcData = readADC();
     sendToLCDQueue(batteryLevel, adcData);
-    //    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
+    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
   }  
 }
 

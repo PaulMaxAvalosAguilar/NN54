@@ -57,7 +57,7 @@ typedef enum messageTypes_t{
 
 typedef struct uartTXData_t{
   messageTypes_t messageType;
-  uint16_t traveledDistanceOrADC;
+  uint16_t traveledDistanceOrBattery;
   uint16_t meanPropulsiveVelocity;
   uint16_t peakVelocity;
 } uartTXData_t;
@@ -100,7 +100,7 @@ extern uint8_t (*newMaxRomDetected[2])(uint32_t,uint32_t);
 
 //Helper functions---------------------------
 void sendToUARTTXQueue(messageTypes_t messageType,
-		       uint16_t traveledDistanceOrADC,
+		       uint16_t traveledDistanceOrBattery,
 		       uint16_t meanPropulsiveVelocity,
 		       uint16_t peakVelocity);
 void sendToLCDQueue(messageTypes_t messageType,
@@ -118,6 +118,8 @@ uint32_t readADC(void);
 void printStringUART(const char myString[]);
 void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode);
 uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb);
+void encodeOneByte(char *oneByteBuffer, unsigned int numberToEncode);
+uint8_t decodeOneByte(uint8_t byte);
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
 void getLine(void);
 

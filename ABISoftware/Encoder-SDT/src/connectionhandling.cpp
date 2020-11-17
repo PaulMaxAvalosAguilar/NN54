@@ -178,36 +178,26 @@ void ConnectionHandling::disconnect()
     controller->disconnectFromDevice();
 }
 
-void ConnectionHandling::sendADC()
-{
-    if(connected){
-        char code = static_cast<char>(3);
-
-        QByteArray c;
-        c.append('|');
-        c.append(code);
-
-        c.append('|');
-        encoderService->writeCharacteristic(encoderCharacteristic, c);
-    }
-}
-
 void ConnectionHandling::sendStart(uint minDistToTravel, uint desiredCountDir, uint desiredRepDir)
 {
     if(connected){
+        char oneByteBuffers[3][2];
+        encodeOneByte(oneByteBuffers[0], static_cast<char>(1));//Periphereal code for Encoder Start
+
         char twoByteBuffer[3];
         encodeTwoBytes(twoByteBuffer,minDistToTravel);
 
-        char code = static_cast<char>(1);
+        encodeOneByte(oneByteBuffers[1],desiredCountDir+1);
+        encodeOneByte(oneByteBuffers[2],desiredRepDir+1);
 
         QByteArray c;
         c.append('|');
-        c.append(code);
+        c.append(oneByteBuffers[0][0]);
 
         c.append(static_cast<char>(twoByteBuffer[0]));
         c.append(static_cast<char>(twoByteBuffer[1]));
-        c.append(static_cast<char>(desiredCountDir+1));
-        c.append(static_cast<char>(desiredRepDir+1));
+        c.append(static_cast<char>(oneByteBuffers[1][0]));
+        c.append(static_cast<char>(oneByteBuffers[2][0]));
 
         c.append('|');
         encoderService->writeCharacteristic(encoderCharacteristic, c);
@@ -219,16 +209,34 @@ void ConnectionHandling::sendStart(uint minDistToTravel, uint desiredCountDir, u
 void ConnectionHandling::sendStop()
 {
     if(connected){
-        char code = static_cast<char>(2);
+        char oneByteBuffer[2];
+        encodeOneByte(oneByteBuffer, static_cast<char>(2));//Periphereal code for Encoder ADC
 
         QByteArray c;
         c.append('|');
-        c.append(code);
+        c.append(oneByteBuffer[0]);
 
         c.append('|');
         encoderService->writeCharacteristic(encoderCharacteristic, c);
         timer->start();
         qDebug() << "Stop Sended";
+    }
+}
+
+void ConnectionHandling::sendADC()
+{
+    if(connected){
+
+        char oneByteBuffer[2];
+        encodeOneByte(oneByteBuffer, static_cast<char>(3));//Periphereal code for Encoder ADC
+
+        QByteArray c;
+        c.append('|');
+        c.append(oneByteBuffer[0]);
+
+        c.append('|');
+        encoderService->writeCharacteristic(encoderCharacteristic, c);
+        qDebug() << "ADC Sended";
     }
 }
 
@@ -350,48 +358,71 @@ void ConnectionHandling::serviceStateChanged(QLowEnergyService::ServiceState s)
 
 void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    QString parsedValue;
-    uint16_t uvalue;
+    QString parsedString;
+    uint16_t messageType;
+    uint16_t convertedNumber;
 
     if (c.uuid() == encoderCharacteristic.uuid()){
 
         QString hexValue = value.toHex();
-        qDebug() << hexValue;
+        qDebug() << "Characteristic: " << hexValue;
 
-        for(auto iterator = hexValue.begin(); iterator < hexValue.begin() + 2;
+        for(auto iterator = hexValue.begin()+2; iterator < hexValue.begin() + 4;
             iterator++){
-            parsedValue.append(*iterator);
+            parsedString.append(*iterator);
         }
+        messageType = parsedString.toUInt(nullptr,16);
+        messageType = decodeOneByte(messageType);
+        parsedString.clear();
 
-        uvalue = parsedValue.toUInt(nullptr,16);
-        parsedValue.clear();
+        if(messageType == 64){//Central code for Encoder Data
 
-        if(uvalue == 255){
-            for(auto iterator = hexValue.begin()+2; iterator < hexValue.begin() + 6;
+            //Get TraveledDistance
+            for(auto iterator = hexValue.begin() + 4; iterator < hexValue.begin() + 8;
                 iterator++){
-                parsedValue.append(*iterator);
+                parsedString.append(*iterator);
             }
-            uvalue = parsedValue.toUInt(nullptr,16);
-            parsedValue.clear();
-            setTraveledDist(uvalue);
+            convertedNumber = parsedString.toUInt(nullptr,16);
+            convertedNumber = decodeTwoBytes(convertedNumber>>8,static_cast<uint8_t>(convertedNumber));
+            setTraveledDist(convertedNumber);
+            parsedString.clear();
 
-            for(auto iterator = hexValue.begin()+6; iterator < hexValue.begin() + 10;
+            //Get MeanPropulsiveVelocity
+            for(auto iterator = hexValue.begin() + 8; iterator < hexValue.begin() + 12;
                 iterator++){
-                parsedValue.append(*iterator);
+                parsedString.append(*iterator);
             }
-            uvalue = parsedValue.toUInt(nullptr,16);
-            parsedValue.clear();
-            setMeanPropVel(uvalue);
+            convertedNumber = parsedString.toUInt(nullptr,16);
+            convertedNumber = decodeTwoBytes(convertedNumber>>8,static_cast<uint8_t>(convertedNumber));
+            setMeanPropVel(convertedNumber);
+            parsedString.clear();
 
-            for(auto iterator = hexValue.begin()+10; iterator < hexValue.begin() + 14;
+            //Get PeakPropulsiveVelocity
+            for(auto iterator = hexValue.begin() + 12; iterator < hexValue.begin() + 16;
                 iterator++){
-                parsedValue.append(*iterator);
+                parsedString.append(*iterator);
             }
-            uvalue = parsedValue.toUInt(nullptr,16);
-            parsedValue.clear();
-            setPeakVel(uvalue);
-        }else if(uvalue == 200){
+            convertedNumber = parsedString.toUInt(nullptr,16);
+            convertedNumber = decodeTwoBytes(convertedNumber>>8,static_cast<uint8_t>(convertedNumber));
+            setPeakVel(convertedNumber);
+            parsedString.clear();
+
+        }else if(messageType == 65){//Central code for Encoder Start
             setEncoderStartMessage(encoderStartMessage++);
+
+        }else if(messageType == 66){//Central code for Battery Level
+            //Get BatteryLevel
+            for(auto iterator = hexValue.begin() + 4; iterator < hexValue.begin() + 8;
+                iterator++){
+                parsedString.append(*iterator);
+            }
+            convertedNumber = parsedString.toUInt(nullptr,16);
+            convertedNumber = decodeTwoBytes(convertedNumber>>8,static_cast<uint8_t>(convertedNumber));
+            parsedString.clear();
+            qDebug()<<"Battery level: " <<convertedNumber;
+
+        }else if(messageType == 67){//Central code for Encoder Stop
+
         }
     }
 }
@@ -404,10 +435,10 @@ void ConnectionHandling::confirmedDescriptorWritten(const QLowEnergyDescriptor &
     }
 }
 
-void ConnectionHandling::encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
+void ConnectionHandling::encodeTwoBytes(char *twoByteBuffer, uint numberToEncode){
 
-    static uint8_t lowPart = 0;
-    static uint8_t highPart = 0;
+    uint8_t lowPart = 0;
+    uint8_t highPart = 0;
 
     lowPart = ((numberToEncode & 0x7F) << 1) | 1;
     highPart = (numberToEncode >>6) | 1;
@@ -419,9 +450,18 @@ void ConnectionHandling::encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEn
 
 uint16_t ConnectionHandling::decodeTwoBytes(uint8_t msb, uint8_t lsb){
 
-  return (lsb>>1) | ((msb & 0xFE)<<6);
+    return (lsb>>1) | ((msb & 0xFE)<<6);
 }
 
+void ConnectionHandling::encodeOneByte(char *oneByteBuffer, uint numberToEncode)
+{
+    uint8_t lowPart = 0;
+    lowPart = (numberToEncode<<1) | 1;
+    oneByteBuffer[0] = static_cast<char>(lowPart);
+    oneByteBuffer[1] = 0;
+}
 
-
-
+uint8_t ConnectionHandling::decodeOneByte(uint8_t byte)
+{
+    return byte>>1;
+}

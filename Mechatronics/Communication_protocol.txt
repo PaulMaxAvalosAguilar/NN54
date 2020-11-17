@@ -1,5 +1,8 @@
 DESCRIPTION OF THE PROTOCOL
 
+Every message should be enclosed by an initator and a terminator character
+
+
 1.- 0 should be interpreted as a null terminator always, henceforth no 0's other than null
     characters should be used in the implementation. This is so because characters of 0 are to be
     interpreted as null characters and as such might notify there are no more characters to be
@@ -11,6 +14,15 @@ DESCRIPTION OF THE PROTOCOL
     where the message begins and ends. This is so if the central or peripheral would be using
     a protocol which provides a uart like service with no delimitation of what each 20 bytes payload
     both devices could still interpretate what the intended message is.
+
+    These initator/terminator characters should have a binary representation different than any value
+    which may appear in the payload, this is so because payload can be interpreted as a terminator 
+    character and end parsing prematurely. To ensure this, every byte should be encoded with
+    a special format which differentiates wheter bytes are initiator/terminator related or data 
+    related, the first bit with a value of 1 may be used for data types and with a value of 0 for
+    initiator/terminator types. This would effectively reduce the amount of data that can be sent per
+    byte to just 2^7. Shall a number bigger than 2^7 be sent this number might be split each 7 bits
+    and encoded according to the just mentioned rule.
 
 3.- The first byte after the initiator character should be the message type which values are to be
     interpreted with a clear division between central message types and peripheral message types as
@@ -25,26 +37,46 @@ DESCRIPTION OF THE PROTOCOL
     can be excluded and be assumed as a notification of own central actions, the same behaviour
     would be expected with the periphereal.
 
-
-4.- More than one byte numerical values should be encoded with a special format which has a the
-    first bit set to one, as to comply with the first rule
-
-    A common implementation for doing a split of a 2 byte value in two which complies with the spec
-    might be as follows:
-
-    uint16_t numberToEncode = 16300;	
-    uint8_t low = ((numberToEncode & 0x7F) << 1) | 1;
-    uint8_t high = (numberToEncode>>6) | 1;
-
-    printf("%02X%02X\n",high, low);
-
-    Note that original 2 byte max value is reduced.
-
 The specific implementation of this protocol is made with:
 
 2.- 7C as the initiator and terminator character
-3.- 01 to 128 are chosen as encoder (periphereal) values, 129 to 255 are chosen as app (central)
+3.- 0 to 63 are chosen as encoder (periphereal) values, 64 to 127 are chosen as app (central)
     values
     
     
+
+Central application example:
+Started discovery
+Added device  "00:1E:C0:42:01:29"
+Calling appending
+create() calling: Index row: -1
+Index is not valid: Appending
+Stopped discovery
+Scan finished
+Connecting to  "VBT"  with address:  "00:1E:C0:42:01:29"
+Device is connected
+Encoder service discovered.
+Encoder service created.
+Discovering details!
+Activating notifications
+"7c830f227c"
+Notifications activated
+Start Sended
+"7c01013302027c"
+"7c827c"
+Stop Sended
+"7c027c"
+"7c847c"
+"7c830f227c"
+Start Sended
+"7c01013302027c"
+"7c827c"
+"7c81011d0037004d7c"
+"7c8100f5004d006d7c"
+"7c81010d0052007b7c"
+Stop Sended
+"7c027c"
+"7c847c"
+"7c830f207c"
+Device is disconnected
     
