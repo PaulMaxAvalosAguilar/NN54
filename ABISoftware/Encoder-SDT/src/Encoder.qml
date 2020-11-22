@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.12
 import QtCharts 2.3
 
 Page{
+    objectName: "encoderPage"
 
     property var encoderStartMessage: connhandling.encoderStartMessage
 
@@ -976,5 +977,9 @@ Page{
                 console.log("Error loading component:", component.errorString());
             }
         }
+    }
+
+    function encoderHello(){
+        console.log("Hello");
     }
 }

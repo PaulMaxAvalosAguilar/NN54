@@ -20,60 +20,31 @@
 #include "CUSTOM/MATH/math.h"
 #include <string.h>
 
-/* DWT (Data Watchpoint and Trace) registers, only exists on ARM Cortex with a DWT unit */
-#define KIN1_DWT_CONTROL             (*((volatile uint32_t*)0xE0001000))
-/*!< DWT Control register */
-#define KIN1_DWT_CYCCNTENA_BIT       (1UL<<0)
-/*!< CYCCNTENA bit in DWT_CONTROL register */
-#define KIN1_DWT_CYCCNT              (*((volatile uint32_t*)0xE0001004))
-/*!< DWT Cycle Counter register */
-#define KIN1_DEMCR                   (*((volatile uint32_t*)0xE000EDFC))
-/*!< DEMCR: Debug Exception and Monitor Control Register */
-#define KIN1_TRCENA_BIT              (1UL<<24)
-/*!< Trace enable bit in DEMCR register */
-
-#define KIN1_InitCycleCounter()			\
-  KIN1_DEMCR |= KIN1_TRCENA_BIT
-/*!< TRCENA: Enable trace and debug block DEMCR (Debug Exception and Monitor Control Register */
- 
-#define KIN1_ResetCycleCounter()		\
-  KIN1_DWT_CYCCNT = 0
-/*!< Reset cycle counter */
- 
-#define KIN1_EnableCycleCounter()		\
-  KIN1_DWT_CONTROL |= KIN1_DWT_CYCCNTENA_BIT
-/*!< Enable cycle counter */
- 
-#define KIN1_DisableCycleCounter()		\
-  KIN1_DWT_CONTROL &= ~KIN1_DWT_CYCCNTENA_BIT
-/*!< Disable cycle counter */
- 
-#define KIN1_GetCycleCounter()			\
-  KIN1_DWT_CYCCNT
-/*!< Read cycle counter register */
-
-//UART RX------------------------------------
-char receiveBuffer[UART_RX_BUFFER_LEN] = {0};
-uint32_t receiveBufferPos = 0;
-char parseBuffer[100] = {0};
-
-SemaphoreHandle_t communicationSemaphore;
-
-//Ring buffer handles------------------------
-ring_t encoder_ring;
-
-//Queue handles------------------------------
-QueueHandle_t uartTXQueue;
+//Queue handles----------------------------------
 QueueHandle_t lcdQueue;
-QueueHandle_t communicationQueue;
+QueueHandle_t uartTXQueue;
 QueueSetHandle_t communicationQueueSet;
 
-//Task Handles-------------------------------
-TaskHandle_t encoderTaskHandle = NULL;
-TaskHandle_t adcFreeTaskHandle = NULL;
-TaskHandle_t adcWaitTaskHandle = NULL;
+//Binary semaphore handles-----------------------
+SemaphoreHandle_t communicationSemaphore;
 
-//Encoder variables--------------------------
+//Task Handles-----------------------------------
+TaskHandle_t encoderTaskHandle = NULL;
+TaskHandle_t batteryFreeTaskHandle = NULL;
+TaskHandle_t batteryWaitTaskHandle = NULL;
+
+//Ring buffer handles----------------------------
+ring_t encoder_ring;
+
+//Buffers-----------------------------
+encoderValues_t encoder_buffer[ENCODER_BUFFER_SIZE];
+char receiveBuffer[UART_RX_BUFFER_SIZE] = {0};
+char parseBuffer[PARSE_BUFFER_SIZE] = {0};
+
+//Buffers' positions------------------------------
+uint32_t receiveBufferPos = 0;
+
+//encoderTask variables--------------------------
 uint8_t (*goingDesiredCountDir[2])(uint32_t, uint32_t) = {descendente, ascendente};
 uint8_t (*hasTraveledMinDist[2])(uint32_t, uint32_t) = {minDistTraveledDes,
 						      minDistTraveledAs};
@@ -81,17 +52,13 @@ uint8_t (*hasReturnedToInitial[2])(uint32_t, uint32_t) =
   {returnedToInitialDes,returnedToInitialAs};
 uint8_t (*newMaxRomDetected[2])(uint32_t,uint32_t) = {maxRomDes, maxRomAs};
 
-//ISR variables------------------------------
-//Timer ISR variables
-static volatile encoderValues_t encInterruptValues;
-static volatile uint16_t tim2Counter = 0;
-static volatile uint32_t capturedTime = 0;
-static volatile uint32_t overflowCounter=0 ;
+//ISR variables----------------------------------
+volatile encoderValues_t encInterruptValues;
+volatile uint16_t tim2Counter = 0;
+volatile uint32_t capturedTime = 0;
+volatile uint32_t overflowCounter=0 ;
 
-//RingBuffer buffers------------------------------------
-encoderValues_t encoder_buffer[ENCODER_BUFFER_LEN];
-
-
+//Helper functions--------------------------------
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrBattery,
 		       uint16_t meanPropulsiveVelocity,
@@ -238,16 +205,17 @@ void  __attribute__((optimize("O0"))) getLine(){
     while(!receiveBuffer[receiveBufferPos]);
     if(receiveBuffer[receiveBufferPos] != '\n'){
       parseBuffer[parseBufferPos++] = receiveBuffer[receiveBufferPos];
-      cleanAdvanceBuffer(receiveBuffer, &receiveBufferPos, UART_RX_BUFFER_LEN);
+      cleanAdvanceBuffer(receiveBuffer, &receiveBufferPos, UART_RX_BUFFER_SIZE);
     }else{
       break;
     }
   }
 	
   parseBuffer[parseBufferPos++] = 0;
-  cleanAdvanceBuffer(receiveBuffer, &receiveBufferPos, UART_RX_BUFFER_LEN);
+  cleanAdvanceBuffer(receiveBuffer, &receiveBufferPos, UART_RX_BUFFER_SIZE);
 }
 
+//EncoderHelper functions-------------------------
 uint8_t descendente(uint32_t a, uint32_t b){
   return a<b;
 }
@@ -366,12 +334,11 @@ static void configurePeriphereals(void){
   dma_set_memory_address(DMA1, DMA_CHANNEL5, (uint32_t)receiveBuffer);
   dma_set_peripheral_address(DMA1, DMA_CHANNEL5, (uint32_t)&USART1_DR);
 
-  dma_set_number_of_data(DMA1, DMA_CHANNEL5, UART_RX_BUFFER_LEN);
+  dma_set_number_of_data(DMA1, DMA_CHANNEL5, UART_RX_BUFFER_SIZE);
   
   dma_enable_channel(DMA1, DMA_CHANNEL5);
   //Receive DMA
 
-  communicationSemaphore = xSemaphoreCreateBinary();
   USART_CR1(USART1) |= USART_CR1_IDLEIE;  //Enable USART1 Receive interrupt.
 
   usart_enable(USART1);//Enable USART
@@ -460,17 +427,9 @@ static void configurePeriphereals(void){
 
   rcc_periph_clock_disable(RCC_TIM1);    // TIM1
   rcc_periph_clock_disable(RCC_TIM2);    // TIM2
-    
-  
-
-
-
-  //  KIN1_InitCycleCounter(); /* enable DWT hardware */
-  //  KIN1_ResetCycleCounter(); /* reset cycle counter */
-  //  KIN1_EnableCycleCounter(); /* start counting */
-
 }
 
+//Processes---------------------------------------
  __attribute__((optimize("O0"))) void encoderTask(void *args __attribute__((unused))){
 
   encoderValues_t receiveEncValues;  
@@ -603,7 +562,7 @@ void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__
 
       if(receivedData.messageType == encoderData){
 	
-	encodeOneByte(oneByteBuffer,64);//Central code for Encoder Data
+	encodeOneByte(oneByteBuffer,centralCode_encoderData);
 	encodeTwoBytes(twoByteBuffers[0],receivedData.traveledDistanceOrBattery);
 	encodeTwoBytes(twoByteBuffers[1],receivedData.meanPropulsiveVelocity);
 	encodeTwoBytes(twoByteBuffers[2],receivedData.peakVelocity);
@@ -615,13 +574,13 @@ void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__
 	
       }else if(receivedData.messageType == encoderStart){
 	
-	encodeOneByte(oneByteBuffer,65);//Central code for Encoder Start
+	encodeOneByte(oneByteBuffer,centralCode_encoderStart);
 	
 	writeEncoderStartValue(oneByteBuffer[0]);
 
       }else if(receivedData.messageType == batteryLevel){
 
-	encodeOneByte(oneByteBuffer,66);//Central code for Encoder Start
+	encodeOneByte(oneByteBuffer,centralCode_encoderBattery);
 	encodeTwoBytes(twoByteBuffers[0],receivedData.traveledDistanceOrBattery);
 	
 	writeBatteryLevel(oneByteBuffer[0],
@@ -629,7 +588,7 @@ void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__
 
       }else if(receivedData.messageType == encoderStop){
 
-	encodeOneByte(oneByteBuffer,67);//Central code for Encoder Stop
+	encodeOneByte(oneByteBuffer,centrlCode_encoderStop);
 	
 	writeEncoderStop(oneByteBuffer[0]
 			 );	
@@ -691,7 +650,7 @@ void lcdTask(void *args __attribute__((unused))){
   }
 }
 
-void adcFreeTask(void *args __attribute__((unused))) {
+void batteryFreeTask(void *args __attribute__((unused))){
 
   uint32_t adcData = 0;
   
@@ -705,7 +664,7 @@ void adcFreeTask(void *args __attribute__((unused))) {
   }
 }
 
-void adcWaitTask(void *args __attribute__((unused))){
+void batteryWaitTask(void *args __attribute__((unused))){
   uint32_t adcData = 0;
   
   for(;;){
@@ -748,6 +707,18 @@ void tim1_up_isr(){
   overflowCounter++;  
 }
 
+void usart1_isr(void){
+  if (((USART_CR1(USART1) & USART_CR1_IDLEIE) != 0) &&
+      ((USART_SR(USART1) & USART_SR_IDLE) != 0)) {
+    usart_recv(USART1);//Interrupt clears at reading rx register
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(communicationSemaphore,&xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    
+  }
+}
+
 void exti15_10_isr(){
   
   exti_reset_request(EXTI12);//Clear flag
@@ -781,13 +752,15 @@ int main(void)
   uartTXQueue = xQueueCreate(TX_QUEUE_SIZE, sizeof(uartTXData_t));
   lcdQueue = xQueueCreate(LCD_QUEUE_SIZE, sizeof(lcdData_t));
 
+  communicationSemaphore = xSemaphoreCreateBinary();
+  
   communicationQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
   xQueueAddToSet( uartTXQueue, communicationQueueSet);
   xQueueAddToSet( communicationSemaphore, communicationQueueSet);
   
   xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
   xTaskCreate(lcdTask,"lcdTask",200, NULL, 2, NULL);
-  xTaskCreate(adcFreeTask,"adcFreeTask",100,NULL,2,&adcFreeTaskHandle);
+  xTaskCreate(batteryFreeTask,"battery FreeTask",100,NULL,2,&batteryFreeTaskHandle);
 
   nvic_enable_irq(NVIC_USART1_IRQ);
   nvic_enable_irq(NVIC_EXTI15_10_IRQ);
@@ -806,16 +779,5 @@ int main(void)
   return 0;
 }
 
-void usart1_isr(void)
-{
-  if (((USART_CR1(USART1) & USART_CR1_IDLEIE) != 0) &&
-      ((USART_SR(USART1) & USART_SR_IDLE) != 0)) {
-    usart_recv(USART1);//Interrupt clears at reading rx register
 
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(communicationSemaphore,&xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    
-  }
-}
 

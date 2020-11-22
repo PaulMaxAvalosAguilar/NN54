@@ -164,8 +164,7 @@ ApplicationWindow {
         currentView.visible = false
         newView.visible = true
         currentView = newView
-    }
-}
+    }}
 
 /*
 Window {

@@ -89,12 +89,12 @@ void writeEncoderValues(uint8_t centralCode,
 		    "%04X"//peakVelocity
 		    "%02X\n",//Protocol Message terminator character
 		    characteristicStatus.handle,
-		    '|',
+		    PROTOCOL_INITIATOR,
 		    centralCode,
 		    ((traveledDistance[0]<<8) | traveledDistance[1]),
 		    ((meanPropulsiveVelocity[0]<<8) | meanPropulsiveVelocity[1]),
 		    ((peakVelocity[0]<<8) | peakVelocity[1]),
-		    '|');
+		    PROTOCOL_TERMINATOR);
 }
 
 void writeEncoderStartValue(uint8_t centralCode){
@@ -104,9 +104,9 @@ void writeEncoderStartValue(uint8_t centralCode){
 		    "%02X"//Central code for Encoder Start
 		    "%02X\n",//Protocol Message terminator character
 		    characteristicStatus.handle,
-		    '|',
+		    PROTOCOL_INITIATOR,
 		    centralCode,
-		    '|');
+		    PROTOCOL_TERMINATOR);
 }
 
 void writeBatteryLevel(uint8_t centralCode,
@@ -118,10 +118,10 @@ void writeBatteryLevel(uint8_t centralCode,
 		    "%04X"//BatteryLevel
 		    "%02X\n",//Protocol Message terminator character
 		    characteristicStatus.handle,
-		    '|',
+		    PROTOCOL_INITIATOR,
 		    centralCode,
 		    ((level[0]<<8) | level[1]),
-		    '|');
+		    PROTOCOL_TERMINATOR);
 
 }
 
@@ -132,9 +132,9 @@ void writeEncoderStop(uint8_t centralCode){
 		    "%02X"//Central code for Encoder Stop
 		    "%02X\n",//Protocol Message terminator character
 		    characteristicStatus.handle,
-		    '|',
+		    PROTOCOL_INITIATOR,
 		    centralCode,
-		    '|'
+		    PROTOCOL_TERMINATOR
 		    );
 }
 
@@ -295,7 +295,7 @@ int parseWVLine(const char* line){
   uint8_t messageType = strtol(twoByteBuffer, NULL, 16);
   messageType = decodeOneByte(messageType);
 
-  if(messageType == 1){//Periphereal code for Encoder Start
+  if(messageType == peripherealCode_EncoderStart){
 
     encoderTaskParamTypes_t dataToSend;
 
@@ -318,7 +318,7 @@ int parseWVLine(const char* line){
     dataToSend.desiredRepDirection = decodeOneByte((uint8_t)dataToSend.desiredRepDirection)-1;
 
     //Should go before creating encoderTask------------------------------
-    (adcWaitTaskHandle != NULL)? vTaskSuspend(adcWaitTaskHandle): "";
+    (batteryWaitTaskHandle != NULL)? vTaskSuspend(batteryWaitTaskHandle): "";
 
     gpio_clear(GPIOA, GPIO4);//Activate sensors, should go before initializeTimers()
     initializeTimers();//Clock gating, should go before clearing ring buffer
@@ -329,18 +329,18 @@ int parseWVLine(const char* line){
     createTask(encoderTask, "encoderTask",200,&dataToSend, 4,
 	       &encoderTaskHandle);
     
-  }else if(messageType ==2){//Periphereal code for Encoder Stop
+  }else if(messageType == peripherealCode_EncoderStop){
 
     deleteTask(&encoderTaskHandle);
     //Should go after deleting encoderTask-------------------------------
     sendToUARTTXQueue(encoderStop,0,0,0);
     stopTimers();
     gpio_set(GPIOA, GPIO4);
-    vTaskResume(adcWaitTaskHandle);
+    vTaskResume(batteryWaitTaskHandle);
     //Should go after deleting encoderTask-------------------------------
     
-  }else if(messageType == 3){//Periphereal code for Encoder ADC
-    (adcWaitTaskHandle != NULL)? xTaskNotifyGive(adcWaitTaskHandle) : 0;
+  }else if(messageType == peripherealCode_EncoderBattery){
+    (batteryWaitTaskHandle != NULL)? xTaskNotifyGive(batteryWaitTaskHandle) : 0;
   }
 
   return 1;
@@ -448,8 +448,8 @@ void genericParsing(char *buffer){
     gpio_set(GPIOA, GPIO4);//Should go after delting encoder task
     //In case no stop was ever received-----------------------------------
     sendToLCDQueue(connectedStatus, 0);
-    deleteTask(&adcWaitTaskHandle);
-    createTask(adcFreeTask,"adcFreeTask",100,NULL,1,&adcFreeTaskHandle);
+    deleteTask(&batteryWaitTaskHandle);
+    createTask(batteryFreeTask,"batteryFreeTask",100,NULL,1,&batteryFreeTaskHandle);
 
 
     characteristicStatus.isNotifying = 0;
@@ -463,8 +463,8 @@ void genericParsing(char *buffer){
   
   }else if(strstr(buffer,"Connected") != NULL){
     sendToLCDQueue(connectedStatus,1);
-    deleteTask(&adcFreeTaskHandle);
-    createTask(adcWaitTask,"adcWaitTask",100,NULL,1,&adcWaitTaskHandle);
+    deleteTask(&batteryFreeTaskHandle);
+    createTask(batteryWaitTask,"batteryWaitTask",100,NULL,1,&batteryWaitTaskHandle);
 
   }else if(strstr(buffer, "Bonded") != NULL){
       
