@@ -12,11 +12,11 @@
 //-------------------------CUSTOMIZABLE PART-------------------------
 //*******************************************************************
 
-//-------------------------------------------------
+//-----------------------------------------------
 #define ENCODERINITIAL_VALUE 32767
 #define ENCODERSTEPDISTANCEINMILLS 4084
 
-//Queue sizes------------------------
+//Queue sizes------------------------------------
 #define LCD_QUEUE_SIZE                20
 #define TX_QUEUE_SIZE                 20
 #define SEMAPHORE_SIZE                 1
@@ -31,6 +31,11 @@
 #else
 #warning ENCODER_BUFFER NOT POWER OF 2
 #endif
+
+//TIMING ----------------------------------------
+#define ENCODER_TASK_DELAY_MS 50
+#define BATTERY_FREE_TASK_DELAY_MS 20000
+
 
 //*******************************************************************
 
@@ -141,12 +146,14 @@ void createTask(TaskFunction_t pvTaskCode,
 void deleteTask(TaskHandle_t *pxTask);
 void initializeTimers(void);
 void stopTimers(void);
-uint32_t readADC(void);
+uint32_t readBattery(void);
 void printStringUART(const char myString[]);
 void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode);
 uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb);
 void encodeOneByte(char *oneByteBuffer, unsigned int numberToEncode);
 uint8_t decodeOneByte(uint8_t byte);
+
+//Implemenation dependent helper functions
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
 void getLine(void);
 

@@ -132,7 +132,7 @@ void stopTimers(void){
   rcc_periph_clock_disable(RCC_TIM2);    // TIM2  
 }
 
-uint32_t readADC(void){
+uint32_t readBattery(void){
 
   uint32_t voltageSupply;
   uint32_t adcData;
@@ -539,7 +539,7 @@ static void configurePeriphereals(void){
       //REPETITION ALGORITHM---------------------------------------------------------------
     }
     
-    vTaskDelay(pdMS_TO_TICKS(50));    
+    vTaskDelay(pdMS_TO_TICKS(ENCODER_TASK_DELAY_MS));    
   }
 }
 
@@ -656,11 +656,11 @@ void batteryFreeTask(void *args __attribute__((unused))){
   
   for(;;){
     
-    adcData = readADC();
+    adcData = readBattery();
 
     sendToLCDQueue(batteryLevel,adcData);
 
-    vTaskDelay(pdMS_TO_TICKS(4000));
+    vTaskDelay(pdMS_TO_TICKS(BATTERY_FREE_TASK_DELAY_MS));
   }
 }
 
@@ -671,7 +671,7 @@ void batteryWaitTask(void *args __attribute__((unused))){
 
     ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
     
-    adcData = readADC();
+    adcData = readBattery();
     sendToLCDQueue(batteryLevel, adcData);
     sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
   }  

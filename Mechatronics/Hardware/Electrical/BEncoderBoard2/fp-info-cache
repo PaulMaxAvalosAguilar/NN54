@@ -1,4 +1,4 @@
-18626848870905941
+18671119692215723
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -50623,6 +50623,202 @@ One digit LED 7 segment SA39-11 SC39-11 SA39-12 SC39-12
 0
 10
 10
+Encoder
+BarrelJack_Horizontal
+DC Barrel Jack
+Power Jack
+0
+3
+3
+Encoder
+BatteryHolder_Keystone_1042_1x18650
+Battery holder for 18650 cylindrical cells http://www.keyelco.com/product.cfm/product_id/918
+18650 Keystone 1042 Li-ion
+0
+2
+2
+Encoder
+Bluetooth_Module_RN4020
+http://ww1.microchip.com/downloads/en/DeviceDoc/50002279B.pdf
+
+0
+22
+22
+Encoder
+Bluetooth_Module_RN4871
+
+
+0
+16
+16
+Encoder
+C_0603_1608Metric_Pad1.05x0.95mm_HandSolder
+Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
+capacitor handsolder
+0
+2
+2
+Encoder
+Crystal_HC49-U_Vertical
+Crystal THT HC-49/U http://5hertz.com/pdfs/04404_D.pdf
+THT crystalHC-49/U
+0
+2
+2
+Encoder
+DFN-6_DC
+
+
+0
+7
+7
+Encoder
+D_DO-201AD_P15.24mm_Horizontal
+Diode, DO-201AD series, Axial, Horizontal, pin pitch=15.24mm, , length*diameter=9.5*5.2mm^2, , http://www.diodes.com/_files/packages/DO-201AD.pdf
+Diode DO-201AD series Axial Horizontal pin pitch 15.24mm  length 9.5mm diameter 5.2mm
+0
+2
+2
+Encoder
+D_SMA
+Diode SMA (DO-214AC)
+Diode SMA (DO-214AC)
+0
+2
+2
+Encoder
+D_SOD-323_HandSoldering
+SOD-323
+SOD-323
+0
+2
+2
+Encoder
+LQFP-48_7x7mm_P0.5mm
+
+
+0
+48
+48
+Encoder
+OptointerrupterConnector
+
+
+0
+4
+4
+Encoder
+PinHeader_1x01_P2.54mm_Vertical
+Through hole straight pin header, 1x01, 2.54mm pitch, single row
+Through hole pin header THT 1x01 2.54mm single row
+0
+1
+1
+Encoder
+PinHeader_1x01_P2.54mm_Vertical_NO3D
+Through hole straight pin header, 1x01, 2.54mm pitch, single row
+Through hole pin header THT 1x01 2.54mm single row
+0
+1
+1
+Encoder
+PinHeader_1x03_P2.54mm_Vertical
+Through hole straight pin header, 1x03, 2.54mm pitch, single row
+Through hole pin header THT 1x03 2.54mm single row
+0
+3
+3
+Encoder
+PinHeader_1x04_P2.54mm_Vertical
+Through hole straight socket strip, 1x04, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
+Through hole socket strip THT 1x04 2.54mm single row
+0
+4
+4
+Encoder
+PinHeader_1x06_P2.54mm_Vertical
+Through hole straight pin header, 1x06, 2.54mm pitch, single row
+Through hole pin header THT 1x06 2.54mm single row
+0
+6
+6
+Encoder
+PinHeader_1x07_P2.54mm_Vertical
+Through hole straight socket strip, 1x07, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
+Through hole socket strip THT 1x07 2.54mm single row
+0
+7
+7
+Encoder
+PinHeader_1x08_P2.54mm_Vertical
+Through hole straight pin header, 1x08, 2.54mm pitch, single row
+Through hole pin header THT 1x08 2.54mm single row
+0
+8
+8
+Encoder
+PinHeader_2x02_P2.54mm_Vertical
+Through hole straight pin header, 1x02, 2.54mm pitch, single row
+Through hole pin header THT 1x02 2.54mm single row
+0
+4
+4
+Encoder
+R_0603_1608Metric_Pad1.05x0.95mm_HandSolder
+Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
+resistor handsolder
+0
+2
+2
+Encoder
+SO-8_3.9x4.9mm_P1.27mm
+SO, 8 Pin (https://www.nxp.com/docs/en/data-sheet/PCF8523.pdf), generated with kicad-footprint-generator ipc_gullwing_generator.py
+SO SO
+0
+8
+8
+Encoder
+SOT-23
+SOT-23, Standard
+SOT-23
+0
+3
+3
+Encoder
+SolderWirePad_1x01_SMD_5x10mm
+Wire Pad, Square, SMD Pad,  5mm x 10mm,
+MesurementPoint Square SMDPad 5mmx10mm 
+0
+6
+6
+Encoder
+Sop(8)
+8ESOP
+Integrated Circuit
+0
+9
+9
+Encoder
+Sot-23(6)
+sot-23-6,
+Integrated Circuit
+0
+6
+6
+Encoder
+Switch_Slide_11.6x4mm_EG1218
+http://spec_sheets.e-switch.com/specs/P040040.pdf
+
+0
+3
+3
+Encoder
+itr8102
+
+
+0
+4
+4
 Ferrite_THT
 LairdTech_28C0236-0JW-10
 Ferrite, vertical, LairdTech 28C0236-0JW-10, https://assets.lairdtech.com/home/brandworld/files/28C0236-0JW-10.pdf, JW Miller core https://www.bourns.com/products/magnetic-products/j.w.-miller-through-hole-ferrite-beads-emi-filters
