@@ -116,6 +116,32 @@ void deleteTask(TaskHandle_t *pxTask){
   
 }
 
+void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
+  uint8_t lowPart = 0;
+  uint8_t highPart = 0;
+  
+  lowPart = ((numberToEncode & 0x7F) << 1) | 1;
+  highPart = (numberToEncode >>6) | 1;
+  twoByteBuffer[0] = highPart;
+  twoByteBuffer[1] = lowPart;
+  twoByteBuffer[2] = 0;
+}
+
+uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
+   return (lsb>>1) | ((msb & 0xFE)<<6);
+}
+
+void encodeOneByte(char *oneByteBuffer, unsigned int numberToEncode){
+  uint8_t lowPart = 0;
+  lowPart = (numberToEncode<<1) | 1;
+  oneByteBuffer[0] = (uint8_t)lowPart;
+  oneByteBuffer[1] = 0;
+}
+
+uint8_t decodeOneByte(uint8_t byte){
+    return byte>>1;
+}
+
 void initializeTimers(void){
 
   rcc_periph_clock_enable(RCC_TIM1);    // TIM1
@@ -165,32 +191,6 @@ void printStringUART(const char myString[]) {
   while(!dma_get_interrupt_flag(DMA1, DMA_CHANNEL4, DMA_TCIF));
   dma_clear_interrupt_flags(DMA1, DMA_CHANNEL4, DMA_TCIF); 
 
-}
-
-void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode){
-  uint8_t lowPart = 0;
-  uint8_t highPart = 0;
-  
-  lowPart = ((numberToEncode & 0x7F) << 1) | 1;
-  highPart = (numberToEncode >>6) | 1;
-  twoByteBuffer[0] = highPart;
-  twoByteBuffer[1] = lowPart;
-  twoByteBuffer[2] = 0;
-}
-
-uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb){
-   return (lsb>>1) | ((msb & 0xFE)<<6);
-}
-
-void encodeOneByte(char *oneByteBuffer, unsigned int numberToEncode){
-  uint8_t lowPart = 0;
-  lowPart = (numberToEncode<<1) | 1;
-  oneByteBuffer[0] = (uint8_t)lowPart;
-  oneByteBuffer[1] = 0;
-}
-
-uint8_t decodeOneByte(uint8_t byte){
-    return byte>>1;
 }
 
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength){
@@ -543,6 +543,78 @@ static void configurePeriphereals(void){
   }
 }
 
+void batteryFreeTask(void *args __attribute__((unused))){
+
+  uint32_t adcData = 0;
+  
+  for(;;){
+    
+    adcData = readBattery();
+
+    sendToLCDQueue(batteryLevel,adcData);
+
+    vTaskDelay(pdMS_TO_TICKS(BATTERY_FREE_TASK_DELAY_MS));
+  }
+}
+
+void batteryWaitTask(void *args __attribute__((unused))){
+  uint32_t adcData = 0;
+  
+  for(;;){
+
+    ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
+    
+    adcData = readBattery();
+    sendToLCDQueue(batteryLevel, adcData);
+    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
+  }  
+}
+
+void lcdTask(void *args __attribute__((unused))){
+  lcdData_t receivedData;
+  char buffer[22];
+
+  uint16_t lineState = 0;
+  uint32_t lastVoltage = 0;
+  
+  lcd_init();
+  
+  for(;;){
+    
+    xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
+    
+    if(receivedData.messageType == turnOnMessage){
+      lcdPutsBlinkFree(" SDT ENCODER",0);
+      
+    }else if(receivedData.messageType == bleConfig){
+      lcdPutsBlinkFree(" SDT ENCODER     BLE",0);
+
+    }else if(receivedData.messageType == connectedStatus){
+      lcdPutsBlinkFree(receivedData.displayValue?
+		       "Connected":"         ",
+		       2);
+      
+    }else if(receivedData.messageType == batteryLevel){
+      lineState = GPIOB_IDR;
+      if( (lineState & (1 <<12)) !=0){
+	sprintf(buffer,"    ** Batt: %lu", receivedData.displayValue);
+	lcdPutsBlinkFree(buffer,7);
+      }else{
+	sprintf(buffer,"       Batt: %lu", receivedData.displayValue);
+	lcdPutsBlinkFree(buffer,7);
+      }
+      lastVoltage = receivedData.displayValue;
+      
+    }else if(receivedData.messageType == chargingStatus){
+      sprintf(buffer, receivedData.displayValue?
+	      "    ** Batt: %lu":
+	      "       Batt: %lu", lastVoltage);
+      lcdPutsBlinkFree(buffer, 7);
+      
+    }
+  }
+}
+
 void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__((unused))) {
 
   uartTXData_t receivedData;
@@ -603,78 +675,6 @@ void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__
       }
     }
   }
-}
-
-void lcdTask(void *args __attribute__((unused))){
-  lcdData_t receivedData;
-  char buffer[22];
-
-  uint16_t lineState = 0;
-  uint32_t lastVoltage = 0;
-  
-  lcd_init();
-  
-  for(;;){
-    
-    xQueueReceive(lcdQueue,&receivedData, portMAX_DELAY);
-    
-    if(receivedData.messageType == turnOnMessage){
-      lcdPutsBlinkFree(" SDT ENCODER",0);
-      
-    }else if(receivedData.messageType == bleConfig){
-      lcdPutsBlinkFree(" SDT ENCODER     BLE",0);
-
-    }else if(receivedData.messageType == connectedStatus){
-      lcdPutsBlinkFree(receivedData.displayValue?
-		       "Connected":"         ",
-		       2);
-      
-    }else if(receivedData.messageType == batteryLevel){
-      lineState = GPIOB_IDR;
-      if( (lineState & (1 <<12)) !=0){
-	sprintf(buffer,"    ** Batt: %lu", receivedData.displayValue);
-	lcdPutsBlinkFree(buffer,7);
-      }else{
-	sprintf(buffer,"       Batt: %lu", receivedData.displayValue);
-	lcdPutsBlinkFree(buffer,7);
-      }
-      lastVoltage = receivedData.displayValue;
-      
-    }else if(receivedData.messageType == chargingStatus){
-      sprintf(buffer, receivedData.displayValue?
-	      "    ** Batt: %lu":
-	      "       Batt: %lu", lastVoltage);
-      lcdPutsBlinkFree(buffer, 7);
-      
-    }
-  }
-}
-
-void batteryFreeTask(void *args __attribute__((unused))){
-
-  uint32_t adcData = 0;
-  
-  for(;;){
-    
-    adcData = readBattery();
-
-    sendToLCDQueue(batteryLevel,adcData);
-
-    vTaskDelay(pdMS_TO_TICKS(BATTERY_FREE_TASK_DELAY_MS));
-  }
-}
-
-void batteryWaitTask(void *args __attribute__((unused))){
-  uint32_t adcData = 0;
-  
-  for(;;){
-
-    ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
-    
-    adcData = readBattery();
-    sendToLCDQueue(batteryLevel, adcData);
-    sendToUARTTXQueue(batteryLevel, (uint16_t)adcData, 0,0);
-  }  
 }
 
 void tim1_cc_isr(){

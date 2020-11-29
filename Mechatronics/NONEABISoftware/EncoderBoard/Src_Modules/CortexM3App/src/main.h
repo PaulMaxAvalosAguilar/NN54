@@ -144,16 +144,18 @@ void createTask(TaskFunction_t pvTaskCode,
 		UBaseType_t uxPriority,
 		TaskHandle_t *taskHandle);
 void deleteTask(TaskHandle_t *pxTask);
-void initializeTimers(void);
-void stopTimers(void);
-uint32_t readBattery(void);
-void printStringUART(const char myString[]);
 void encodeTwoBytes(char *twoByteBuffer, uint32_t numberToEncode);
 uint16_t decodeTwoBytes(uint8_t msb, uint8_t lsb);
 void encodeOneByte(char *oneByteBuffer, unsigned int numberToEncode);
 uint8_t decodeOneByte(uint8_t byte);
 
-//Implemenation dependent helper functions
+//To implement helper functions
+void initializeTimers(void);
+void stopTimers(void);
+uint32_t readBattery(void);
+void printStringUART(const char myString[]);
+
+//Custom helper functions
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
 void getLine(void);
 
@@ -169,10 +171,12 @@ uint8_t maxRomDes(uint32_t counter, uint32_t lastMaxDist);
 
 //Processes---------------------------------------
 void encoderTask(void *args);
-void communicationTask(void *args);
-void lcdTask(void *args);
 void batteryFreeTask(void *args);
 void batteryWaitTask(void *args);
+
+//To implement processes
+void lcdTask(void *args);
+void communicationTask(void *args);
 
 //Interrupt handlers------------------------------
 void tim1_cc_isr(void);
