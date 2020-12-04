@@ -545,7 +545,7 @@ int main(void)
   GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE7)) | (0b10 << GPIO_MODER_MODE7_Pos) ; //Alternate function mode
   GPIOB->OTYPER &= (~GPIO_OTYPER_OT7);//Push pull  
   GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEED7)) | (0b00 << GPIO_OSPEEDR_OSPEED7_Pos); //Low speed
-  GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD7)) | (0b00 << GPIO_PUPDR_PUPD7_Pos); //No pull up, no pull down
+  GPIOB->PUPDR = (GPIOB->PUPJDR & (~GPIO_PUPDR_PUPD7)) | (0b00 << GPIO_PUPDR_PUPD7_Pos); //No pull up, no pull down
   GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL7)) | (11 << GPIO_AFRL_AFSEL7_Pos); //Alternate function 11
 
 

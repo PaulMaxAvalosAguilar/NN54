@@ -320,7 +320,7 @@ int parseWVLine(const char* line){
     //Should go before creating encoderTask------------------------------
     (batteryWaitTaskHandle != NULL)? vTaskSuspend(batteryWaitTaskHandle): "";
 
-    gpio_clear(GPIOA, GPIO4);//Activate sensors, should go before initializeTimers()
+    turnOnEncoderSensors();//should go before initializeTimers()
     initializeTimers();//Clock gating, should go before clearing ring buffer
     sendToUARTTXQueue(encoderStart,0,0,0);
     ring_buffer_clear(&encoder_ring);//Clear ring buffer
@@ -335,7 +335,7 @@ int parseWVLine(const char* line){
     //Should go after deleting encoderTask-------------------------------
     sendToUARTTXQueue(encoderStop,0,0,0);
     stopTimers();
-    gpio_set(GPIOA, GPIO4);
+    turnOffEncoderSensors();
     vTaskResume(batteryWaitTaskHandle);
     //Should go after deleting encoderTask-------------------------------
     
@@ -445,7 +445,7 @@ void genericParsing(char *buffer){
     //In case no stop was ever received-----------------------------------
     deleteTask(&encoderTaskHandle);
     stopTimers();//Should go after deleting encoder task
-    gpio_set(GPIOA, GPIO4);//Should go after delting encoder task
+    turnOffEncoderSensors();//Should go after delting encoder task
     //In case no stop was ever received-----------------------------------
     sendToLCDQueue(connectedStatus, 0);
     deleteTask(&batteryWaitTaskHandle);
@@ -475,7 +475,6 @@ void genericParsing(char *buffer){
   }else if(parseWCLine(buffer)){
     
   }else if(strstr(buffer, "CMD")!= NULL){
-    sendToLCDQueue(bleConfig,1);
     bluetoothConfig(0);
     sendLS();
     stopAdvertising();

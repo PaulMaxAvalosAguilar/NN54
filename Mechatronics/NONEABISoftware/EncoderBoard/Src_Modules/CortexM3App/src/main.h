@@ -4,43 +4,70 @@
 #include "FreeRTOS.h"
 #include "ring.h"
 
+/*
+To implement means functions, variables and magnitude values which are present
+on the protocol but function definitions and values need to be provided
+in the way most convenient and functional for the specific hardware 
+characteristics in which the implementation is meant to work.
+
+Implementation dependent means functions, variables and magnitude values which
+are not present on the protocol but which 
+functionality is contemplated by the protocol but which implementation can
+not be encapsulated in universal fixed declarations and namings, thus
+specific functions, variables and magnitude values should be created freely
+in order to comply with the protocol specified functionality.
+
+Custom means functions, variables and magnitude values which are not present
+in the protocol and which functionality is not expected by the protocol,
+however a particular implementation may find convinient or necessary to
+implement.
+
+Implementation dependent handles
+A handle for talking to inform commandRXInterfaceProcess there's work
+to do.
+
+Implementation dependent processes:
+commandRXTX communication process
+
+Implementation dependent interrupt handlers:
+encoder pulse capture (time and encoder counter)
+power connection status change
+ */
+
+/*
+displayInterface
+commandTXInterface
+commandRXInterface
+ */
+
 //Mathematical defs--------------------------------
 #define BITS31 2147483648.0f
 #define PI 3.14159265f
 #define degToRads(x) ((x) * PI)/180.0
 
-//-------------------------CUSTOMIZABLE PART-------------------------
+//-------------------------PROTOCOL--------------------------
 //*******************************************************************
 
-//-----------------------------------------------
+//To implement ENCODER hardware specs-------------------------
 #define ENCODERINITIAL_VALUE 32767
 #define ENCODERSTEPDISTANCEINMILLS 4084
 
-//Queue sizes------------------------------------
-#define LCD_QUEUE_SIZE                20
-#define TX_QUEUE_SIZE                 20
-#define SEMAPHORE_SIZE                 1
-#define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + SEMAPHORE_SIZE
+//To implement Queue sizes------------------------------------
+#define LCD_QUEUE_SIZE                20//CHANGE
+#define TX_QUEUE_SIZE                 20//CHANGE
 
-//BUFFER sizes-----------------------------------
+//To implement BUFFER sizes-----------------------------------
 #define ENCODER_BUFFER_SIZE 256
-#define UART_RX_BUFFER_SIZE 500
-#define PARSE_BUFFER_SIZE   70
 
 #if ((ENCODER_BUFFER_LEN - 1) & ENCODER_BUFFER_LEN) == 0
 #else
 #warning ENCODER_BUFFER NOT POWER OF 2
 #endif
 
-//TIMING ----------------------------------------
+//To implement TIMING ----------------------------------------
 #define ENCODER_TASK_DELAY_MS 50
 #define BATTERY_FREE_TASK_DELAY_MS 20000
 
-
-//*******************************************************************
-
-//-------------------------PROTOCOL IMPLEMENTATION-------------------
-//*******************************************************************
 //Protocol numbers-------------------------------
 typedef enum codes_t{
   peripherealCode_EncoderStart = 1,
@@ -52,23 +79,13 @@ typedef enum codes_t{
   centrlCode_encoderStop = 67
 }codes_t;
 
-#define PROTOCOL_INITIATOR 0b01111100 // '|'
-#define PROTOCOL_TERMINATOR PROTOCOL_INITIATOR
-
-//*******************************************************************
-
 //Queue handles----------------------------------
-extern QueueHandle_t lcdQueue;
-extern QueueHandle_t uartTXQueue;
-extern QueueSetHandle_t communicationQueueSet;
+extern QueueHandle_t lcdQueue;//CHANGE
+extern QueueHandle_t uartTXQueue;//CHANGE
 
-//Binary semaphore handles-----------------------
-extern SemaphoreHandle_t communicationSemaphore;
-
-//Queue structures-------------------------------
+//Queue structures----------------------------------------
 typedef enum messageTypes_t{
 			    turnOnMessage,
-			    bleConfig,
 			    encoderData,
 			    encoderStart,
 			    encoderStop,
@@ -80,14 +97,14 @@ typedef enum messageTypes_t{
 typedef struct lcdData_t{
   messageTypes_t messageType;
   uint32_t displayValue;  
-}lcdData_t;
+}lcdData_t;//CHANGE
 
 typedef struct uartTXData_t{
   messageTypes_t messageType;
   uint16_t traveledDistanceOrBattery;
   uint16_t meanPropulsiveVelocity;
   uint16_t peakVelocity;
-} uartTXData_t;
+} uartTXData_t;//CHANGE
 
 //Tasks Handles-----------------------------------
 extern TaskHandle_t encoderTaskHandle;
@@ -104,7 +121,7 @@ typedef struct encoderTaskParamTypes_t{
 //Ring buffer handles-----------------------------
 extern ring_t encoder_ring;
 
-//RingBuffer structures---------------------------
+//Ring buffer structures--------------------------
 typedef struct encoderValues_t{
   uint16_t encoderCounter;
   uint32_t inputCapture;
@@ -112,11 +129,6 @@ typedef struct encoderValues_t{
 
 //Buffers-----------------------------------------
 extern encoderValues_t encoder_buffer[ENCODER_BUFFER_SIZE];
-extern char receiveBuffer[UART_RX_BUFFER_SIZE];
-extern char parseBuffer[PARSE_BUFFER_SIZE];
-
-//Buffers' positions------------------------------
-extern uint32_t receiveBufferPos;
 
 //encoderTask variables---------------------------
 extern uint8_t (*goingDesiredCountDir[2])(uint32_t, uint32_t);
@@ -126,7 +138,7 @@ extern uint8_t (*newMaxRomDetected[2])(uint32_t,uint32_t);
 
 //ISR variables-----------------------------------
 extern volatile encoderValues_t encInterruptValues;
-extern volatile uint16_t tim2Counter;
+extern volatile uint16_t encoderTimerCounter;
 extern volatile uint32_t capturedTime;
 extern volatile uint32_t overflowCounter;
 
@@ -134,9 +146,9 @@ extern volatile uint32_t overflowCounter;
 void sendToUARTTXQueue(messageTypes_t messageType,
 		       uint16_t traveledDistanceOrBattery,
 		       uint16_t meanPropulsiveVelocity,
-		       uint16_t peakVelocity);
+		       uint16_t peakVelocity);//CHANGE
 void sendToLCDQueue(messageTypes_t messageType,
-		    uint32_t displayValue);
+		    uint32_t displayValue);//CHANGE
 void createTask(TaskFunction_t pvTaskCode,
 		const char *const pcName,
 		configSTACK_DEPTH_TYPE usStackDepth,
@@ -152,12 +164,9 @@ uint8_t decodeOneByte(uint8_t byte);
 //To implement helper functions
 void initializeTimers(void);
 void stopTimers(void);
+void turnOnEncoderSensors(void);
+void turnOffEncoderSensors(void);
 uint32_t readBattery(void);
-void printStringUART(const char myString[]);
-
-//Custom helper functions
-void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
-void getLine(void);
 
 //EncoderHelper functions-------------------------
 uint8_t descendente(uint32_t a, uint32_t b);
@@ -175,14 +184,54 @@ void batteryFreeTask(void *args);
 void batteryWaitTask(void *args);
 
 //To implement processes
-void lcdTask(void *args);
-void communicationTask(void *args);
+void lcdTask(void *args);//CHANGE
 
-//Interrupt handlers------------------------------
+//*******************************************************************
+
+//-----------------PROTOCOL IMPLEMENTATION DEPENDENT-----------------
+//*******************************************************************
+
+//TX/RX protocol delimiters----------------------
+#define PROTOCOL_INITIATOR 0b01111100 // '|'
+#define PROTOCOL_TERMINATOR PROTOCOL_INITIATOR
+
+//Command RXInterfaceProcess handles-------------
+extern QueueSetHandle_t communicationQueueSet;//CHANGE
+extern SemaphoreHandle_t communicationSemaphore;//CHANGE
+
+//Implementation dependent proceses--------------
+void communicationTask(void *args);//CHANGE
+
+//Interrupt handlers-----------------------------
 void tim1_cc_isr(void);
 void tim1_up_isr(void);
 void usart1_isr(void);
 void exti15_10_isr(void);
+
+//*******************************************************************
+
+//---------------------------CUSTOM----------------------------------
+//*******************************************************************
+#define SEMAPHORE_SIZE                 1
+#define COMMUNICATION_QUEUE_SET_SIZE  LCD_QUEUE_SIZE + SEMAPHORE_SIZE
+
+#define UART_RX_BUFFER_SIZE 500//CHANGE
+#define PARSE_BUFFER_SIZE   70//CHANGE
+
+//Custom Buffers---------------------------------
+extern char receiveBuffer[UART_RX_BUFFER_SIZE];//CHANGE
+extern char parseBuffer[PARSE_BUFFER_SIZE];//CHANGE
+
+//Custom Buffers positions-----------------------
+extern uint32_t receiveBufferPos;//CHANGE
+
+//Custom helper functions------------------------
+void printStringUART(const char myString[]);
+
+void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
+void getLine(void);
+//*******************************************************************
+
 
 /* DWT (Data Watchpoint and Trace) registers, only exists on ARM Cortex with a DWT unit */
 #define KIN1_DWT_CONTROL             (*((volatile uint32_t*)0xE0001000))
