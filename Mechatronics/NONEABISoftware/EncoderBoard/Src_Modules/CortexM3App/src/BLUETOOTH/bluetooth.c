@@ -292,10 +292,10 @@ int parseWVLine(const char* line){
   //WV,FFFF,7C01FFFF02027C
   strncpy(twoByteBuffer, line+10,2);
   twoByteBuffer[2] = 0;
-  uint8_t messageType = strtol(twoByteBuffer, NULL, 16);
-  messageType = decodeOneByte(messageType);
+  uint8_t code = strtol(twoByteBuffer, NULL, 16);
+  code = decodeOneByte(code);
 
-  if(messageType == peripherealCode_EncoderStart){
+  if(code == forEncoderDevicePCMCode_encoderStart){
 
     encoderTaskParamTypes_t dataToSend;
 
@@ -322,24 +322,24 @@ int parseWVLine(const char* line){
 
     turnOnEncoderSensors();//should go before initializeTimers()
     initializeTimers();//Clock gating, should go before clearing ring buffer
-    sendToUARTTXQueue(encoderStart,0,0,0);
+    sendToMessagesTXRequestQueue(messagesTXRequestCode_start,0,0,0);
     ring_buffer_clear(&encoder_ring);//Clear ring buffer
 
     //Should go before creating encoderTask------------------------------
     createTask(encoderTask, "encoderTask",200,&dataToSend, 4,
 	       &encoderTaskHandle);
     
-  }else if(messageType == peripherealCode_EncoderStop){
+  }else if(code == forEncoderDevicePCMCode_encoderStop){
 
     deleteTask(&encoderTaskHandle);
     //Should go after deleting encoderTask-------------------------------
-    sendToUARTTXQueue(encoderStop,0,0,0);
+    sendToMessagesTXRequestQueue(messagesTXRequestCode_Stop,0,0,0);
     stopTimers();
     turnOffEncoderSensors();
     vTaskResume(batteryWaitTaskHandle);
     //Should go after deleting encoderTask-------------------------------
     
-  }else if(messageType == peripherealCode_EncoderBattery){
+  }else if(code == forEncoderDevicePCMCode_encoderBattery){
     (batteryWaitTaskHandle != NULL)? xTaskNotifyGive(batteryWaitTaskHandle) : 0;
   }
 
@@ -447,7 +447,8 @@ void genericParsing(char *buffer){
     stopTimers();//Should go after deleting encoder task
     turnOffEncoderSensors();//Should go after delting encoder task
     //In case no stop was ever received-----------------------------------
-    sendToLCDQueue(connectedStatus, 0);
+    sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequestCode_connectionStatus,
+					    0);
     deleteTask(&batteryWaitTaskHandle);
     createTask(batteryFreeTask,"batteryFreeTask",100,NULL,1,&batteryFreeTaskHandle);
 
@@ -462,7 +463,9 @@ void genericParsing(char *buffer){
     advertise();
   
   }else if(strstr(buffer,"Connected") != NULL){
-    sendToLCDQueue(connectedStatus,1);
+    sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequestCode_connectionStatus,
+					    1);
+
     deleteTask(&batteryFreeTaskHandle);
     createTask(batteryWaitTask,"batteryWaitTask",100,NULL,1,&batteryWaitTaskHandle);
 
