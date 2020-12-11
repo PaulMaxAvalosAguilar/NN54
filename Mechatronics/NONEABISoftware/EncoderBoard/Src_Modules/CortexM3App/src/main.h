@@ -13,11 +13,10 @@ in the way most convenient and functional for the specific hardware
 characteristics in which the implementation is meant to work.
 
 *Implementation dependent means functions, variables and magnitude values which
-are not present on the protocol but which 
-functionality is contemplated by the protocol but which implementation can
-not be encapsulated in universal fixed declarations and namings, thus
-specific functions, variables and magnitude values should be created freely
-in order to comply with the protocol specified functionality.
+are not present on the protocol yet they are contemplated by it but its
+implementation cannot be encapsulated in universal fixed declarations and 
+namings, thus specific functions, variables and magnitude values should be
+created freely in order to comply with the protocol specified functionality.
 
 *Custom means functions, variables and magnitude values which are not present
 in the protocol and which functionality is not expected by the protocol,
@@ -25,14 +24,14 @@ however a particular implementation may find convinient or necessary to
 implement.
 
 The protocol is based on the serial communication relationship there exists
-between two devices (which may be implemented in any known way which can accomodate
-serial communications):
+between two devices (which may be implemented in any known way which can 
+accomodate serial communications):
 1.- The encoder device where this program is loaded
 2.- The encoder controler device which talks to the encoder device
 
-The communication is done through messages which have data containing a code as 
-well as parameters depending on the sent code. Codes indicate the message type and
-who it sent for, the encoder controller uses messages to command the encoder
+The communication is done through messages which have information composed of a 
+code and parameters depending on the sent code. Codes indicate the message type 
+and who it sent for, the encoder controller uses codes to command the encoder
 device what to do and the encoder device uses them to report information to the 
 encoder controller depending on what the controller commanded. Parameters may be
 sent for if the message type is required to provide further information on the 
@@ -151,10 +150,10 @@ typedef enum humanInterfaceDisplayRequest_Codes{
   humanInterfaceDisplayRequestCode_chargingStatus
 } humanInterfaceDisplayRequest_Codes;
 
-typedef struct humanInterfaceDisplayRequest_Data{
+typedef struct humanInterfaceDisplayRequest_Parameters{
   humanInterfaceDisplayRequest_Codes humanInterfaceDisplayRequest_Code;
   uint32_t displayValue;  
-}humanInterfaceDisplayRequest_Data;
+}humanInterfaceDisplayRequest_Parameters;
 
 typedef enum messagesTXRequest_Codes{
   messagesTXRequestCode_encoderData,
@@ -163,12 +162,12 @@ typedef enum messagesTXRequest_Codes{
   messagesTXRequestCode_Stop
 }messagesTXRequest_Codes;
 
-typedef struct messagesTXRequest_Data{
+typedef struct messagesTXRequest_Parameters{
   messagesTXRequest_Codes messageTXRequest_Code;
   uint16_t traveledDistanceOrBattery;
   uint16_t meanPropulsiveVelocity;
   uint16_t peakVelocity;
-} messagesTXRequest_Data;
+} messagesTXRequest_Parameters;
 
 //Tasks Handles-----------------------------------
 extern TaskHandle_t encoderTaskHandle;

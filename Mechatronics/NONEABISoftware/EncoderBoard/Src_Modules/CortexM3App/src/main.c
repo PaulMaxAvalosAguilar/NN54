@@ -57,7 +57,7 @@ void sendToMessagesTXRequestQueue(messagesTXRequest_Codes code,
 				  uint16_t traveledDistanceOrBattery,
 				  uint16_t meanPropulsiveVelocity,
 				  uint16_t peakVelocity){
-  messagesTXRequest_Data dataToSend;
+  messagesTXRequest_Parameters dataToSend;
   dataToSend.messageTXRequest_Code = code;
   dataToSend.traveledDistanceOrBattery = traveledDistanceOrBattery;
   dataToSend.meanPropulsiveVelocity = meanPropulsiveVelocity;
@@ -69,7 +69,7 @@ void sendToMessagesTXRequestQueue(messagesTXRequest_Codes code,
 
 void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes code,
 					     uint32_t displayValue){
-  humanInterfaceDisplayRequest_Data dataToSend;
+  humanInterfaceDisplayRequest_Parameters dataToSend;
   dataToSend.humanInterfaceDisplayRequest_Code = code;
   dataToSend.displayValue = displayValue;
 
@@ -361,7 +361,7 @@ void batteryWaitTask(void *args __attribute__((unused))){
 }
 
 void humanInterfaceDisplayRequestTask(void *args __attribute__((unused))){
-  humanInterfaceDisplayRequest_Data receivedData;
+  humanInterfaceDisplayRequest_Parameters receivedData;
   char buffer[22];
 
   uint16_t lineState = 0;
@@ -418,7 +418,7 @@ SemaphoreHandle_t communicationSemaphore;
 //Implementation dependent proceses--------------
 void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__((unused))) {
 
-  messagesTXRequest_Data receivedData;
+  messagesTXRequest_Parameters receivedData;
   QueueSetMemberHandle_t xHandle;
   char twoByteBuffers[3][3];
   char oneByteBuffer[2];
@@ -510,7 +510,7 @@ void exti15_10_isr(){
   
   uint16_t lineState = GPIOB_IDR;
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  humanInterfaceDisplayRequest_Data dataToSend;
+  humanInterfaceDisplayRequest_Parameters dataToSend;
 
   dataToSend.humanInterfaceDisplayRequest_Code =
     humanInterfaceDisplayRequestCode_chargingStatus;  
@@ -795,10 +795,10 @@ int main(void)
   //---------------------CONFIGURE RTOS-------------------------
 
   messagesTXRequestQueue = xQueueCreate(MESSAGES_TX_REQUEST_QUEUE_SIZE,
-					sizeof(messagesTXRequest_Data));
+					sizeof(messagesTXRequest_Parameters));
   humanInterfaceDisplayRequestQueue =
     xQueueCreate(HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE,
-		 sizeof(humanInterfaceDisplayRequest_Data));
+		 sizeof(humanInterfaceDisplayRequest_Parameters));
   communicationSemaphore = xSemaphoreCreateBinary();
   communicationQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
   xQueueAddToSet( messagesTXRequestQueue, communicationQueueSet);
