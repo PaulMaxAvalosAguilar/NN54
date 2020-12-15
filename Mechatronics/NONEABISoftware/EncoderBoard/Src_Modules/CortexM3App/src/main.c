@@ -25,7 +25,7 @@
 
 //Queue handles----------------------------------
 QueueHandle_t humanInterfaceDisplayRequestQueue;
-QueueHandle_t messagesTXRequestQueue;
+QueueHandle_t protocolMessagesTXRequestQueue;
 
 //Task Handles-----------------------------------
 TaskHandle_t encoderTaskHandle = NULL;
@@ -53,25 +53,26 @@ volatile uint32_t capturedTime = 0;
 volatile uint32_t overflowCounter=0 ;
 
 //Helper functions--------------------------------
-void sendToMessagesTXRequestQueue(messagesTXRequest_Codes code,
-				  uint16_t traveledDistanceOrBattery,
-				  uint16_t meanPropulsiveVelocity,
-				  uint16_t peakVelocity){
-  messagesTXRequest_Parameters dataToSend;
-  dataToSend.messageTXRequest_Code = code;
-  dataToSend.traveledDistanceOrBattery = traveledDistanceOrBattery;
-  dataToSend.meanPropulsiveVelocity = meanPropulsiveVelocity;
-  dataToSend.peakVelocity = peakVelocity;
-
-  xQueueSendToBack(messagesTXRequestQueue,&dataToSend,0);
+void sendToMessagesTXRequestQueue(protocolMessagesTXRequest_Codes
+				  protocolMessageTXRequest_Code,
+				  uint16_t firstParameter,
+				  uint16_t secondParameter,
+				  uint16_t thirdParameter){
+  protocolMessagesTXRequest_Message dataToSend;
+  dataToSend.protocolMessageTXRequest_Code = protocolMessageTXRequest_Code;
+  dataToSend.firstParameter = firstParameter;
+  dataToSend.secondParameter = secondParameter;
+  dataToSend.thirdParameter = thirdParameter;
+  xQueueSendToBack(protocolMessagesTXRequestQueue,&dataToSend,0);
 
 }
 
-void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes code,
-					     uint32_t displayValue){
-  humanInterfaceDisplayRequest_Parameters dataToSend;
-  dataToSend.humanInterfaceDisplayRequest_Code = code;
-  dataToSend.displayValue = displayValue;
+void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes
+					     humanInterfaceDisplayRequest_Code,
+					     uint32_t firstParameter){
+  humanInterfaceDisplayRequest_Message dataToSend;
+  dataToSend.humanInterfaceDisplayRequest_Code = humanInterfaceDisplayRequest_Code;
+  dataToSend.firstParameter = firstParameter;
 
   xQueueSendToBack(humanInterfaceDisplayRequestQueue,&dataToSend,0);
 }
@@ -184,6 +185,18 @@ uint32_t readBattery(void){
   return adcData;
 }
 
+uint32_t isEncoderCharging(void){
+  uint32_t returnedValue;
+  
+  if( (GPIOB_IDR & (1 <<12)) != 0){
+    returnedValue = 1;
+  }else{
+    returnedValue = 0;
+  }
+  
+  return returnedValue;
+}
+
 //EncoderHelper functions-------------------------
 uint8_t descendente(uint32_t a, uint32_t b){
   return a<b;
@@ -269,7 +282,7 @@ __attribute__((optimize("O0"))) void encoderTask(void *args __attribute__((unuse
       lastTime = receiveEncValues.inputCapture;
       
       if(desiredDirFollowed){
-	elapsedDistance = ENCODERSTEPDISTANCEINMILLS * elapsedPosition;
+	elapsedDistance = ENCODERSTEPDISTANCE * elapsedPosition;
 	currentVelocity = (elapsedDistance * 100) / elapsedTime;
 
 	//Mean Propulsive Velocity Calculation
@@ -306,7 +319,7 @@ __attribute__((optimize("O0"))) void encoderTask(void *args __attribute__((unuse
       if(canCountRep){
 
 	sendToMessagesTXRequestQueue(messagesTXRequestCode_encoderData,
-			  (custom_abs(maxROM-ENCODERINITIAL_VALUE)* ENCODERSTEPDISTANCEINMILLS)/1000,
+			  (custom_abs(maxROM-ENCODERINITIAL_VALUE)* ENCODERSTEPDISTANCE)/1000,
 			  meanPropVel/meanPropVelCount,
 			  peakVel);
 	
@@ -354,17 +367,17 @@ void batteryWaitTask(void *args __attribute__((unused))){
     ulTaskNotifyTake(pdTRUE,portMAX_DELAY);//Should go first
     
     adcData = readBattery();
+    sendToMessagesTXRequestQueue(messagesTXRequestCode_BatteryLevel,
+				 (uint16_t)adcData, 0,0);
     sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequestCode_batteryLevel
 					    , adcData);
-    sendToMessagesTXRequestQueue(messagesTXRequestCode_Battery, (uint16_t)adcData, 0,0);
   }  
 }
 
 void humanInterfaceDisplayRequestTask(void *args __attribute__((unused))){
-  humanInterfaceDisplayRequest_Parameters receivedData;
+  humanInterfaceDisplayRequest_Message receivedData;
   char buffer[22];
 
-  uint16_t lineState = 0;
   uint32_t lastVoltage = 0;
   
   lcd_init();
@@ -380,25 +393,25 @@ void humanInterfaceDisplayRequestTask(void *args __attribute__((unused))){
       
     }else if(receivedData.humanInterfaceDisplayRequest_Code == 
 	     humanInterfaceDisplayRequestCode_connectionStatus){
-      lcdPutsBlinkFree(receivedData.displayValue?
+      lcdPutsBlinkFree(receivedData.firstParameter?
 		       "Connected":"         ",
 		       2);
       
     }else if(receivedData.humanInterfaceDisplayRequest_Code ==
 	     humanInterfaceDisplayRequestCode_batteryLevel){
-      lineState = GPIOB_IDR;
-      if( (lineState & (1 <<12)) !=0){
-	sprintf(buffer,"    ** Batt: %lu", receivedData.displayValue);
+
+      if(isEncoderCharging()){
+	sprintf(buffer,"    ** Batt: %u", receivedData.firstParameter);
 	lcdPutsBlinkFree(buffer,7);
       }else{
-	sprintf(buffer,"       Batt: %lu", receivedData.displayValue);
+	sprintf(buffer,"       Batt: %u", receivedData.firstParameter);
 	lcdPutsBlinkFree(buffer,7);
       }
-      lastVoltage = receivedData.displayValue;
+      lastVoltage = receivedData.firstParameter;
       
     }else if(receivedData.humanInterfaceDisplayRequest_Code ==
 	     humanInterfaceDisplayRequestCode_chargingStatus){
-      sprintf(buffer, receivedData.displayValue?
+      sprintf(buffer, receivedData.firstParameter?
 	      "    ** Batt: %lu":
 	      "       Batt: %lu", lastVoltage);
       lcdPutsBlinkFree(buffer, 7);
@@ -411,14 +424,14 @@ void humanInterfaceDisplayRequestTask(void *args __attribute__((unused))){
 //-----------------PROTOCOL IMPLEMENTATION DEPENDENT-----------------
 //*******************************************************************
 
-//Command RXInterfaceProcess handles-------------
-QueueSetHandle_t communicationQueueSet;
-SemaphoreHandle_t communicationSemaphore;
+//Handles-------------
+QueueSetHandle_t messagesTXRXQueueSet;
+SemaphoreHandle_t messagesRXSemaphore;
 
 //Implementation dependent proceses--------------
-void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__((unused))) {
+void  __attribute__((optimize("O0"))) messagesTXRXTask(void *args __attribute__((unused))) {
 
-  messagesTXRequest_Parameters receivedData;
+  protocolMessagesTXRequest_Message receivedData;
   QueueSetMemberHandle_t xHandle;
   char twoByteBuffers[3][3];
   char oneByteBuffer[2];
@@ -427,47 +440,57 @@ void  __attribute__((optimize("O0"))) communicationTask(void *args __attribute__
   
   for (;;) {
 
-    xHandle = xQueueSelectFromSet(communicationQueueSet,portMAX_DELAY);//Should go first
+    xHandle = xQueueSelectFromSet(messagesTXRXQueueSet,portMAX_DELAY);//Should go first
 
-    if( xHandle == ( QueueSetMemberHandle_t ) messagesTXRequestQueue){
-      xQueueReceive(messagesTXRequestQueue, &receivedData,0);//Should go first
+    if( xHandle == ( QueueSetMemberHandle_t ) protocolMessagesTXRequestQueue){
+      xQueueReceive(protocolMessagesTXRequestQueue, &receivedData,0);//Should go first
 
-      if(receivedData.messageTXRequest_Code == messagesTXRequestCode_encoderData){
+      if(receivedData.protocolMessageTXRequest_Code == messagesTXRequestCode_encoderData){
 	
 	encodeOneByte(oneByteBuffer, forEncoderControllerPCMCode_encoderData);
-	encodeTwoBytes(twoByteBuffers[0],receivedData.traveledDistanceOrBattery);
-	encodeTwoBytes(twoByteBuffers[1],receivedData.meanPropulsiveVelocity);
-	encodeTwoBytes(twoByteBuffers[2],receivedData.peakVelocity);
+	encodeTwoBytes(twoByteBuffers[0],receivedData.firstParameter);
+	encodeTwoBytes(twoByteBuffers[1],receivedData.secondParameter);
+	encodeTwoBytes(twoByteBuffers[2],receivedData.thirdParameter);
 	
-	writeEncoderValues(oneByteBuffer[0],
+	writeEncoderData(oneByteBuffer[0],
 			   twoByteBuffers[0],
 			   twoByteBuffers[1],
 			   twoByteBuffers[2]);
 	
-      }else if(receivedData.messageTXRequest_Code == messagesTXRequestCode_start){
+      }else if(receivedData.protocolMessageTXRequest_Code == messagesTXRequestCode_start){
 	
 	encodeOneByte(oneByteBuffer, forEncoderControllerPCMCode_encoderStart);
 	
 	writeEncoderStartValue(oneByteBuffer[0]);
 
-      }else if(receivedData.messageTXRequest_Code == messagesTXRequestCode_Battery){
+      }else if(receivedData.protocolMessageTXRequest_Code ==
+	       messagesTXRequestCode_BatteryLevel){
 
-	encodeOneByte(oneByteBuffer, forEncoderControllerPCMCode_encoderBattery);
-	encodeTwoBytes(twoByteBuffers[0],receivedData.traveledDistanceOrBattery);
+	encodeOneByte(oneByteBuffer,
+		      forEncoderControllerPCMCode_encoderBatteryLevel);
+	encodeTwoBytes(twoByteBuffers[0],receivedData.firstParameter);
 	
 	writeBatteryLevel(oneByteBuffer[0],
 			  twoByteBuffers[0]);
 
-      }else if(receivedData.messageTXRequest_Code == messagesTXRequestCode_Stop){
+      }else if(receivedData.protocolMessageTXRequest_Code == messagesTXRequestCode_Stop){
 
-	encodeOneByte(oneByteBuffer, forEncoderControllerPCMCode_encoderStop);
-	
+	encodeOneByte(oneByteBuffer, forEncoderControllerPCMCode_encoderStop);	
 	writeEncoderStop(oneByteBuffer[0]
-			 );	
+			 );
+	
+      }else if(receivedData.protocolMessageTXRequest_Code ==
+	       messagesTXRequestCode_chargingStatus){
+	encodeOneByte(oneByteBuffer,
+		      forEncoderControllerPCMCode_encoderChargingStatus);
+	encodeTwoBytes(twoByteBuffers[0], receivedData.firstParameter);
+	writeEncoderChargingStatus(oneByteBuffer[0],
+				twoByteBuffers[0]);
+
       }
       
-    }else if ( xHandle == (QueueSetMemberHandle_t ) communicationSemaphore){
-      xSemaphoreTake(communicationSemaphore,0);//Should go first
+    }else if ( xHandle == (QueueSetMemberHandle_t ) messagesRXSemaphore){
+      xSemaphoreTake(messagesRXSemaphore,0);//Should go first
 
       while(receiveBuffer[receiveBufferPos]){
 	getLine();
@@ -508,20 +531,24 @@ void exti15_10_isr(){
   
   exti_reset_request(EXTI12);//Clear flag
   
-  uint16_t lineState = GPIOB_IDR;
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  humanInterfaceDisplayRequest_Parameters dataToSend;
+  uint32_t chargingStatus = 0;
+  humanInterfaceDisplayRequest_Message hIDRPdataToSend;
+  protocolMessagesTXRequest_Message mTRPdataToSend;
 
-  dataToSend.humanInterfaceDisplayRequest_Code =
-    humanInterfaceDisplayRequestCode_chargingStatus;  
+  hIDRPdataToSend.humanInterfaceDisplayRequest_Code =
+    humanInterfaceDisplayRequestCode_chargingStatus;
+  mTRPdataToSend.protocolMessageTXRequest_Code =
+    messagesTXRequestCode_chargingStatus;
 
-  if( (lineState & (1 <<12)) != 0){
-    dataToSend.displayValue = 1;
-  }else{
-    dataToSend.displayValue = 0;
-  }
+  chargingStatus = isEncoderCharging();  
+  hIDRPdataToSend.firstParameter = chargingStatus;
+  mTRPdataToSend.firstParameter = chargingStatus;
+
   xQueueSendToBackFromISR(humanInterfaceDisplayRequestQueue,
-			  &dataToSend,&xHigherPriorityTaskWoken);
+			  &hIDRPdataToSend,&xHigherPriorityTaskWoken);
+  xQueueSendToBackFromISR(protocolMessagesTXRequestQueue,
+			  &mTRPdataToSend,&xHigherPriorityTaskWoken);
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
@@ -588,7 +615,7 @@ void usart1_isr(void){
     usart_recv(USART1);//Interrupt clears at reading rx register
 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(communicationSemaphore,&xHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(messagesRXSemaphore,&xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     
   }
@@ -794,19 +821,22 @@ int main(void)
 
   //---------------------CONFIGURE RTOS-------------------------
 
-  messagesTXRequestQueue = xQueueCreate(MESSAGES_TX_REQUEST_QUEUE_SIZE,
-					sizeof(messagesTXRequest_Parameters));
+  protocolMessagesTXRequestQueue = xQueueCreate(MESSAGES_TX_REQUEST_QUEUE_SIZE,
+					sizeof(protocolMessagesTXRequest_Message));
   humanInterfaceDisplayRequestQueue =
     xQueueCreate(HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE,
-		 sizeof(humanInterfaceDisplayRequest_Parameters));
-  communicationSemaphore = xSemaphoreCreateBinary();
-  communicationQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
-  xQueueAddToSet( messagesTXRequestQueue, communicationQueueSet);
-  xQueueAddToSet( communicationSemaphore, communicationQueueSet);
+		 sizeof(humanInterfaceDisplayRequest_Message));
+  messagesRXSemaphore = xSemaphoreCreateBinary();
+  messagesTXRXQueueSet = xQueueCreateSet(COMMUNICATION_QUEUE_SET_SIZE);
+  xQueueAddToSet( protocolMessagesTXRequestQueue, messagesTXRXQueueSet);
+  xQueueAddToSet( messagesRXSemaphore, messagesTXRXQueueSet);
 
-  xTaskCreate(communicationTask,"communicationTask",800,NULL,1,NULL);
-  xTaskCreate(humanInterfaceDisplayRequestTask,"lcdTask",200, NULL, 2, NULL);
-  xTaskCreate(batteryFreeTask,"battery FreeTask",100,NULL,2,&batteryFreeTaskHandle);
+  xTaskCreate(messagesTXRXTask,"messagesTXRXTask",
+	      MESSAGETXRXTASK_SIZE,NULL,3,NULL);
+  xTaskCreate(humanInterfaceDisplayRequestTask,"lcdTask",
+	      HUMANINTERFACEDISPLAYREQUESTTASK_SIZE, NULL, 2, NULL);
+  xTaskCreate(batteryFreeTask,"batteryFreeTask1",
+	      BATTERYFREETASK_SIZE,NULL,1,&batteryFreeTaskHandle);
 
   ring_buffer_init(&encoder_ring, encoder_buffer, sizeof(encoder_buffer[0]),
 		   sizeof(encoder_buffer));
@@ -823,6 +853,7 @@ int main(void)
   nvic_enable_irq(NVIC_EXTI15_10_IRQ);
   nvic_enable_irq(NVIC_TIM1_CC_IRQ);
   nvic_enable_irq(NVIC_TIM1_UP_IRQ);
+
 
   //---------------------START RTOS-------------------------------
   vTaskStartScheduler();

@@ -423,6 +423,8 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
 
         }else if(messageType == 67){//Central code for Encoder Stop
 
+        }else if(messageType == 68){
+
         }
     }
 }

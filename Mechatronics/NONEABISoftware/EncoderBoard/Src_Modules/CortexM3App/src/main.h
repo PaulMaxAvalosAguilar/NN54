@@ -7,18 +7,18 @@
 /*
 DESCRIPTION OF THE PROTOCOL
 
-*To implement means functions, variables and magnitude values which are present
+*To implement means functions, variables or magnitude values which are present
 on the protocol but function definitions and values need to be provided
 in the way most convenient and functional for the specific hardware 
 characteristics in which the implementation is meant to work.
 
-*Implementation dependent means functions, variables and magnitude values which
+*Implementation dependent means functions, variables or magnitude values which
 are not present on the protocol yet they are contemplated by it but its
 implementation cannot be encapsulated in universal fixed declarations and 
 namings, thus specific functions, variables and magnitude values should be
 created freely in order to comply with the protocol specified functionality.
 
-*Custom means functions, variables and magnitude values which are not present
+*Custom means functions, variables or magnitude values which are not present
 in the protocol and which functionality is not expected by the protocol,
 however a particular implementation may find convinient or necessary to
 implement.
@@ -37,9 +37,8 @@ encoder controller depending on what the controller commanded. Parameters may be
 sent for if the message type is required to provide further information on the 
 factors to take into account for the command execution or the data being reported. 
 
-Data may be sent along with the code to specify parameters for command execution
-as well as for information being reported. Communication starts only after a 
-connection is established and finishes after a disconnection occurs.
+All parameters are 16 bit long. Communication starts only after a connection 
+is established and finishes after a disconnection occurs.
 
 Every message containting a code should  contain the following characteristics:
 
@@ -77,26 +76,15 @@ Every message containting a code should  contain the following characteristics:
 The following functionalities should be implemented:
 1.- The ability to detect connection/disconnection status
 2.- The ability to receive encoder device messages
-3.- The ability to transmit encoder controller messages requested from a queue
-
-4.- The ability to interrupt the cpu when the encoder is connected to an AC
-    adpater
+3.- The ability to transmit encoder controller messages requested from a
+    queue(messagesTXRequestQueue)
+4.- The ability to interrupt the cpu when the encoder is getting charged
+    and transmit a message with this information
 5.- The ability to interrupt the cpu when the encoder counter changes
     capturing both time and encoder counter
 
 The naming of every procotol implementation 
 MCU_ANGLE_SerialProtocolImplementation
-
-
-humanInterfaceDisplayTask
-encoderControllerMessagesTransmissionTask
-
- */
-
-/*
-displayInterface
-commandTXInterface
-commandRXInterface
  */
 
 //Mathematical defs--------------------------------
@@ -108,66 +96,108 @@ commandRXInterface
 //*******************************************************************
 
 //To implement ENCODER hardware specs-------------------------
-#define ENCODERINITIAL_VALUE 32767
-#define ENCODERSTEPDISTANCEINMILLS 4084
+#define ENCODERINITIAL_VALUE       32767
+#define ENCODERSTEPDISTANCE        4084
 
 //To implement Queue sizes------------------------------------
 #define HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE        20
 #define MESSAGES_TX_REQUEST_QUEUE_SIZE                    20
 
 //To implement BUFFER sizes-----------------------------------
-#define ENCODER_BUFFER_SIZE 256
+#define ENCODER_BUFFER_SIZE        256
 
-#if ((ENCODER_BUFFER_LEN - 1) & ENCODER_BUFFER_LEN) == 0
+//To implement TIMING ----------------------------------------
+#define ENCODER_TASK_DELAY_MS      50
+#define BATTERY_FREE_TASK_DELAY_MS 20000
+
+//To implement stask sizes for tasks
+#define ENCODERTASK_SIZE                       100
+#define BATTERYFREETASK_SIZE                   50
+#define BATTERYWAITTASK_SIZE                   50
+#define HUMANINTERFACEDISPLAYREQUESTTASK_SIZE  100
+
+//To implement TX/RX protocol delimiters----------------------
+#define PROTOCOL_INITIATOR 0b01111100 // '|'
+#define PROTOCOL_TERMINATOR PROTOCOL_INITIATOR
+
+#if ((ENCODER_BUFFER_SIZE - 1) & ENCODER_BUFFER_SIZE) == 0
 #else
 #warning ENCODER_BUFFER NOT POWER OF 2
 #endif
 
-//To implement TIMING ----------------------------------------
-#define ENCODER_TASK_DELAY_MS 50
-#define BATTERY_FREE_TASK_DELAY_MS 20000
-
 //Protocol communication message codes-----------
-typedef enum Protocol_Communication_Message_Codes_t{
+typedef enum Protocol_Message_Codes_t{
   forEncoderDevicePCMCode_encoderStart = 1,
+  //Command the encoder to start measuring repetitions
+  //minDistToTravel desiredCountDir desiredRepDir
   forEncoderDevicePCMCode_encoderStop = 2,
+  //Command the encoder to stop measuring
+  //No parameter
   forEncoderDevicePCMCode_encoderBattery = 3,
+  //Command the encoder to read battery level
+  //No parameter
+  
   forEncoderControllerPCMCode_encoderData = 64,
+  //Report measured repetition
+  //traveledDistance(mm) meanPropulsiveVelocity(mm) peakVelocity(mm)
   forEncoderControllerPCMCode_encoderStart = 65,
-  forEncoderControllerPCMCode_encoderBattery = 66,
-  forEncoderControllerPCMCode_encoderStop = 67
-}Protocol_Communication_Message_Codes_t;
+  //Report encoder has started measuring repetitions
+  //No parameter
+  forEncoderControllerPCMCode_encoderBatteryLevel = 66,
+  //Report the encoder's battery level
+  //batteryLevel(mV)
+  forEncoderControllerPCMCode_encoderStop = 67,
+  //Report the encoder has stopped measuring repetitions
+  //No parameter
+  forEncoderControllerPCMCode_encoderChargingStatus = 68
+  //Report the encoder chargingStatus
+  //isCharging(Y/N)
+}Protocol_Message_Codes_t;
 
 //Queue handles----------------------------------
 extern QueueHandle_t humanInterfaceDisplayRequestQueue;
-extern QueueHandle_t messagesTXRequestQueue;
+extern QueueHandle_t protocolMessagesTXRequestQueue;
 
 //Queue structures----------------------------------------
 typedef enum humanInterfaceDisplayRequest_Codes{
   humanInterfaceDisplayRequestCode_startup,
+  //Display encoder is ready to accept connections
+  //No parameter
   humanInterfaceDisplayRequestCode_connectionStatus,
+  //Display encoder connection status
+  //isConnected
   humanInterfaceDisplayRequestCode_batteryLevel,
+  //Display encoder battery level
+  //batteryLevel(mV)
   humanInterfaceDisplayRequestCode_chargingStatus
+  //Display encoder charging status
+  //isCharging(Y/N)
 } humanInterfaceDisplayRequest_Codes;
 
-typedef struct humanInterfaceDisplayRequest_Parameters{
+typedef struct humanInterfaceDisplayRequest_Message{
   humanInterfaceDisplayRequest_Codes humanInterfaceDisplayRequest_Code;
-  uint32_t displayValue;  
-}humanInterfaceDisplayRequest_Parameters;
+  uint16_t firstParameter;
+}humanInterfaceDisplayRequest_Message;
 
-typedef enum messagesTXRequest_Codes{
+typedef enum protocolMessagesTXRequest_Codes{
   messagesTXRequestCode_encoderData,
+  //traveledDistance(mm) meanPropulsiveVelocity(mm) peakVelocity(mm)
   messagesTXRequestCode_start,
-  messagesTXRequestCode_Battery,
-  messagesTXRequestCode_Stop
-}messagesTXRequest_Codes;
+  //No parameter
+  messagesTXRequestCode_BatteryLevel,
+  //batteryLevel(mV)
+  messagesTXRequestCode_Stop,
+  //No parameter
+  messagesTXRequestCode_chargingStatus
+  //isCharging(Y/N)
+}protocolMessagesTXRequest_Codes;
 
-typedef struct messagesTXRequest_Parameters{
-  messagesTXRequest_Codes messageTXRequest_Code;
-  uint16_t traveledDistanceOrBattery;
-  uint16_t meanPropulsiveVelocity;
-  uint16_t peakVelocity;
-} messagesTXRequest_Parameters;
+typedef struct protocolMessagesTXRequest_Message{
+  protocolMessagesTXRequest_Codes protocolMessageTXRequest_Code;
+  uint16_t firstParameter;
+  uint16_t secondParameter;
+  uint16_t thirdParameter;
+} protocolMessagesTXRequest_Message;
 
 //Tasks Handles-----------------------------------
 extern TaskHandle_t encoderTaskHandle;
@@ -206,11 +236,13 @@ extern volatile uint32_t capturedTime;
 extern volatile uint32_t overflowCounter;
 
 //Helper functions--------------------------------
-void sendToMessagesTXRequestQueue(messagesTXRequest_Codes code,
+void sendToMessagesTXRequestQueue(protocolMessagesTXRequest_Codes
+				  protocolMessageTXRequest_Code,
 				  uint16_t traveledDistanceOrBattery,
 				  uint16_t meanPropulsiveVelocity,
 				  uint16_t peakVelocity);
-void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes code,
+void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes
+					     humanInterfaceDisplayRequest_Code,
 					     uint32_t displayValue);
 void createTask(TaskFunction_t pvTaskCode,
 		const char *const pcName,
@@ -230,6 +262,7 @@ void stopTimers(void);
 void turnOnEncoderSensors(void);
 void turnOffEncoderSensors(void);
 uint32_t readBattery(void);
+uint32_t isEncoderCharging(void);
 
 //EncoderHelper functions-------------------------
 uint8_t descendente(uint32_t a, uint32_t b);
@@ -254,18 +287,17 @@ void humanInterfaceDisplayRequestTask(void *args);
 //-----------------PROTOCOL IMPLEMENTATION DEPENDENT-----------------
 //*******************************************************************
 
-//TX/RX protocol delimiters----------------------
-#define PROTOCOL_INITIATOR 0b01111100 // '|'
-#define PROTOCOL_TERMINATOR PROTOCOL_INITIATOR
+//Imp dependent Stack sizes for tasks------------
+#define MESSAGETXRXTASK_SIZE                  400
 
-//Command RXInterfaceProcess handles-------------
-extern QueueSetHandle_t communicationQueueSet;//CHANGE
-extern SemaphoreHandle_t communicationSemaphore;//CHANGE
+//Imp dependent handles--------------------------
+extern QueueSetHandle_t messagesTXRXQueueSet;
+extern SemaphoreHandle_t messagesRXSemaphore;
 
-//Implementation dependent proceses--------------
-void communicationTask(void *args);//CHANGE
+//Imp dependent proceses-------------------------
+void messagesTXRXTask(void *args);
 
-//Interrupt handlers-----------------------------
+//Imp dependent interrupt handlers---------------
 void tim1_cc_isr(void);
 void exti15_10_isr(void);
 
@@ -277,15 +309,15 @@ void exti15_10_isr(void);
 #define COMMUNICATION_QUEUE_SET_SIZE  HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE \
   + SEMAPHORE_SIZE
 
-#define UART_RX_BUFFER_SIZE 500//CHANGE
-#define PARSE_BUFFER_SIZE   70//CHANGE
+#define UART_RX_BUFFER_SIZE 500
+#define PARSE_BUFFER_SIZE   70
 
 //Custom Buffers---------------------------------
-extern char receiveBuffer[UART_RX_BUFFER_SIZE];//CHANGE
-extern char parseBuffer[PARSE_BUFFER_SIZE];//CHANGE
+extern char receiveBuffer[UART_RX_BUFFER_SIZE];
+extern char parseBuffer[PARSE_BUFFER_SIZE];
 
 //Custom Buffers positions-----------------------
-extern uint32_t receiveBufferPos;//CHANGE
+extern uint32_t receiveBufferPos;
 
 //Custom helper functions------------------------
 void printStringUART(const char myString[]);

@@ -75,7 +75,7 @@ void unlockWaitingLineParsing(char *buffer,
 void bluetoothConfig(int configuration);
 
 
-void writeEncoderValues(uint8_t centralCode,
+void writeEncoderData(uint8_t centralCode,
 			char traveledDistance[3],
 			char meanPropulsiveVelocity[3],
 			char peakVelocity[3]){
@@ -136,6 +136,21 @@ void writeEncoderStop(uint8_t centralCode){
 		    centralCode,
 		    PROTOCOL_TERMINATOR
 		    );
+}
+
+void writeEncoderChargingStatus(uint8_t centralCode,
+				char chargingStatus[3]){
+  runLockingCOMMAND(&characteristicStatus.isNotifying
+		    ,"SHW,%04X,"
+		    "%02X"//Protocol Message initiator character 
+		    "%02X"//Central code for Encoder ChargingStatus
+		    "%04X"//chargingStatus
+		    "%02X\n",//Protocol Message terminator character
+		    characteristicStatus.handle,
+		    PROTOCOL_INITIATOR,
+		    centralCode,
+		    ((chargingStatus[0]<<8) | chargingStatus[1]),
+		    PROTOCOL_TERMINATOR);
 }
 
 void runLockingCOMMAND(uint8_t* notifyChecking, const char * format, ...){
@@ -450,7 +465,8 @@ void genericParsing(char *buffer){
     sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequestCode_connectionStatus,
 					    0);
     deleteTask(&batteryWaitTaskHandle);
-    createTask(batteryFreeTask,"batteryFreeTask",100,NULL,1,&batteryFreeTaskHandle);
+    createTask(batteryFreeTask,"batteryFreeTask2",
+	       BATTERYFREETASK_SIZE,NULL,1,&batteryFreeTaskHandle);
 
 
     characteristicStatus.isNotifying = 0;
@@ -467,7 +483,8 @@ void genericParsing(char *buffer){
 					    1);
 
     deleteTask(&batteryFreeTaskHandle);
-    createTask(batteryWaitTask,"batteryWaitTask",100,NULL,1,&batteryWaitTaskHandle);
+    createTask(batteryWaitTask,"batteryWaitTask",
+	       BATTERYWAITTASK_SIZE,NULL,1,&batteryWaitTaskHandle);
 
   }else if(strstr(buffer, "Bonded") != NULL){
       
