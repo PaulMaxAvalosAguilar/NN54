@@ -337,18 +337,19 @@ int parseWVLine(const char* line){
 
     turnOnEncoderSensors();//should go before initializeTimers()
     initializeTimers();//Clock gating, should go before clearing ring buffer
-    sendToMessagesTXRequestQueue(messagesTXRequestCode_start,0,0,0);
+    sendToProtocolMessagesTXRequestQueue(protocolMessagesTXRequestCode_start,0,0,0);
     ring_buffer_clear(&encoder_ring);//Clear ring buffer
 
     //Should go before creating encoderTask------------------------------
-    createTask(encoderTask, "encoderTask",200,&dataToSend, 4,
+    createTask(encoderTask, "encoderTask",ENCODERTASK_SIZE,
+	       &dataToSend, ENCODERTASK_PRIORITY,
 	       &encoderTaskHandle);
     
   }else if(code == forEncoderDevicePCMCode_encoderStop){
 
     deleteTask(&encoderTaskHandle);
     //Should go after deleting encoderTask-------------------------------
-    sendToMessagesTXRequestQueue(messagesTXRequestCode_Stop,0,0,0);
+    sendToProtocolMessagesTXRequestQueue(protocolMessagesTXRequestCode_Stop,0,0,0);
     stopTimers();
     turnOffEncoderSensors();
     vTaskResume(batteryWaitTaskHandle);
@@ -452,7 +453,7 @@ void unlockWaitingLineParsing(char *buffer,
 }
 
 
-void genericParsing(char *buffer){
+void  __attribute__((optimize("O0"))) genericParsing(char *buffer){
   
   //INTERPRET
   if(strstr(buffer, "Connection End") != NULL){
@@ -466,7 +467,8 @@ void genericParsing(char *buffer){
 					    0);
     deleteTask(&batteryWaitTaskHandle);
     createTask(batteryFreeTask,"batteryFreeTask2",
-	       BATTERYFREETASK_SIZE,NULL,1,&batteryFreeTaskHandle);
+	       BATTERYFREETASK_SIZE,NULL,BATTERYFREETASK_PRIORITY
+	       ,&batteryFreeTaskHandle);
 
 
     characteristicStatus.isNotifying = 0;
@@ -474,6 +476,7 @@ void genericParsing(char *buffer){
     if(characteristicStatus.notificationEnabled){
       turnOffSubscription();
     }
+
 
     unBond();
     advertise();
@@ -484,7 +487,8 @@ void genericParsing(char *buffer){
 
     deleteTask(&batteryFreeTaskHandle);
     createTask(batteryWaitTask,"batteryWaitTask",
-	       BATTERYWAITTASK_SIZE,NULL,1,&batteryWaitTaskHandle);
+	       BATTERYWAITTASK_SIZE,NULL,BATTERYWAITTASK_PRIORITY,
+	       &batteryWaitTaskHandle);
 
   }else if(strstr(buffer, "Bonded") != NULL){
       

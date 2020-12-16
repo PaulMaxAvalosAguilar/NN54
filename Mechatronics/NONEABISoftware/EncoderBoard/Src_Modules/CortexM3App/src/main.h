@@ -96,19 +96,20 @@ MCU_ANGLE_SerialProtocolImplementation
 //*******************************************************************
 
 //To implement ENCODER hardware specs-------------------------
-#define ENCODERINITIAL_VALUE       32767
-#define ENCODERSTEPDISTANCE        4084
+
+#define ENCODERINITIAL_VALUE              32767
+#define ENCODERSTEPDISTANCE_MICROS        4084
 
 //To implement Queue sizes------------------------------------
 #define HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE        20
-#define MESSAGES_TX_REQUEST_QUEUE_SIZE                    20
+#define PROTOCOL_MESSAGES_TX_REQUEST_QUEUE_SIZE           20
 
 //To implement BUFFER sizes-----------------------------------
 #define ENCODER_BUFFER_SIZE        256
 
 //To implement TIMING ----------------------------------------
 #define ENCODER_TASK_DELAY_MS      50
-#define BATTERY_FREE_TASK_DELAY_MS 20000
+#define BATTERY_FREE_TASK_DELAY_MS 2000
 
 //To implement stask sizes for tasks
 #define ENCODERTASK_SIZE                       100
@@ -124,6 +125,11 @@ MCU_ANGLE_SerialProtocolImplementation
 #else
 #warning ENCODER_BUFFER NOT POWER OF 2
 #endif
+
+#define ENCODERTASK_PRIORITY                        4
+#define BATTERYFREETASK_PRIORITY                    1
+#define BATTERYWAITTASK_PRIORITY                    1
+#define HUMANINTERFACEDISPLAYREQUESTTASK_PRIORITY   2
 
 //Protocol communication message codes-----------
 typedef enum Protocol_Message_Codes_t{
@@ -180,15 +186,16 @@ typedef struct humanInterfaceDisplayRequest_Message{
 }humanInterfaceDisplayRequest_Message;
 
 typedef enum protocolMessagesTXRequest_Codes{
-  messagesTXRequestCode_encoderData,
+
+  protocolMessagesTXRequestCode_encoderData,
   //traveledDistance(mm) meanPropulsiveVelocity(mm) peakVelocity(mm)
-  messagesTXRequestCode_start,
+  protocolMessagesTXRequestCode_start,
   //No parameter
-  messagesTXRequestCode_BatteryLevel,
+  protocolMessagesTXRequestCode_BatteryLevel,
   //batteryLevel(mV)
-  messagesTXRequestCode_Stop,
+  protocolMessagesTXRequestCode_Stop,
   //No parameter
-  messagesTXRequestCode_chargingStatus
+  protocolMessagesTXRequestCode_chargingStatus
   //isCharging(Y/N)
 }protocolMessagesTXRequest_Codes;
 
@@ -236,11 +243,11 @@ extern volatile uint32_t capturedTime;
 extern volatile uint32_t overflowCounter;
 
 //Helper functions--------------------------------
-void sendToMessagesTXRequestQueue(protocolMessagesTXRequest_Codes
-				  protocolMessageTXRequest_Code,
-				  uint16_t traveledDistanceOrBattery,
-				  uint16_t meanPropulsiveVelocity,
-				  uint16_t peakVelocity);
+void sendToProtocolMessagesTXRequestQueue(protocolMessagesTXRequest_Codes
+					  protocolMessageTXRequest_Code,
+					  uint16_t traveledDistanceOrBattery,
+					  uint16_t meanPropulsiveVelocity,
+					  uint16_t peakVelocity);
 void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes
 					     humanInterfaceDisplayRequest_Code,
 					     uint32_t displayValue);
@@ -288,14 +295,14 @@ void humanInterfaceDisplayRequestTask(void *args);
 //*******************************************************************
 
 //Imp dependent Stack sizes for tasks------------
-#define MESSAGETXRXTASK_SIZE                  400
+#define PROTOCOLMESSAGETXRXTASK_SIZE                  800
 
 //Imp dependent handles--------------------------
-extern QueueSetHandle_t messagesTXRXQueueSet;
-extern SemaphoreHandle_t messagesRXSemaphore;
+extern QueueSetHandle_t protocolMessagesTXRXQueueSet;
+extern SemaphoreHandle_t protocolMessagesRXSemaphore;
 
 //Imp dependent proceses-------------------------
-void messagesTXRXTask(void *args);
+void protocolMessagesTXRXTask(void *args);
 
 //Imp dependent interrupt handlers---------------
 void tim1_cc_isr(void);
@@ -306,7 +313,8 @@ void exti15_10_isr(void);
 //---------------------------CUSTOM----------------------------------
 //*******************************************************************
 #define SEMAPHORE_SIZE                 1
-#define COMMUNICATION_QUEUE_SET_SIZE  HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE \
+#define PROTOCOL_MESSAGESTXRX_QUEUE_SET_SIZE \
+HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE\
   + SEMAPHORE_SIZE
 
 #define UART_RX_BUFFER_SIZE 500
@@ -354,6 +362,7 @@ void usart1_isr(void);
 #define KIN1_EnableCycleCounter()		\
   KIN1_DWT_CONTROL |= KIN1_DWT_CYCCNTENA_BIT
 /*!< Enable cycle counter */
+
  
 #define KIN1_DisableCycleCounter()		\
   KIN1_DWT_CONTROL &= ~KIN1_DWT_CYCCNTENA_BIT
