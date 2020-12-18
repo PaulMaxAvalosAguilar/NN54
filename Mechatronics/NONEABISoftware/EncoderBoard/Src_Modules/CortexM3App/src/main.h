@@ -112,10 +112,10 @@ MCU_ANGLE_SerialProtocolImplementation
 #define BATTERY_FREE_TASK_DELAY_MS 2000
 
 //To implement stask sizes for tasks
-#define ENCODERTASK_SIZE                       100
-#define BATTERYFREETASK_SIZE                   50
-#define BATTERYWAITTASK_SIZE                   50
-#define HUMANINTERFACEDISPLAYREQUESTTASK_SIZE  100
+#define ENCODERTASK_SIZE                       200
+#define BATTERYFREETASK_SIZE                   100
+#define BATTERYWAITTASK_SIZE                   100
+#define HUMANINTERFACEDISPLAYREQUESTTASK_SIZE  200
 
 //To implement TX/RX protocol delimiters----------------------
 #define PROTOCOL_INITIATOR 0b01111100 // '|'
@@ -132,7 +132,7 @@ MCU_ANGLE_SerialProtocolImplementation
 #define HUMANINTERFACEDISPLAYREQUESTTASK_PRIORITY   2
 
 //Protocol communication message codes-----------
-typedef enum Protocol_Message_Codes_t{
+typedef enum Protocol_Messages_Codes_t{
   forEncoderDevicePCMCode_encoderStart = 1,
   //Command the encoder to start measuring repetitions
   //minDistToTravel desiredCountDir desiredRepDir
@@ -158,7 +158,7 @@ typedef enum Protocol_Message_Codes_t{
   forEncoderControllerPCMCode_encoderChargingStatus = 68
   //Report the encoder chargingStatus
   //isCharging(Y/N)
-}Protocol_Message_Codes_t;
+}Protocol_Messages_Codes_t;
 
 //Queue handles----------------------------------
 extern QueueHandle_t humanInterfaceDisplayRequestQueue;
@@ -243,14 +243,14 @@ extern volatile uint32_t capturedTime;
 extern volatile uint32_t overflowCounter;
 
 //Helper functions--------------------------------
+void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes
+					     humanInterfaceDisplayRequest_Code,
+					     uint32_t displayValue);
 void sendToProtocolMessagesTXRequestQueue(protocolMessagesTXRequest_Codes
 					  protocolMessageTXRequest_Code,
 					  uint16_t traveledDistanceOrBattery,
 					  uint16_t meanPropulsiveVelocity,
 					  uint16_t peakVelocity);
-void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes
-					     humanInterfaceDisplayRequest_Code,
-					     uint32_t displayValue);
 void createTask(TaskFunction_t pvTaskCode,
 		const char *const pcName,
 		configSTACK_DEPTH_TYPE usStackDepth,
@@ -295,7 +295,7 @@ void humanInterfaceDisplayRequestTask(void *args);
 //*******************************************************************
 
 //Imp dependent Stack sizes for tasks------------
-#define PROTOCOLMESSAGETXRXTASK_SIZE                  800
+#define PROTOCOLMESSAGETXRXTASK_SIZE                  400
 
 //Imp dependent handles--------------------------
 extern QueueSetHandle_t protocolMessagesTXRXQueueSet;

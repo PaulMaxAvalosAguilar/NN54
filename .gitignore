@@ -128,4 +128,5 @@ CMakeLists.txt.user*
 #Personalized
 #write everything beginning with a / from root directory
 
+!/Mechatronics/NONEABISoftware/EncoderBoard/Libraries/**/*.a
 /Mechatronics/Mechanical_Calculations/Release/

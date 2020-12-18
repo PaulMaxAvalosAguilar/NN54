@@ -53,6 +53,16 @@ volatile uint32_t capturedTime = 0;
 volatile uint32_t overflowCounter=0 ;
 
 //Helper functions--------------------------------
+void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes
+					     humanInterfaceDisplayRequest_Code,
+					     uint32_t firstParameter){
+  humanInterfaceDisplayRequest_Message dataToSend;
+  dataToSend.humanInterfaceDisplayRequest_Code = humanInterfaceDisplayRequest_Code;
+  dataToSend.firstParameter = firstParameter;
+
+  xQueueSendToBack(humanInterfaceDisplayRequestQueue,&dataToSend,0);
+}
+
 void sendToProtocolMessagesTXRequestQueue(protocolMessagesTXRequest_Codes
 					  protocolMessageTXRequest_Code,
 					  uint16_t firstParameter,
@@ -65,16 +75,6 @@ void sendToProtocolMessagesTXRequestQueue(protocolMessagesTXRequest_Codes
   dataToSend.thirdParameter = thirdParameter;
   xQueueSendToBack(protocolMessagesTXRequestQueue,&dataToSend,0);
 
-}
-
-void sendToHumanInterfaceDisplayRequestQueue(humanInterfaceDisplayRequest_Codes
-					     humanInterfaceDisplayRequest_Code,
-					     uint32_t firstParameter){
-  humanInterfaceDisplayRequest_Message dataToSend;
-  dataToSend.humanInterfaceDisplayRequest_Code = humanInterfaceDisplayRequest_Code;
-  dataToSend.firstParameter = firstParameter;
-
-  xQueueSendToBack(humanInterfaceDisplayRequestQueue,&dataToSend,0);
 }
 
 void createTask(TaskFunction_t pvTaskCode,
@@ -543,15 +543,21 @@ void exti15_10_isr(){
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   uint32_t chargingStatus = 0;
   humanInterfaceDisplayRequest_Message hIDRPdataToSend;
+  protocolMessagesTXRequest_Message pMTRdataToSend;
 
   hIDRPdataToSend.humanInterfaceDisplayRequest_Code =
     humanInterfaceDisplayRequestCode_chargingStatus;
+  pMTRdataToSend.protocolMessageTXRequest_Code =
+    protocolMessagesTXRequestCode_chargingStatus;
 
   chargingStatus = isEncoderCharging();  
   hIDRPdataToSend.firstParameter = chargingStatus;
+  pMTRdataToSend.firstParameter = chargingStatus;
 
   xQueueSendToBackFromISR(humanInterfaceDisplayRequestQueue,
 			  &hIDRPdataToSend,&xHigherPriorityTaskWoken);
+  xQueueSendToBackFromISR(protocolMessagesTXRequestQueue,
+			  &pMTRdataToSend,&xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
 }

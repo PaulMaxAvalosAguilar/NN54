@@ -25,7 +25,7 @@ ConnectionHandling::ConnectionHandling(QObject *parent):
     seffect(new QSoundEffect)
 
 {
-//    connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
+    connect(timer.get(), &QTimer::timeout, this, &ConnectionHandling::sendADC);
     seffect->setSource(QUrl(QStringLiteral("qrc:/SoundEffects/fatigue-alert.wav")));
     seffect->setVolume(1);
 }
@@ -423,8 +423,16 @@ void ConnectionHandling::updateEncoderValue(const QLowEnergyCharacteristic &c, c
 
         }else if(messageType == 67){//Central code for Encoder Stop
 
-        }else if(messageType == 68){
+        }else if(messageType == 68){//Central code for encoder Charging status
 
+            for(auto iterator = hexValue.begin() + 4; iterator < hexValue.begin() + 8;
+                iterator++){
+                parsedString.append(*iterator);
+            }
+            convertedNumber = parsedString.toUInt(nullptr,16);
+            convertedNumber = decodeTwoBytes(convertedNumber>>8,static_cast<uint8_t>(convertedNumber));
+            parsedString.clear();
+            qDebug()<<"Charging status: " <<convertedNumber;
         }
     }
 }
