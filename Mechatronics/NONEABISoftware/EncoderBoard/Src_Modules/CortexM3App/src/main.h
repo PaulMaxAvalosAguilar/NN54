@@ -109,7 +109,7 @@ MCU_ANGLE_SerialProtocolImplementation
 
 //To implement TIMING ----------------------------------------
 #define ENCODER_TASK_DELAY_MS      50
-#define BATTERY_FREE_TASK_DELAY_MS 2000
+#define BATTERY_FREE_TASK_DELAY_MS 20000
 
 //To implement stask sizes for tasks
 #define ENCODERTASK_SIZE                       200
@@ -320,6 +320,9 @@ HUMAN_INTERFACE_DISPLAY_REQUEST_QUEUE_SIZE\
 #define UART_RX_BUFFER_SIZE 500
 #define PARSE_BUFFER_SIZE   70
 
+#define portNVIC_SYSTICK_CTRL_REG			( * ( ( volatile uint32_t * ) 0xe000e010 ) )
+#define portNVIC_SYSTICK_ENABLE_BIT			( 1UL << 0UL )
+
 //Custom Buffers---------------------------------
 extern char receiveBuffer[UART_RX_BUFFER_SIZE];
 extern char parseBuffer[PARSE_BUFFER_SIZE];
@@ -329,13 +332,14 @@ extern uint32_t receiveBufferPos;
 
 //Custom helper functions------------------------
 void printStringUART(const char myString[]);
-
 void cleanAdvanceBuffer(char *buffer, uint32_t *bufferPosition, uint32_t bufferLength);
 void getLine(void);
+void vPortSupressTicksAndSleep(TickType_t xExpectedIdleTime);
 
 //Custom interrupt handlers----------------------
 void tim1_up_isr(void);
 void usart1_isr(void);
+void tim3_isr(void);
 //*******************************************************************
 
 

@@ -610,6 +610,77 @@ void  __attribute__((optimize("O0"))) getLine(){
   cleanAdvanceBuffer(receiveBuffer, &receiveBufferPos, UART_RX_BUFFER_SIZE);
 }
 
+void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime){
+
+  //Formula used to determine ARR value:
+  // #ticksMissing * (1 second/#Ticks) * (1 timer_counter_Unit/time_in_seconds)
+
+  //Formula used to determine elapsed ticks
+  // timCounter * (time_in_seconds/1 time_counter_Unit) * (#ticks/1second)
+
+  eSleepModeStatus eSleepStatus;
+
+  portNVIC_SYSTICK_CTRL_REG &= ~portNVIC_SYSTICK_ENABLE_BIT;  //Stop the SysTick
+  //Disable interrupts
+  __asm volatile( "cpsid i" ::: "memory" );
+  __asm volatile( "dsb" );
+  __asm volatile( "isb" );
+
+  eSleepStatus = eTaskConfirmSleepModeStatus();
+
+  if( eSleepStatus == eAbortSleep ){
+
+    portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;//Restart systick
+    __asm volatile( "cpsie i" ::: "memory" );//reenable interrupts
+    
+  }else{
+
+    rcc_periph_clock_enable(RCC_TIM3);//Enable TIM3 clock
+    lcdPutsBlinkFree("S",4);    
+      
+    if(eSleepStatus == eNoTasksWaitingTimeout){
+      
+      TIM3_ARR = 65535;
+      TIM3_CR1 |= TIM_CR1_CEN;
+      
+      //Wait for interrupt
+      __asm volatile( "dsb" ::: "memory" );
+      __asm volatile( "wfi" );
+      __asm volatile( "isb" );
+    }else{
+
+      TIM3_ARR = (xExpectedIdleTime * (10000 / configTICK_RATE_HZ) )/ 9;
+      TIM3_CR1 |= TIM_CR1_CEN;
+      
+      //Wait for interrupt
+      __asm volatile( "dsb" ::: "memory" );
+      __asm volatile( "wfi" );
+      __asm volatile( "isb" );
+    }
+
+    TIM3_CR1 &= ~TIM_CR1_CEN;
+
+
+    ((TIM3_SR & TIM_SR_UIF) && (TIM3_CNT == 0))?
+      vTaskStepTick(xExpectedIdleTime):
+      vTaskStepTick((TIM3_CNT * 9 * configTICK_RATE_HZ)/10000);
+
+    TIM3_CNT = 0;
+
+    lcdPutsBlinkFree("",4);    
+
+    //Reenable interrupts
+    __asm volatile( "cpsie i" ::: "memory" );
+    __asm volatile( "dsb" );
+    __asm volatile( "isb" );
+
+    rcc_periph_clock_disable(RCC_TIM3);//Enable TIM3 clock
+    portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;//Restart systick
+
+
+  }  
+}
+
 //Custom interrupt handlers----------------------
 
 void tim1_up_isr(){
@@ -627,6 +698,13 @@ void usart1_isr(void){
     xSemaphoreGiveFromISR(protocolMessagesRXSemaphore,&xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     
+  }
+}
+
+void tim3_isr(void){
+  if (timer_get_flag(TIM3, TIM_SR_UIF)) {
+    /* Clear compare interrupt flag. */
+    timer_clear_flag(TIM3, TIM_SR_UIF);
   }
 }
 
@@ -803,12 +881,14 @@ int main(void)
   rcc_periph_clock_disable(RCC_TIM2);    
 
   //---------------------CONFIGURE TIM3-------------------------
-  rcc_periph_clock_enable(RCC_TIM3);
+  rcc_periph_clock_enable(RCC_TIM3);//Enable TIM3 clock
 
   TIM3_CR1 |= TIM_CR1_OPM;//One pulse mode
   timer_enable_irq(TIM3, TIM_DIER_UIE);//Enable update interrupt
   TIM3_PSC = 65535;
-  TIM_CNT(TIM3) = 0;
+  TIM3_CNT = 0;
+
+  rcc_periph_clock_disable(RCC_TIM3);//Disable TIM3 clock
   
   //---------------------CONFIGURE EXTI-------------------------
   exti_select_source(EXTI12, GPIOB);
@@ -866,11 +946,11 @@ int main(void)
   nvic_set_priority(NVIC_USART1_IRQ,(1 << 4));
   nvic_set_priority(NVIC_EXTI15_10_IRQ, (2 << 4));
 
-  nvic_enable_irq(NVIC_USART1_IRQ);
-  nvic_enable_irq(NVIC_EXTI15_10_IRQ);
   nvic_enable_irq(NVIC_TIM1_CC_IRQ);
   nvic_enable_irq(NVIC_TIM1_UP_IRQ);
-
+  nvic_enable_irq(NVIC_TIM3_IRQ);
+  nvic_enable_irq(NVIC_EXTI15_10_IRQ);
+  nvic_enable_irq(NVIC_USART1_IRQ);
 
   //---------------------START RTOS-------------------------------
   vTaskStartScheduler();

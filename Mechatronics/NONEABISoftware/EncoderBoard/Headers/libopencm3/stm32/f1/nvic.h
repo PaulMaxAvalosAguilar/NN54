@@ -122,7 +122,7 @@ void tim1_brk_isr(void);
 void tim1_trg_com_isr(void);
 //void tim1_cc_isr(void);
 void tim2_isr(void);
-void tim3_isr(void);
+//void tim3_isr(void);
 void tim4_isr(void);
 void i2c1_ev_isr(void);
 void i2c1_er_isr(void);

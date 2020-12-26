@@ -54,7 +54,7 @@
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
-#define configUSE_TICKLESS_IDLE         0
+#define configUSE_TICKLESS_IDLE         1
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP  (1000 * configTICK_RATE_HZ)/1000
 #define configUSE_IDLE_HOOK		0
 #define configUSE_TICK_HOOK		0
@@ -111,7 +111,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 	
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
-#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }	
-	
+#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+
 #endif /* FREERTOS_CONFIG_H */
 

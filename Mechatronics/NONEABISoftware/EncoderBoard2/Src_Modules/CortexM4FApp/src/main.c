@@ -726,7 +726,7 @@ int main(void)
   TIM3->EGR = TIM_EGR_UG;//Generate update
   TIM3->CNT = 0;
 
-  RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM3EN;//Enable TIM3 clock
+  RCC->APB1ENR1 &= ~RCC_APB1ENR1_TIM3EN;//Disable TIM3 clock
   
   //---------------------CONFIGURE EXTI-------------------------
   RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;//Enable SYSCFG clock
