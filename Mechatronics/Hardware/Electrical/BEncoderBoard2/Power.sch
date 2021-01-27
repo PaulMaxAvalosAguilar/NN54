@@ -289,7 +289,6 @@ Wire Wire Line
 	4550 3900 4550 3700
 Wire Wire Line
 	4550 3700 4600 3700
-NoConn ~ 5300 4300
 Wire Wire Line
 	6000 3500 6000 2750
 Connection ~ 6000 2750
@@ -820,5 +819,16 @@ F 11 "E-Switch" H 8100 4800 60  0001 L CNN "Manufacturer"
 F 12 "Active" H 8100 4900 60  0001 L CNN "Status"
 	1    7900 3700
 	-1   0    0    1   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5FF02BF1
+P 5300 4300
+F 0 "#PWR?" H 5300 4050 50  0001 C CNN
+F 1 "GND" H 5300 4150 50  0000 C CNN
+F 2 "" H 5300 4300 50  0001 C CNN
+F 3 "" H 5300 4300 50  0001 C CNN
+	1    5300 4300
+	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
