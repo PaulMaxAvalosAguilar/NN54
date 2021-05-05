@@ -1,4 +1,4 @@
-18673498799091491
+18691282734931353
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -50624,6 +50624,13 @@ One digit LED 7 segment SA39-11 SC39-11 SA39-12 SC39-12
 10
 10
 Encoder
+Antenna
+
+
+0
+2
+1
+Encoder
 BarrelJack_Horizontal
 DC Barrel Jack
 Power Jack
@@ -50651,6 +50658,13 @@ Bluetooth_Module_RN4871
 0
 16
 16
+Encoder
+C_0402_1005Metric
+Capacitor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
+capacitor
+0
+2
+2
 Encoder
 C_0603_1608Metric_Pad1.05x0.95mm_HandSolder
 Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
@@ -50694,6 +50708,41 @@ SOD-323
 2
 2
 Encoder
+HRO_TYPE-C-31-M-12
+
+
+0
+16
+16
+Encoder
+JST_EH_B2B-EH-A_1x02_P2.50mm_Vertical
+JST EH series connector, B2B-EH-A (http://www.jst-mfg.com/product/pdf/eng/eEH.pdf), generated with kicad-footprint-generator
+connector JST EH vertical
+0
+2
+2
+Encoder
+JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical
+JST EH series connector, B4B-EH-A (http://www.jst-mfg.com/product/pdf/eng/eEH.pdf), generated with kicad-footprint-generator
+connector JST EH vertical
+0
+4
+4
+Encoder
+JST_EH_B6B-EH-A_1x06_P2.50mm_Vertical
+JST EH series connector, B6B-EH-A (http://www.jst-mfg.com/product/pdf/eng/eEH.pdf), generated with kicad-footprint-generator
+connector JST EH vertical
+0
+6
+6
+Encoder
+JST_EH_B8B-EH-A_1x08_P2.50mm_Vertical
+JST EH series connector, B8B-EH-A (http://www.jst-mfg.com/product/pdf/eng/eEH.pdf), generated with kicad-footprint-generator
+connector JST EH vertical
+0
+8
+8
+Encoder
 LQFP-48_7x7mm_P0.5mm
 
 
@@ -50707,6 +50756,20 @@ LSM6DSRX
 0
 14
 14
+Encoder
+L_0402_1005Metric
+Inductor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
+inductor
+0
+2
+2
+Encoder
+MountingHole_3.2mm_M3_Pad
+Mounting Hole 3.2mm, M3
+mounting hole 3.2mm m3
+0
+1
+1
 Encoder
 OptointerrupterConnector
 
@@ -50771,6 +50834,13 @@ Through hole pin header THT 1x02 2.54mm single row
 4
 4
 Encoder
+RN4871U
+RN4871U
+Integrated Circuit
+0
+18
+18
+Encoder
 R_0603_1608Metric_Pad1.05x0.95mm_HandSolder
 Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator
 resistor handsolder
@@ -50798,6 +50868,13 @@ MesurementPoint Square SMDPad 5mmx10mm
 0
 6
 6
+Encoder
+SolderWirePad_1x04_SMD_5x10mm_copy
+Wire Pad, Square, SMD Pad,  5mm x 10mm,
+MesurementPoint Square SMDPad 5mmx10mm 
+0
+4
+4
 Encoder
 Sop(8)
 8ESOP

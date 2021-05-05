@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="150"
+   height="30"
+   viewBox="0 0 150 30"
+   version="1.1"
+   id="svg4632"
+   sodipodi:docname="AnyConv.com__Inverted_F_Antenna.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)">
+  <metadata
+     id="metadata4638">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Produce by Acme CAD Converter</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4636" />
+  <sodipodi:namedview
+     inkscape:document-rotation="0"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     id="namedview4634"
+     showgrid="false"
+     units="px"
+     inkscape:zoom="4"
+     inkscape:cx="46.517238"
+     inkscape:cy="0.67384724"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4632"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-nodes="false"
+     inkscape:snap-others="false" />
+  <title
+     id="title4320">Produce by Acme CAD Converter</title>
+  <desc
+     id="desc4322">Produce by Acme CAD Converter</desc>
+  <g
+     id="g9263"
+     transform="scale(0.0096)">
+    <g
+       id="g9132"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    <g
+       id="g9134"
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:-0.000393701;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    <g
+       id="g9136"
+       style="fill:#840000;fill-opacity:0;stroke:#840000;stroke-width:-0.000393701;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    <g
+       id="g9138"
+       style="fill:#840000;fill-opacity:0;stroke:#840000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    <g
+       id="g9206"
+       style="fill:#840000;fill-opacity:1;stroke:#840000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1">
+      <path
+         id="path9140"
+         d="M 10040,438 H 3576 v 787 h 394 v 394 H 2789 v -394 h 393 V 831 H 820 v 1129 h 3150 v 840 h -394 v -394 h -394 v 394 H 2730 V 2390 L 250,2380 H 40 V 40 h 10000 z"
+         style="fill:#840000;fill-opacity:1;fill-rule:evenodd;stroke:#840000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+      <g
+         id="g9142" />
+      <g
+         id="g9144" />
+      <g
+         id="g9146"
+         style="fill:#840000;fill-opacity:1;stroke:#840000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+      <g
+         id="g9148"
+         style="fill:#840000;fill-opacity:1;stroke:#840000;stroke-width:180;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+      <g
+         id="g9154"
+         style="fill:#840000;fill-opacity:0;stroke:#840000;stroke-width:180;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1">
+        <path
+           id="path9150"
+           d="M 4280,2850 V 1857" />
+        <path
+           id="path9152"
+           d="M 4280,1857 3944,1521" />
+      </g>
+      <g
+         id="g9202"
+         style="fill:#840000;fill-opacity:0;stroke:#840000;stroke-width:80;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1">
+        <path
+           id="path9156"
+           d="M 3970,2800 H 3576" />
+        <path
+           id="path9158"
+           d="M 3576,2800 V 2406" />
+        <path
+           id="path9160"
+           d="M 3576,2406 H 3182" />
+        <path
+           id="path9162"
+           d="m 3182,2406 v 394" />
+        <path
+           id="path9164"
+           d="M 3182,2800 H 2730" />
+        <path
+           id="path9166"
+           d="M 2730,2800 V 2390" />
+        <path
+           id="path9168"
+           d="M 2730,2390 250,2380" />
+        <path
+           id="path9170"
+           d="M 250,2380 H 40" />
+        <path
+           id="path9172"
+           d="M 40,2380 V 40" />
+        <path
+           id="path9174"
+           d="M 40,40 H 10040" />
+        <path
+           id="path9176"
+           d="M 10040,40 V 438" />
+        <path
+           id="path9178"
+           d="M 10040,438 H 3576" />
+        <path
+           id="path9180"
+           d="m 3576,438 v 787" />
+        <path
+           id="path9182"
+           d="m 3576,1225 h 394" />
+        <path
+           id="path9184"
+           d="m 3970,1225 v 394" />
+        <path
+           id="path9186"
+           d="M 3970,1619 H 2789" />
+        <path
+           id="path9188"
+           d="M 2789,1619 V 1225" />
+        <path
+           id="path9190"
+           d="m 2789,1225 h 393" />
+        <path
+           id="path9192"
+           d="M 3182,1225 V 831" />
+        <path
+           id="path9194"
+           d="M 3182,831 H 820" />
+        <path
+           id="path9196"
+           d="M 820,831 V 1960" />
+        <path
+           id="path9198"
+           d="M 820,1960 H 3970" />
+        <path
+           id="path9200"
+           d="m 3970,1960 v 840" />
+      </g>
+      <g
+         id="g9204" />
+    </g>
+    <g
+       id="g9208"
+       style="fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:80;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    <g
+       id="g9212"
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:80;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1">
+      <g
+         id="g9210" />
+    </g>
+  </g>
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.777085;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     id="rect8555"
+     width="95.990913"
+     height="3.8117273"
+     x="0.3885425"
+     y="0.3885425" />
+</svg>
