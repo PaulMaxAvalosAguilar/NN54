@@ -192,6 +192,7 @@ void BleScannerModel::addDevice(const QBluetoothDeviceInfo &info)
 {
     if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
         DeviceInfo d(info);
+
         if(d.getName() == "VBT"){
 
 
@@ -203,7 +204,8 @@ void BleScannerModel::addDevice(const QBluetoothDeviceInfo &info)
 
             qDebug()<< "Added device "<<d.getAddress();
             append(d);
-        }        
+
+        }
     }
 }
 
