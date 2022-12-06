@@ -62,10 +62,10 @@ Wire Wire Line
 Wire Wire Line
 	2100 4550 1750 4550
 $Comp
-L Device:R R3
+L Device:R R4
 U 1 1 5C28C76B
 P 2250 3400
-F 0 "R3" H 2320 3446 50  0000 L CNN
+F 0 "R4" H 2320 3446 50  0000 L CNN
 F 1 "1.2K" H 2320 3355 50  0000 L CNN
 F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 2180 3400 50  0001 C CNN
 F 3 "~" H 2250 3400 50  0001 C CNN
@@ -126,10 +126,10 @@ Connection ~ 900  3450
 Wire Wire Line
 	900  3450 900  3150
 $Comp
-L Device:C C6
+L Device:C C7
 U 1 1 5EFE06DB
 P 4550 2700
-F 0 "C6" H 4665 2746 50  0000 L CNN
+F 0 "C7" H 4665 2746 50  0000 L CNN
 F 1 "4.7uF" H 4665 2655 50  0000 L CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 4588 2550 50  0001 C CNN
 F 3 "~" H 4550 2700 50  0001 C CNN
@@ -150,10 +150,10 @@ $EndComp
 Text Label 4550 2300 3    50   ~ 0
 Supply
 $Comp
-L Device:C C4
+L Device:C C8
 U 1 1 5EFA1FD1
 P 5100 4050
-F 0 "C4" V 5050 3900 50  0000 C CNN
+F 0 "C8" V 5050 3900 50  0000 C CNN
 F 1 "100nF" V 5050 3700 50  0000 C CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 5138 3900 50  0001 C CNN
 F 3 "~" H 5100 4050 50  0001 C CNN
@@ -178,10 +178,10 @@ Wire Wire Line
 Wire Wire Line
 	4000 3900 3850 3900
 $Comp
-L Device:C C1
+L Device:C C3
 U 1 1 5EFB0E20
 P 4150 3600
-F 0 "C1" V 4350 3600 50  0000 C CNN
+F 0 "C3" V 4350 3600 50  0000 C CNN
 F 1 "12pF" V 4450 3600 50  0000 C CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 4188 3450 50  0001 C CNN
 F 3 "~" H 4150 3600 50  0001 C CNN
@@ -189,10 +189,10 @@ F 3 "~" H 4150 3600 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Device:C C3
+L Device:C C5
 U 1 1 5EFB0E1A
 P 4150 3900
-F 0 "C3" V 3898 3900 50  0000 C CNN
+F 0 "C5" V 3898 3900 50  0000 C CNN
 F 1 "12pF" V 3989 3900 50  0000 C CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 4188 3750 50  0001 C CNN
 F 3 "~" H 4150 3900 50  0001 C CNN
@@ -235,11 +235,11 @@ F 3 "" H 5850 2400 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Device:R R5
+L Device:R R7
 U 1 1 5F070E68
 P 5850 2550
-F 0 "R5" V 5850 2500 50  0000 L CNN
-F 1 "10K" V 5920 2505 50  0000 L CNN
+F 0 "R7" V 5950 2500 50  0000 L CNN
+F 1 "10K" V 6050 2500 50  0000 L CNN
 F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 5780 2550 50  0001 C CNN
 F 3 "~" H 5850 2550 50  0001 C CNN
 	1    5850 2550
@@ -315,10 +315,10 @@ Batt+
 Text GLabel 7950 4050 2    50   Input ~ 0
 VCC
 $Comp
-L Device:R R9
+L Device:R R8
 U 1 1 5F0F6150
 P 6450 6200
-F 0 "R9" H 6520 6246 50  0000 L CNN
+F 0 "R8" H 6520 6246 50  0000 L CNN
 F 1 "10K" H 6520 6155 50  0000 L CNN
 F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6380 6200 50  0001 C CNN
 F 3 "~" H 6450 6200 50  0001 C CNN
@@ -326,10 +326,10 @@ F 3 "~" H 6450 6200 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:R R8
+L Device:R R9
 U 1 1 5F0F6BEE
 P 6150 6200
-F 0 "R8" H 6220 6246 50  0000 L CNN
+F 0 "R9" H 6220 6246 50  0000 L CNN
 F 1 "10K" H 6220 6155 50  0000 L CNN
 F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6080 6200 50  0001 C CNN
 F 3 "~" H 6150 6200 50  0001 C CNN
@@ -434,10 +434,10 @@ Wire Wire Line
 Wire Wire Line
 	7200 4500 7850 4500
 $Comp
-L Device:C C5
+L Device:C C6
 U 1 1 6001D7FF
 P 7450 4950
-F 0 "C5" H 7565 4996 50  0000 L CNN
+F 0 "C6" H 7565 4996 50  0000 L CNN
 F 1 "100nF" H 7565 4905 50  0000 L CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 7488 4800 50  0001 C CNN
 F 3 "~" H 7450 4950 50  0001 C CNN
@@ -486,10 +486,10 @@ SWDIO
 Text Label 7600 3600 2    50   ~ 0
 SWCLK
 $Comp
-L Device:C C7
+L Device:C C9
 U 1 1 600372BF
 P 6600 5650
-F 0 "C7" H 6450 5750 50  0000 L CNN
+F 0 "C9" H 6450 5750 50  0000 L CNN
 F 1 "10nF" H 6400 5550 50  0000 L CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 6638 5500 50  0001 C CNN
 F 3 "~" H 6600 5650 50  0001 C CNN
@@ -530,10 +530,10 @@ F 3 "" H 6900 5800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C8
+L Device:C C10
 U 1 1 600372DA
 P 6900 5650
-F 0 "C8" H 6700 5700 50  0000 L CNN
+F 0 "C10" H 6700 5750 50  0000 L CNN
 F 1 "1uF" H 6700 5550 50  0000 L CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 6938 5500 50  0001 C CNN
 F 3 "~" H 6900 5650 50  0001 C CNN
@@ -569,10 +569,10 @@ F 3 "" H 4850 3300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C2
+L Device:C C4
 U 1 1 6004F22F
 P 5000 3300
-F 0 "C2" V 4748 3300 50  0000 C CNN
+F 0 "C4" V 4748 3300 50  0000 C CNN
 F 1 "100nF" V 4839 3300 50  0000 C CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 5038 3150 50  0001 C CNN
 F 3 "~" H 5000 3300 50  0001 C CNN
@@ -787,21 +787,21 @@ Text Label 950  3450 0    50   ~ 0
 E+(b)
 Text Label 1150 3650 2    50   ~ 0
 E-(b)
-Text Label 3250 3600 0    50   ~ 0
+Text Label 3200 3500 0    50   ~ 0
 E+(a)
-Text Label 3250 3700 0    50   ~ 0
+Text Label 3200 3400 0    50   ~ 0
 E-(a)
-Text Label 3250 3900 0    50   ~ 0
+Text Label 3200 3200 0    50   ~ 0
 D+(a)
-Text Label 3250 3800 0    50   ~ 0
+Text Label 3200 3300 0    50   ~ 0
 D-(a)
-Text Label 3250 3500 0    50   ~ 0
+Text Label 3200 3600 0    50   ~ 0
 D+(b)
-Text Label 3250 3400 0    50   ~ 0
+Text Label 3200 3700 0    50   ~ 0
 D-(b)
-Text Label 3250 3200 0    50   ~ 0
+Text Label 3200 3900 0    50   ~ 0
 E+(b)
-Text Label 3250 3300 0    50   ~ 0
+Text Label 3200 3800 0    50   ~ 0
 E-(b)
 NoConn ~ 5250 4350
 NoConn ~ 5250 4200
@@ -862,10 +862,10 @@ F 3 "~" H 2250 4600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:R R4
+L Device:R R6
 U 1 1 5C285A10
 P 1050 3900
-F 0 "R4" H 1120 3946 50  0000 L CNN
+F 0 "R6" H 1120 3946 50  0000 L CNN
 F 1 "560" H 1120 3855 50  0000 L CNN
 F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 980 3900 50  0001 C CNN
 F 3 "~" H 1050 3900 50  0001 C CNN
@@ -890,10 +890,10 @@ F0 "Power" 50
 F1 "Power.sch" 50
 $EndSheet
 $Comp
-L Device:R R6
+L Device:R R3
 U 1 1 61E0DFAC
 P 6000 1800
-F 0 "R6" H 5930 1754 50  0000 R CNN
+F 0 "R3" H 5930 1754 50  0000 R CNN
 F 1 "R" H 5930 1845 50  0000 R CNN
 F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 5930 1800 50  0001 C CNN
 F 3 "~" H 6000 1800 50  0001 C CNN
@@ -901,10 +901,10 @@ F 3 "~" H 6000 1800 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Device:R R7
+L Device:R R5
 U 1 1 61E0E9A4
 P 6300 1800
-F 0 "R7" H 6250 1750 50  0000 R CNN
+F 0 "R5" H 6250 1750 50  0000 R CNN
 F 1 "R" H 6250 1850 50  0000 R CNN
 F 2 "Encoder:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6230 1800 50  0001 C CNN
 F 3 "~" H 6300 1800 50  0001 C CNN
@@ -912,10 +912,10 @@ F 3 "~" H 6300 1800 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Device:C C9
+L Device:C C1
 U 1 1 61E0EB93
 P 5850 1950
-F 0 "C9" V 6000 1950 50  0000 C CNN
+F 0 "C1" V 6000 1950 50  0000 C CNN
 F 1 "C" V 5850 1950 50  0000 C CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 5888 1800 50  0001 C CNN
 F 3 "~" H 5850 1950 50  0001 C CNN
@@ -923,10 +923,10 @@ F 3 "~" H 5850 1950 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C C10
+L Device:C C2
 U 1 1 61E0F967
 P 6450 1950
-F 0 "C10" V 6600 1950 50  0000 C CNN
+F 0 "C2" V 6600 1950 50  0000 C CNN
 F 1 "C" V 6450 1950 50  0000 C CNN
 F 2 "Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 6488 1800 50  0001 C CNN
 F 3 "~" H 6450 1950 50  0001 C CNN
@@ -974,4 +974,48 @@ Wire Wire Line
 	6300 1650 6300 1350
 Wire Wire Line
 	6300 1950 6300 2950
+$Comp
+L Mechanical:MountingHole_Pad H1
+U 1 1 61ED1F0E
+P 2000 1400
+F 0 "H1" H 2100 1449 50  0000 L CNN
+F 1 "MountingHole_Pad" H 2100 1358 50  0000 L CNN
+F 2 "Encoder:MountingHole_3.2mm_M3_Pad" H 2000 1400 50  0001 C CNN
+F 3 "~" H 2000 1400 50  0001 C CNN
+	1    2000 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole_Pad H2
+U 1 1 61ED244A
+P 2000 900
+F 0 "H2" H 2100 949 50  0000 L CNN
+F 1 "MountingHole_Pad" H 2100 858 50  0000 L CNN
+F 2 "Encoder:MountingHole_3.2mm_M3_Pad" H 2000 900 50  0001 C CNN
+F 3 "~" H 2000 900 50  0001 C CNN
+	1    2000 900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0123
+U 1 1 61ED3018
+P 2000 1000
+F 0 "#PWR0123" H 2000 750 50  0001 C CNN
+F 1 "GND" H 2005 827 50  0000 C CNN
+F 2 "" H 2000 1000 50  0001 C CNN
+F 3 "" H 2000 1000 50  0001 C CNN
+	1    2000 1000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0124
+U 1 1 61ED3933
+P 2000 1500
+F 0 "#PWR0124" H 2000 1250 50  0001 C CNN
+F 1 "GND" H 2005 1327 50  0000 C CNN
+F 2 "" H 2000 1500 50  0001 C CNN
+F 3 "" H 2000 1500 50  0001 C CNN
+	1    2000 1500
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

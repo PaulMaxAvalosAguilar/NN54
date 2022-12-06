@@ -1,0 +1,4 @@
+Reference, Quantity, Value, Footprint, Datasheet
+C12 C13 ,2,"100nF","Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder","~"
+J1 ,1,"Conn_01x06_Male","Encoder:SolderWirePad_1x06_SMD_5x10mm","~"
+U9 ,1,"LSM6DSRX","Encoder:LSM6DSRX",""

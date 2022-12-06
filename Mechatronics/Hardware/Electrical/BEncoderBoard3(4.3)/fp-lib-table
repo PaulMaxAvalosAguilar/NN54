@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name Encoder)(type KiCad)(uri ${KIPRJMOD}/../FootPrints/Encoder.pretty)(options "")(descr ""))
+)

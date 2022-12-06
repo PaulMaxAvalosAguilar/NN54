@@ -1,4 +1,4 @@
-18691282734931353
+18701360279568426
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -50764,12 +50764,26 @@ inductor
 2
 2
 Encoder
+Logo
+
+
+0
+0
+0
+Encoder
 MountingHole_3.2mm_M3_Pad
 Mounting Hole 3.2mm, M3
 mounting hole 3.2mm m3
 0
 1
 1
+Encoder
+Name
+
+
+0
+0
+0
 Encoder
 OptointerrupterConnector
 
@@ -50862,19 +50876,19 @@ SOT-23
 3
 3
 Encoder
-SolderWirePad_1x01_SMD_5x10mm
-Wire Pad, Square, SMD Pad,  5mm x 10mm,
-MesurementPoint Square SMDPad 5mmx10mm 
-0
-6
-6
-Encoder
 SolderWirePad_1x04_SMD_5x10mm_copy
 Wire Pad, Square, SMD Pad,  5mm x 10mm,
 MesurementPoint Square SMDPad 5mmx10mm 
 0
 4
 4
+Encoder
+SolderWirePad_1x06_SMD_5x10mm
+Wire Pad, Square, SMD Pad,  5mm x 10mm,
+MesurementPoint Square SMDPad 5mmx10mm 
+0
+6
+6
 Encoder
 Sop(8)
 8ESOP
@@ -50897,12 +50911,40 @@ http://spec_sheets.e-switch.com/specs/P040040.pdf
 3
 3
 Encoder
+TermicPad
+
+
+0
+2
+1
+Encoder
 itr8102
 
 
 0
 4
 4
+Encoder
+mouse-bite-1mm-slot
+
+
+0
+0
+0
+Encoder
+mouse-bite-2.54mm-slot
+
+
+0
+0
+0
+Encoder
+mouse-bite-2mm-slot
+
+
+0
+0
+0
 Ferrite_THT
 LairdTech_28C0236-0JW-10
 Ferrite, vertical, LairdTech 28C0236-0JW-10, https://assets.lairdtech.com/home/brandworld/files/28C0236-0JW-10.pdf, JW Miller core https://www.bourns.com/products/magnetic-products/j.w.-miller-through-hole-ferrite-beads-emi-filters

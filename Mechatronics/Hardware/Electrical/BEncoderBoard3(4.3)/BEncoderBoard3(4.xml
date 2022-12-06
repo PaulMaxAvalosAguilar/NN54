@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>D:\pauld\Programming\NN54\Mechatronics\Hardware\Electrical\BEncoderBoard3(4.3)\BEncoderBoard3(4.3).sch</source>
+    <date>9/2/2022 8:16:02 PM</date>
+    <tool>Eeschema (5.1.6)-1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>BEncoderBoard3(4.3).sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="U1">
+      <value>RSL10</value>
+      <libsource lib="Encoder" part="RSL10" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>6313C4FA</tstamp>
+    </comp>
+    <comp ref="AE1">
+      <value>Antenna</value>
+      <footprint>Encoder:Antenna</footprint>
+      <libsource lib="Encoder" part="Antenna" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>6055D6C9</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>Conn_01x04_Male</value>
+      <footprint>Encoder:SolderWirePad_1x04_SMD_5x10mm_copy</footprint>
+      <datasheet>~</datasheet>
+      <libsource lib="Connector" part="Conn_01x04_Male" description="Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>6053225A</tstamp>
+    </comp>
+    <comp ref="C18">
+      <value>4.7</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>631526B7</tstamp>
+    </comp>
+    <comp ref="C19">
+      <value>100nF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63152A9D</tstamp>
+    </comp>
+    <comp ref="C20">
+      <value>100pF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63152ECD</tstamp>
+    </comp>
+    <comp ref="C21">
+      <value>4.7</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>6315341A</tstamp>
+    </comp>
+    <comp ref="C22">
+      <value>2.2uF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63153BC6</tstamp>
+    </comp>
+    <comp ref="C23">
+      <value>1uF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63154299</tstamp>
+    </comp>
+    <comp ref="C24">
+      <value>1uF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>631582EE</tstamp>
+    </comp>
+    <comp ref="C25">
+      <value>1uF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>631607A3</tstamp>
+    </comp>
+    <comp ref="C26">
+      <value>1.5pF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63160CEB</tstamp>
+    </comp>
+    <comp ref="C27">
+      <value>1.5pF</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>631615AC</tstamp>
+    </comp>
+    <comp ref="Y3">
+      <value>XTAL</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="Crystal" description="Two pin crystal"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63161F14</tstamp>
+    </comp>
+    <comp ref="Y2">
+      <value>XTAL32</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="Crystal" description="Two pin crystal"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>631624B2</tstamp>
+    </comp>
+    <comp ref="L1">
+      <value>2.2uH</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="L_Small" description="Inductor, small symbol"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63163D41</tstamp>
+    </comp>
+    <comp ref="L3">
+      <value>3nH</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="L_Small" description="Inductor, small symbol"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>6316611B</tstamp>
+    </comp>
+    <comp ref="L2">
+      <value>1.8nH</value>
+      <datasheet>~</datasheet>
+      <libsource lib="Device" part="L_Small" description="Inductor, small symbol"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>63166858</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="Conn_01x04_Male">
+      <description>Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x04_Male</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+        <pin num="4" name="Pin_4" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="Crystal">
+      <description>Two pin crystal</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Crystal*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">Y</field>
+        <field name="Value">Crystal</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="L_Small">
+      <description>Inductor, small symbol</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Choke_*</fp>
+        <fp>*Coil*</fp>
+        <fp>Inductor_*</fp>
+        <fp>L_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">L</field>
+        <field name="Value">L_Small</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="Antenna">
+      <fields>
+        <field name="Reference">AE</field>
+        <field name="Value">Antenna</field>
+      </fields>
+      <pins>
+        <pin num="1" name="F" type="input"/>
+        <pin num="2" name="GND" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="Encoder" part="RSL10">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">RSL10</field>
+      </fields>
+      <pins>
+        <pin num="1" name="RFIO" type="input"/>
+        <pin num="2" name="VDDPA" type="input"/>
+        <pin num="3" name="VSSPA" type="input"/>
+        <pin num="4" name="AOUT" type="input"/>
+        <pin num="5" name="VDDA" type="input"/>
+        <pin num="6" name="CAP1" type="input"/>
+        <pin num="7" name="CAP0" type="input"/>
+        <pin num="8" name="VSSA" type="input"/>
+        <pin num="9" name="VBAT" type="input"/>
+        <pin num="10" name="VDC" type="input"/>
+        <pin num="11" name="RES" type="input"/>
+        <pin num="12" name="VCC" type="input"/>
+        <pin num="13" name="XTAL32_OUT" type="input"/>
+        <pin num="14" name="XTAL32_IN" type="input"/>
+        <pin num="15" name="Wakeup" type="input"/>
+        <pin num="16" name="NRESET" type="input"/>
+        <pin num="17" name="VPP" type="input"/>
+        <pin num="18" name="DIO[0]" type="input"/>
+        <pin num="19" name="VDDC" type="input"/>
+        <pin num="20" name="DIO[1]" type="input"/>
+        <pin num="21" name="VDDM" type="input"/>
+        <pin num="22" name="DIO[9]" type="input"/>
+        <pin num="23" name="DIO[2]" type="input"/>
+        <pin num="24" name="DIO[4]" type="input"/>
+        <pin num="25" name="DIO[3]" type="input"/>
+        <pin num="26" name="DIO[8]" type="input"/>
+        <pin num="27" name="DIO[5]" type="input"/>
+        <pin num="28" name="VSSD" type="input"/>
+        <pin num="29" name="DIO[6]" type="input"/>
+        <pin num="30" name="DIO[7]" type="input"/>
+        <pin num="31" name="EXTCLK" type="input"/>
+        <pin num="32" name="DIO[10]" type="input"/>
+        <pin num="33" name="JTCK" type="input"/>
+        <pin num="34" name="JTMS" type="input"/>
+        <pin num="35" name="VSSD" type="input"/>
+        <pin num="36" name="VDDO" type="input"/>
+        <pin num="37" name="DIO[12]" type="input"/>
+        <pin num="38" name="DIO[11]" type="input"/>
+        <pin num="39" name="DIO[13]" type="input"/>
+        <pin num="40" name="DIO[15]" type="input"/>
+        <pin num="41" name="DIO[14]" type="input"/>
+        <pin num="42" name="VSS(*)" type="input"/>
+        <pin num="43" name="XTAL48_N" type="input"/>
+        <pin num="44" name="XTAL48_P" type="input"/>
+        <pin num="45" name="VDDSYN_SW" type="input"/>
+        <pin num="46" name="VSSRF" type="input"/>
+        <pin num="47" name="VDDRF_SW" type="input"/>
+        <pin num="48" name="VDDRF" type="input"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>D:\Program_Files\KiCad\share\kicad\library/Connector.lib</uri>
+    </library>
+    <library logical="Device">
+      <uri>D:\Program_Files\KiCad\share\kicad\library/Device.lib</uri>
+    </library>
+    <library logical="Encoder">
+      <uri>D:\pauld\Programming\NN54\Mechatronics\Hardware\Electrical\BEncoderBoard3(4.3)/../Library/Encoder.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="GND">
+      <node ref="J1" pin="1"/>
+      <node ref="AE1" pin="2"/>
+    </net>
+    <net code="2" name="Net-(C21-Pad2)">
+      <node ref="C21" pin="2"/>
+    </net>
+    <net code="3" name="Net-(C21-Pad1)">
+      <node ref="C21" pin="1"/>
+    </net>
+    <net code="4" name="Net-(C20-Pad2)">
+      <node ref="C20" pin="2"/>
+    </net>
+    <net code="5" name="Net-(C20-Pad1)">
+      <node ref="C20" pin="1"/>
+    </net>
+    <net code="6" name="Net-(C19-Pad2)">
+      <node ref="C19" pin="2"/>
+    </net>
+    <net code="7" name="Net-(C19-Pad1)">
+      <node ref="C19" pin="1"/>
+    </net>
+    <net code="8" name="Net-(C18-Pad2)">
+      <node ref="C18" pin="2"/>
+    </net>
+    <net code="9" name="Net-(C18-Pad1)">
+      <node ref="C18" pin="1"/>
+    </net>
+    <net code="10" name="+3V3">
+      <node ref="J1" pin="4"/>
+    </net>
+    <net code="11" name="Net-(J1-Pad3)">
+      <node ref="J1" pin="3"/>
+    </net>
+    <net code="12" name="Net-(J1-Pad2)">
+      <node ref="J1" pin="2"/>
+    </net>
+    <net code="13" name="Net-(C22-Pad1)">
+      <node ref="C22" pin="1"/>
+    </net>
+    <net code="14" name="Net-(AE1-Pad1)">
+      <node ref="AE1" pin="1"/>
+    </net>
+    <net code="15" name="Net-(U1-Pad9)">
+      <node ref="U1" pin="9"/>
+    </net>
+    <net code="16" name="Net-(U1-Pad8)">
+      <node ref="U1" pin="8"/>
+    </net>
+    <net code="17" name="Net-(C27-Pad2)">
+      <node ref="C27" pin="2"/>
+    </net>
+    <net code="18" name="Net-(L2-Pad2)">
+      <node ref="L2" pin="2"/>
+    </net>
+    <net code="19" name="Net-(L2-Pad1)">
+      <node ref="L2" pin="1"/>
+    </net>
+    <net code="20" name="Net-(L3-Pad2)">
+      <node ref="L3" pin="2"/>
+    </net>
+    <net code="21" name="Net-(L3-Pad1)">
+      <node ref="L3" pin="1"/>
+    </net>
+    <net code="22" name="Net-(L1-Pad2)">
+      <node ref="L1" pin="2"/>
+    </net>
+    <net code="23" name="Net-(L1-Pad1)">
+      <node ref="L1" pin="1"/>
+    </net>
+    <net code="24" name="Net-(Y2-Pad2)">
+      <node ref="Y2" pin="2"/>
+    </net>
+    <net code="25" name="Net-(Y2-Pad1)">
+      <node ref="Y2" pin="1"/>
+    </net>
+    <net code="26" name="Net-(Y3-Pad2)">
+      <node ref="Y3" pin="2"/>
+    </net>
+    <net code="27" name="Net-(Y3-Pad1)">
+      <node ref="Y3" pin="1"/>
+    </net>
+    <net code="28" name="Net-(U1-Pad7)">
+      <node ref="U1" pin="7"/>
+    </net>
+    <net code="29" name="Net-(C27-Pad1)">
+      <node ref="C27" pin="1"/>
+    </net>
+    <net code="30" name="Net-(C26-Pad2)">
+      <node ref="C26" pin="2"/>
+    </net>
+    <net code="31" name="Net-(C26-Pad1)">
+      <node ref="C26" pin="1"/>
+    </net>
+    <net code="32" name="Net-(C25-Pad2)">
+      <node ref="C25" pin="2"/>
+    </net>
+    <net code="33" name="Net-(C25-Pad1)">
+      <node ref="C25" pin="1"/>
+    </net>
+    <net code="34" name="Net-(C24-Pad2)">
+      <node ref="C24" pin="2"/>
+    </net>
+    <net code="35" name="Net-(C24-Pad1)">
+      <node ref="C24" pin="1"/>
+    </net>
+    <net code="36" name="Net-(C23-Pad2)">
+      <node ref="C23" pin="2"/>
+    </net>
+    <net code="37" name="Net-(C23-Pad1)">
+      <node ref="C23" pin="1"/>
+    </net>
+    <net code="38" name="Net-(C22-Pad2)">
+      <node ref="C22" pin="2"/>
+    </net>
+    <net code="39" name="Net-(U1-Pad2)">
+      <node ref="U1" pin="2"/>
+    </net>
+    <net code="40" name="Net-(U1-Pad3)">
+      <node ref="U1" pin="3"/>
+    </net>
+    <net code="41" name="Net-(U1-Pad29)">
+      <node ref="U1" pin="29"/>
+    </net>
+    <net code="42" name="Net-(U1-Pad28)">
+      <node ref="U1" pin="28"/>
+    </net>
+    <net code="43" name="Net-(U1-Pad27)">
+      <node ref="U1" pin="27"/>
+    </net>
+    <net code="44" name="Net-(U1-Pad26)">
+      <node ref="U1" pin="26"/>
+    </net>
+    <net code="45" name="Net-(U1-Pad25)">
+      <node ref="U1" pin="25"/>
+    </net>
+    <net code="46" name="Net-(U1-Pad24)">
+      <node ref="U1" pin="24"/>
+    </net>
+    <net code="47" name="Net-(U1-Pad23)">
+      <node ref="U1" pin="23"/>
+    </net>
+    <net code="48" name="Net-(U1-Pad22)">
+      <node ref="U1" pin="22"/>
+    </net>
+    <net code="49" name="Net-(U1-Pad21)">
+      <node ref="U1" pin="21"/>
+    </net>
+    <net code="50" name="Net-(U1-Pad20)">
+      <node ref="U1" pin="20"/>
+    </net>
+    <net code="51" name="Net-(U1-Pad30)">
+      <node ref="U1" pin="30"/>
+    </net>
+    <net code="52" name="Net-(U1-Pad19)">
+      <node ref="U1" pin="19"/>
+    </net>
+    <net code="53" name="Net-(U1-Pad18)">
+      <node ref="U1" pin="18"/>
+    </net>
+    <net code="54" name="Net-(U1-Pad17)">
+      <node ref="U1" pin="17"/>
+    </net>
+    <net code="55" name="Net-(U1-Pad16)">
+      <node ref="U1" pin="16"/>
+    </net>
+    <net code="56" name="Net-(U1-Pad15)">
+      <node ref="U1" pin="15"/>
+    </net>
+    <net code="57" name="Net-(U1-Pad14)">
+      <node ref="U1" pin="14"/>
+    </net>
+    <net code="58" name="Net-(U1-Pad13)">
+      <node ref="U1" pin="13"/>
+    </net>
+    <net code="59" name="Net-(U1-Pad12)">
+      <node ref="U1" pin="12"/>
+    </net>
+    <net code="60" name="Net-(U1-Pad11)">
+      <node ref="U1" pin="11"/>
+    </net>
+    <net code="61" name="Net-(U1-Pad10)">
+      <node ref="U1" pin="10"/>
+    </net>
+    <net code="62" name="Net-(U1-Pad40)">
+      <node ref="U1" pin="40"/>
+    </net>
+    <net code="63" name="Net-(U1-Pad6)">
+      <node ref="U1" pin="6"/>
+    </net>
+    <net code="64" name="Net-(U1-Pad5)">
+      <node ref="U1" pin="5"/>
+    </net>
+    <net code="65" name="Net-(U1-Pad48)">
+      <node ref="U1" pin="48"/>
+    </net>
+    <net code="66" name="Net-(U1-Pad47)">
+      <node ref="U1" pin="47"/>
+    </net>
+    <net code="67" name="Net-(U1-Pad46)">
+      <node ref="U1" pin="46"/>
+    </net>
+    <net code="68" name="Net-(U1-Pad45)">
+      <node ref="U1" pin="45"/>
+    </net>
+    <net code="69" name="Net-(U1-Pad44)">
+      <node ref="U1" pin="44"/>
+    </net>
+    <net code="70" name="Net-(U1-Pad43)">
+      <node ref="U1" pin="43"/>
+    </net>
+    <net code="71" name="Net-(U1-Pad42)">
+      <node ref="U1" pin="42"/>
+    </net>
+    <net code="72" name="Net-(U1-Pad41)">
+      <node ref="U1" pin="41"/>
+    </net>
+    <net code="73" name="Net-(U1-Pad1)">
+      <node ref="U1" pin="1"/>
+    </net>
+    <net code="74" name="Net-(U1-Pad4)">
+      <node ref="U1" pin="4"/>
+    </net>
+    <net code="75" name="Net-(U1-Pad39)">
+      <node ref="U1" pin="39"/>
+    </net>
+    <net code="76" name="Net-(U1-Pad38)">
+      <node ref="U1" pin="38"/>
+    </net>
+    <net code="77" name="Net-(U1-Pad37)">
+      <node ref="U1" pin="37"/>
+    </net>
+    <net code="78" name="Net-(U1-Pad36)">
+      <node ref="U1" pin="36"/>
+    </net>
+    <net code="79" name="Net-(U1-Pad35)">
+      <node ref="U1" pin="35"/>
+    </net>
+    <net code="80" name="Net-(U1-Pad34)">
+      <node ref="U1" pin="34"/>
+    </net>
+    <net code="81" name="Net-(U1-Pad33)">
+      <node ref="U1" pin="33"/>
+    </net>
+    <net code="82" name="Net-(U1-Pad32)">
+      <node ref="U1" pin="32"/>
+    </net>
+    <net code="83" name="Net-(U1-Pad31)">
+      <node ref="U1" pin="31"/>
+    </net>
+  </nets>
+</export>

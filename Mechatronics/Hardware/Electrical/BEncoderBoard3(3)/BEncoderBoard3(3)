@@ -1,9 +1,0 @@
-Reference, Value, Footprint, Datasheet
-"IC1","RN4871U","Encoder:RN4871U",""
-"C1","1uF","Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder","~"
-"J1","Conn_01x04_Male","Encoder:SolderWirePad_1x04_SMD_5x10mm_copy","~"
-"C2","10uF","Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder","~"
-"AE1","Antenna","Encoder:Antenna",""
-"L1","L_Rf","Encoder:L_0402_1005Metric","~"
-"C3","C_Rf","Encoder:C_0402_1005Metric","~"
-"C4","C_Rf","Encoder:C_0402_1005Metric","~"

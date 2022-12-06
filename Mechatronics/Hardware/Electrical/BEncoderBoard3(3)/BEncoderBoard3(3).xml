@@ -1,103 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="D">
   <design>
-    <source>D:\pauld\Programming\NN54\Mechatronics\Hardware\Electrical\BEncoderBoard3(RN4871u)\BEncoderBoard3(RN4871u).sch</source>
-    <date>4/14/2021 1:36:23 PM</date>
+    <source>D:\pauld\Programming\NN54\Mechatronics\Hardware\Electrical\BEncoderBoard3(3)\BEncoderBoard3(3).sch</source>
+    <date>9/2/2022 4:20:58 PM</date>
     <tool>Eeschema (5.1.6)-1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
-        <title/>
-        <company/>
-        <rev/>
-        <date/>
-        <source>BEncoderBoard3(RN4871u).sch</source>
-        <comment number="1" value=""/>
-        <comment number="2" value=""/>
+        <title>Encoder MCU</title>
+        <company>S.D.T.</company>
+        <rev>v1</rev>
+        <date>2020-06-30</date>
+        <source>BEncoderBoard3(3).sch</source>
+        <comment number="1" value="Author:Paul Max Avalos Aguilar"/>
+        <comment number="2" value="SingleBoardEncoder2"/>
         <comment number="3" value=""/>
         <comment number="4" value=""/>
       </title_block>
     </sheet>
   </design>
   <components>
-    <comp ref="IC1">
-      <value>RN4871U</value>
-      <footprint>Encoder:RN4871U</footprint>
-      <libsource lib="Encoder" part="RN4871U" description=""/>
+    <comp ref="U9">
+      <value>LSM6DSRX</value>
+      <footprint>Encoder:LSM6DSRX</footprint>
+      <libsource lib="Encoder" part="LSM6DSRX" description=""/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamp>6052DDB9</tstamp>
-    </comp>
-    <comp ref="C1">
-      <value>1uF</value>
-      <footprint>Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
-      <datasheet>~</datasheet>
-      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
-      <sheetpath names="/" tstamps="/"/>
-      <tstamp>60531985</tstamp>
+      <tstamp>6070E109</tstamp>
     </comp>
     <comp ref="J1">
-      <value>Conn_01x04_Male</value>
-      <footprint>Encoder:SolderWirePad_1x04_SMD_5x10mm_copy</footprint>
+      <value>Conn_01x06_Male</value>
+      <footprint>Encoder:SolderWirePad_1x06_SMD_5x10mm</footprint>
       <datasheet>~</datasheet>
-      <libsource lib="Connector" part="Conn_01x04_Male" description="Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <libsource lib="Connector" part="Conn_01x06_Male" description="Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamp>6053225A</tstamp>
+      <tstamp>60714845</tstamp>
     </comp>
-    <comp ref="C2">
-      <value>10uF</value>
+    <comp ref="C12">
+      <value>100nF</value>
       <footprint>Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
       <datasheet>~</datasheet>
       <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamp>60536CD2</tstamp>
+      <tstamp>60719ECD</tstamp>
     </comp>
-    <comp ref="AE1">
-      <value>Antenna</value>
-      <footprint>Encoder:Antenna</footprint>
-      <libsource lib="Encoder" part="Antenna" description=""/>
-      <sheetpath names="/" tstamps="/"/>
-      <tstamp>6055D6C9</tstamp>
-    </comp>
-    <comp ref="L1">
-      <value>L_Rf</value>
-      <footprint>Encoder:L_0402_1005Metric</footprint>
-      <datasheet>~</datasheet>
-      <libsource lib="Device" part="L_Small" description="Inductor, small symbol"/>
-      <sheetpath names="/" tstamps="/"/>
-      <tstamp>6057FAB6</tstamp>
-    </comp>
-    <comp ref="C3">
-      <value>C_Rf</value>
-      <footprint>Encoder:C_0402_1005Metric</footprint>
+    <comp ref="C13">
+      <value>100nF</value>
+      <footprint>Encoder:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder</footprint>
       <datasheet>~</datasheet>
       <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamp>605849D6</tstamp>
-    </comp>
-    <comp ref="C4">
-      <value>C_Rf</value>
-      <footprint>Encoder:C_0402_1005Metric</footprint>
-      <datasheet>~</datasheet>
-      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
-      <sheetpath names="/" tstamps="/"/>
-      <tstamp>60585519</tstamp>
+      <tstamp>6071AD5B</tstamp>
     </comp>
   </components>
   <libparts>
-    <libpart lib="Connector" part="Conn_01x04_Male">
-      <description>Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+    <libpart lib="Connector" part="Conn_01x06_Male">
+      <description>Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
       <docs>~</docs>
       <footprints>
         <fp>Connector*:*_1x??_*</fp>
       </footprints>
       <fields>
         <field name="Reference">J</field>
-        <field name="Value">Conn_01x04_Male</field>
+        <field name="Value">Conn_01x06_Male</field>
       </fields>
       <pins>
         <pin num="1" name="Pin_1" type="passive"/>
         <pin num="2" name="Pin_2" type="passive"/>
         <pin num="3" name="Pin_3" type="passive"/>
         <pin num="4" name="Pin_4" type="passive"/>
+        <pin num="5" name="Pin_5" type="passive"/>
+        <pin num="6" name="Pin_6" type="passive"/>
       </pins>
     </libpart>
     <libpart lib="Device" part="C">
@@ -115,58 +86,26 @@
         <pin num="2" name="~" type="passive"/>
       </pins>
     </libpart>
-    <libpart lib="Device" part="L_Small">
-      <description>Inductor, small symbol</description>
-      <docs>~</docs>
-      <footprints>
-        <fp>Choke_*</fp>
-        <fp>*Coil*</fp>
-        <fp>Inductor_*</fp>
-        <fp>L_*</fp>
-      </footprints>
+    <libpart lib="Encoder" part="LSM6DSRX">
       <fields>
-        <field name="Reference">L</field>
-        <field name="Value">L_Small</field>
+        <field name="Reference">U</field>
+        <field name="Value">LSM6DSRX</field>
       </fields>
       <pins>
-        <pin num="1" name="~" type="passive"/>
-        <pin num="2" name="~" type="passive"/>
-      </pins>
-    </libpart>
-    <libpart lib="Encoder" part="Antenna">
-      <fields>
-        <field name="Reference">AE</field>
-        <field name="Value">Antenna</field>
-      </fields>
-      <pins>
-        <pin num="1" name="F" type="input"/>
-        <pin num="2" name="GND" type="input"/>
-      </pins>
-    </libpart>
-    <libpart lib="Encoder" part="RN4871U">
-      <fields>
-        <field name="Reference">IC</field>
-        <field name="Value">RN4871U</field>
-      </fields>
-      <pins>
-        <pin num="1" name="BT_RF" type="passive"/>
-        <pin num="2" name="P1_2" type="passive"/>
-        <pin num="3" name="P1_3" type="passive"/>
-        <pin num="4" name="UART_TX" type="passive"/>
-        <pin num="5" name="UART_RX" type="passive"/>
-        <pin num="6" name="P3_6" type="passive"/>
-        <pin num="7" name="RST_N" type="passive"/>
-        <pin num="8" name="P0_0" type="passive"/>
-        <pin num="9" name="P0_2" type="passive"/>
-        <pin num="10" name="BK_IN" type="passive"/>
-        <pin num="11" name="VBAT" type="passive"/>
-        <pin num="12" name="GND_1" type="passive"/>
-        <pin num="13" name="P1_6" type="passive"/>
-        <pin num="14" name="P1_7" type="passive"/>
-        <pin num="15" name="P2_7" type="passive"/>
-        <pin num="16" name="MODE" type="passive"/>
-        <pin num="17" name="NC" type="NotConnected"/>
-        <pin num="18" name="GND_2" type="passive"/>
+        <pin num="1" name="SDO/SAO" type="input"/>
+        <pin num="2" name="SDx" type="input"/>
+        <pin num="3" name="SCx" type="input"/>
+        <pin num="4" name="INT1" type="input"/>
+        <pin num="5" name="Vdd_IO" type="input"/>
+        <pin num="6" name="GND" type="input"/>
+        <pin num="7" name="GND" type="input"/>
+        <pin num="8" name="Vdd" type="input"/>
+        <pin num="9" name="INT2" type="input"/>
+        <pin num="10" name="OCS_Aux" type="input"/>
+        <pin num="11" name="SDO_Aux" type="input"/>
+        <pin num="12" name="CS" type="input"/>
+        <pin num="13" name="SCL" type="input"/>
+        <pin num="14" name="SDA" type="input"/>
       </pins>
     </libpart>
   </libparts>
@@ -178,75 +117,53 @@
       <uri>D:\Program_Files\KiCad\share\kicad\library/Device.lib</uri>
     </library>
     <library logical="Encoder">
-      <uri>D:\pauld\Programming\NN54\Mechatronics\Hardware\Electrical\BEncoderBoard3(RN4871u)/../Library/Encoder.lib</uri>
+      <uri>D:\pauld\Programming\NN54\Mechatronics\Hardware\Electrical\BEncoderBoard3(3)/../Library/Encoder.lib</uri>
     </library>
   </libraries>
   <nets>
-    <net code="1" name="Net-(IC1-Pad13)">
-      <node ref="IC1" pin="13"/>
-    </net>
-    <net code="2" name="GND">
-      <node ref="C4" pin="2"/>
-      <node ref="C3" pin="2"/>
-      <node ref="AE1" pin="2"/>
-      <node ref="C1" pin="2"/>
-      <node ref="IC1" pin="18"/>
-      <node ref="IC1" pin="12"/>
-      <node ref="C2" pin="2"/>
-      <node ref="J1" pin="1"/>
-    </net>
-    <net code="3" name="Net-(IC1-Pad2)">
-      <node ref="IC1" pin="2"/>
-    </net>
-    <net code="4" name="Net-(IC1-Pad3)">
-      <node ref="IC1" pin="3"/>
-    </net>
-    <net code="5" name="Net-(IC1-Pad14)">
-      <node ref="IC1" pin="14"/>
-    </net>
-    <net code="6" name="Net-(IC1-Pad15)">
-      <node ref="IC1" pin="15"/>
-    </net>
-    <net code="7" name="Net-(IC1-Pad6)">
-      <node ref="IC1" pin="6"/>
-    </net>
-    <net code="8" name="Net-(IC1-Pad8)">
-      <node ref="IC1" pin="8"/>
-    </net>
-    <net code="9" name="Net-(IC1-Pad9)">
-      <node ref="IC1" pin="9"/>
-    </net>
-    <net code="10" name="Net-(IC1-Pad10)">
-      <node ref="IC1" pin="10"/>
-    </net>
-    <net code="11" name="+3V3">
-      <node ref="IC1" pin="16"/>
-      <node ref="C2" pin="1"/>
-      <node ref="IC1" pin="11"/>
-      <node ref="IC1" pin="7"/>
-      <node ref="C1" pin="1"/>
-      <node ref="J1" pin="4"/>
-    </net>
-    <net code="12" name="Net-(C3-Pad1)">
-      <node ref="IC1" pin="1"/>
-      <node ref="C3" pin="1"/>
-      <node ref="L1" pin="1"/>
-    </net>
-    <net code="13" name="Net-(AE1-Pad1)">
-      <node ref="C4" pin="1"/>
-      <node ref="AE1" pin="1"/>
-      <node ref="L1" pin="2"/>
-    </net>
-    <net code="14" name="Net-(IC1-Pad17)">
-      <node ref="IC1" pin="17"/>
-    </net>
-    <net code="15" name="Net-(IC1-Pad5)">
-      <node ref="J1" pin="3"/>
-      <node ref="IC1" pin="5"/>
-    </net>
-    <net code="16" name="Net-(IC1-Pad4)">
+    <net code="1" name="/SCL">
       <node ref="J1" pin="2"/>
-      <node ref="IC1" pin="4"/>
+      <node ref="U9" pin="13"/>
+    </net>
+    <net code="2" name="+3V3">
+      <node ref="C13" pin="2"/>
+      <node ref="C12" pin="2"/>
+      <node ref="U9" pin="8"/>
+      <node ref="U9" pin="5"/>
+      <node ref="J1" pin="6"/>
+    </net>
+    <net code="3" name="/SDO">
+      <node ref="J1" pin="4"/>
+      <node ref="U9" pin="1"/>
+    </net>
+    <net code="4" name="/SDA">
+      <node ref="U9" pin="14"/>
+      <node ref="J1" pin="3"/>
+    </net>
+    <net code="5" name="GND">
+      <node ref="J1" pin="5"/>
+      <node ref="U9" pin="7"/>
+      <node ref="U9" pin="3"/>
+      <node ref="U9" pin="2"/>
+      <node ref="C13" pin="1"/>
+      <node ref="C12" pin="1"/>
+      <node ref="U9" pin="6"/>
+    </net>
+    <net code="6" name="Net-(U9-Pad9)">
+      <node ref="U9" pin="9"/>
+    </net>
+    <net code="7" name="Net-(U9-Pad4)">
+      <node ref="U9" pin="4"/>
+    </net>
+    <net code="8" name="Net-(U9-Pad11)">
+      <node ref="U9" pin="11"/>
+    </net>
+    <net code="9" name="Net-(U9-Pad10)">
+      <node ref="U9" pin="10"/>
+    </net>
+    <net code="10" name="/CS">
+      <node ref="J1" pin="1"/>
+      <node ref="U9" pin="12"/>
     </net>
   </nets>
 </export>

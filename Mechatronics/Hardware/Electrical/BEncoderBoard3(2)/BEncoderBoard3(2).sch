@@ -14,7 +14,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L SensorsBoard-rescue:ITR1802-Encoder Q3
+L Encoder:ITR8102 Q3
 U 1 1 5C59CA18
 P 5900 4500
 F 0 "Q3" H 5900 4825 50  0000 C CNN
@@ -77,7 +77,7 @@ Wire Wire Line
 Wire Wire Line
 	5350 4400 5600 4400
 $Comp
-L SensorsBoard-rescue:ITR1802-Encoder Q4
+L Encoder:ITR8102 Q4
 U 1 1 6081B0B0
 P 5900 5250
 F 0 "Q4" H 5900 5575 50  0000 C CNN
